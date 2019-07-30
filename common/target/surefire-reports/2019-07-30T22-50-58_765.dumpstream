@@ -1,0 +1,9 @@
+# Created at 2019-07-30T22:50:59.342
+log4j:WARN No appenders could be found for logger (io.kotlintest.runner.junit5.KotlinTestEngine).
+
+# Created at 2019-07-30T22:50:59.343
+log4j:WARN Please initialize the log4j system properly.
+
+# Created at 2019-07-30T22:50:59.343
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+

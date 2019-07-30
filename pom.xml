@@ -1,9 +1,178 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>itasserui</groupId>
-  <artifactId>itasserui</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <name>itasserui</name>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>itasserui</groupId>
+    <artifactId>itasserui</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>common</module>
+    </modules>
+
+    <name>ITASSER Gui Framework</name>
+
+    <description>
+        GUI and backing library system for streamlining the
+        use of the ITASSER utility.
+    </description>
+
+    <properties>
+        <jversion>1.8</jversion>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.target>${jversion}</maven.compiler.target>
+        <maven.compiler.source>${jversion}</maven.compiler.source>
+        <kotlin.compiler.jvmTarget>${jversion}</kotlin.compiler.jvmTarget>
+        <kotlin.compiler.jvmSource>${jversion}</kotlin.compiler.jvmSource>
+        <kotlin.code.style>official</kotlin.code.style>
+
+        <!-- Dependency versions -->
+        <kotlin.version>1.3.41</kotlin.version>
+        <tornadofx.version>1.7.19</tornadofx.version>
+        <nitrite.version>3.2.0</nitrite.version>
+        <lk-observable.version>0.2.2</lk-observable.version>
+        <arrow-core.version>0.8.1</arrow-core.version>
+        <kotlintest-runner-junit5.version>3.3.2</kotlintest-runner-junit5.version>
+
+        <!-- Property Flags -->
+        <skipITs>false</skipITs>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Kotlin -->
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-stdlib</artifactId>
+                <version>${kotlin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-reflect</artifactId>
+                <version>${kotlin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-stdlib-jdk8</artifactId>
+                <version>${kotlin.version}</version>
+            </dependency>
+
+            <!-- Functional Libraries -->
+            <dependency>
+                <groupId>io.arrow-kt</groupId>
+                <artifactId>arrow-core</artifactId>
+                <version>${arrow-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.arrow-kt</groupId>
+                <artifactId>arrow-data</artifactId>
+                <version>${arrow-core.version}</version>
+            </dependency>
+
+            <!-- Observables and Reactive -->
+            <dependency>
+                <groupId>com.lightningkite.kotlin</groupId>
+                <artifactId>lk-kotlin-observable-property</artifactId>
+                <version>${lk-observable.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lightningkite.kotlin</groupId>
+                <artifactId>lk-kotlin-observable-list</artifactId>
+                <version>${lk-observable.version}</version>
+            </dependency>
+
+            <!-- Junit 5 -->
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-launcher</artifactId>
+                <version>1.5.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-engine</artifactId>
+                <version>1.5.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>5.5.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.kotlintest</groupId>
+                <artifactId>kotlintest-runner-junit5</artifactId>
+                <version>3.3.2</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <build>
+        <sourceDirectory>src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.22.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                    <artifactId>kotlin-maven-plugin</artifactId>
+                    <version>${kotlin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>compile</id>
+                            <phase>compile</phase>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>test-compile</id>
+                            <phase>test-compile</phase>
+                            <goals>
+                                <goal>test-compile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <repositories>
+        <repository>
+            <id>maven-central</id>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <id>spek-dev</id>
+            <url>https://dl.bintray.com/spekframework/spek-dev</url>
+        </repository>
+        <repository>
+            <id>jcenter</id>
+            <url>https://jcenter.bintray.com/</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>bintray-kotlin-kotlinx</id>
+            <name>bintray</name>
+            <url>https://kotlin.bintray.com/kotlinx</url>
+        </repository>
+    </repositories>
 </project>
