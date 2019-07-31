@@ -107,7 +107,6 @@
             <version>${commons-validator.version}</version>
         </dependency>
 
-
         <!-- Serialization -->
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
