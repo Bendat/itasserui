@@ -1,6 +1,6 @@
 @file:Suppress("unused")
 
-package itasserui.lib.fasta
+package itasserui.lib.fasta.description
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import itasserui.common.utils.AbstractSealedObject

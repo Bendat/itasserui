@@ -1,6 +1,6 @@
 @file:Suppress("MemberVisibilityCanBePrivate", "unused")
 
-package itasserui.lib.fasta
+package itasserui.lib.fasta.description
 
 import itasserui.common.utils.AbstractSealedObject
 import kotlin.reflect.full.primaryConstructor
@@ -29,8 +29,7 @@ sealed class NCBIIdentifierRule(val items: Int) : AbstractSealedObject() {
     object TR : NCBIIdentifierRule(2)
 
     fun identifierClass() =
-        NCBIIdentifier
-            .types
+        NCBIIdentifier.types
             .first { it.simpleName == simpleName }
 
 
