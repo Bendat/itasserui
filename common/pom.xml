@@ -13,7 +13,9 @@
     <artifactId>common</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+
     <name>Common Utilities Library</name>
+
     <description>
         Provides general, common utilities to be shared throughout the
         application.
@@ -24,7 +26,6 @@
         <jackson-module-kotlin.version>2.9.9</jackson-module-kotlin.version>
         <commons-validator.version>1.5.1</commons-validator.version>
         <javafaker.version>0.18</javafaker.version>
-        <directory-watcher.version>0.9.5</directory-watcher.version>
         <joda-time.version>2.10.1</joda-time.version>
         <jackson.version>2.9.4</jackson.version>
         <jbcrypt.version>0.4</jbcrypt.version>

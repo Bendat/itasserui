@@ -9,6 +9,7 @@
     <modules>
         <module>common</module>
         <module>test_utils</module>
+        <module>lib</module>
     </modules>
 
     <name>ITASSER Gui Framework</name>
@@ -34,6 +35,7 @@
         <lk-observable.version>0.2.2</lk-observable.version>
         <arrow-core.version>0.8.1</arrow-core.version>
         <kotlintest-runner-junit5.version>3.3.2</kotlintest-runner-junit5.version>
+        <directory-watcher.version>0.9.5</directory-watcher.version>
 
         <!-- Property Flags -->
         <skipITs>false</skipITs>
