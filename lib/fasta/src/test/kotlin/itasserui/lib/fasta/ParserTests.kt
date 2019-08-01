@@ -517,4 +517,4 @@ class ParserTests : DescribeSpec({
             }
         }
     }
-}) 
+})
