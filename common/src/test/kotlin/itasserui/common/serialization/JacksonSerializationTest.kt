@@ -1,18 +1,14 @@
 package itasserui.common.serialization
 
-import com.fasterxml.jackson.annotation.JsonValue
 import io.kotlintest.matchers.string.haveSameLengthAs
 import io.kotlintest.should
 import io.kotlintest.specs.DescribeSpec
-import itasserui.common.logger.Logger
 
-class JacksonSerializationTest: DescribeSpec({
+class JacksonSerializationTest : DescribeSpec({
     describe("Inline serialization") {
         lateinit var serializedForm: String
         it("Serializes the ${InlineTest::class.java.simpleName} class") {
-            serializedForm = Serializer.Jackson.toJson(
-                InlineTest("test")
-            )
+            serializedForm = Serializer.Jackson.toJson(InlineTest("test"))
         }
         lateinit var objectForm: InlineTest
         it("Deserializes the generated string") {
