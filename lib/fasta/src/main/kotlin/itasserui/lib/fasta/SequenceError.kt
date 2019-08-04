@@ -1,6 +1,7 @@
-package itasserui.common.errors
+package itasserui.lib.fasta
 
 import arrow.core.Either
+import itasserui.common.errors.RuntimeError
 import java.nio.file.Path
 
 typealias SequenceResult<T> = Either<SequenceError, T>

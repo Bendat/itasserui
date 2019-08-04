@@ -31,7 +31,6 @@ class DescriptionParserTest : DescribeSpec({
 
                 it("Should construct an object instance for each") {
                     val params = rule.items.map { Fake.ancient().primordial() }.toTypedArray()
-                    println(rule.identifierInstance(*  params)?.raw)
                 }
             }
         }

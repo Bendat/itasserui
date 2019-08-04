@@ -14,7 +14,12 @@
     <packaging>jar</packaging>
 
     <name>Test Utilities</name>
-
+    <properties>
+        <commons-validator.version>1.5.1</commons-validator.version>
+        <jbcrypt.version>0.4</jbcrypt.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <commons-lang3.version>3.9</commons-lang3.version>
+    </properties>
     <dependencies>
         <!-- Kotlin -->
         <dependency>
@@ -53,7 +58,22 @@
             <artifactId>jsonassert</artifactId>
             <version>1.5.0</version>
         </dependency>
-
+        <!-- Apache -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>${commons-validator.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

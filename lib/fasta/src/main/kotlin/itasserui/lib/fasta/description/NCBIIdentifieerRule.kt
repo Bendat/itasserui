@@ -29,14 +29,14 @@ sealed class NCBIIdentifierRule(val items: Int) : AbstractSealedObject() {
     object TR : NCBIIdentifierRule(2)
 
     fun identifierClass() =
-        NCBIIdentifier.types
+        NCBIIdentifier
+            .types
             .first { it.simpleName == simpleName }
 
-
     fun identifierInstance(vararg params: String) =
-        identifierClass().primaryConstructor
+        identifierClass()
+            .primaryConstructor
             ?.call(*params)
-
 
     companion object {
         val types

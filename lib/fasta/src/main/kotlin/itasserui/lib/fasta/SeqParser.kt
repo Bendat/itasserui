@@ -3,7 +3,6 @@
 package itasserui.lib.fasta
 
 import arrow.core.*
-import itasserui.common.errors.*
 import itasserui.common.extensions.isFalse
 import itasserui.common.extensions.remove
 import itasserui.common.logger.Logger

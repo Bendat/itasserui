@@ -7,39 +7,7 @@ import itasserui.common.utils.AbstractSealedObject
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
 
-
 sealed class NCBIIdentifier : AbstractSealedObject() {
-    override val simpleName: String
-        get() = super.simpleName.toLowerCase()
-
-    @get:JsonIgnore
-    val rawFormat
-        get() = this::class.memberProperties.map { it.name }.let {
-            it.toMutableList().also { ls ->
-                ls.add(0, simpleName)
-                ls.removeAll(listOf("rawFormat", "simpleName", "raw"))
-            }
-        }.joinToString("|")
-
-    @Suppress("UNCHECKED_CAST")
-    val raw
-        get() = this::class
-            .memberProperties
-            .filter {
-                when (it.name) {
-                    "rawFormat", "simpleName", "raw" -> false
-                    else -> true
-                }
-            }.map {
-                it as KProperty1<Any, *>
-            }.map {
-                it.invoke(this)
-            }.let {
-                it.toMutableList().also { ls ->
-                    ls.add(0, simpleName)
-                }
-            }.joinToString("|")
-
     data class GI(val reference: String) : NCBIIdentifier()
     data class LCL(val reference: String) : NCBIIdentifier()
     data class BBS(val reference: String) : NCBIIdentifier()
@@ -78,6 +46,37 @@ sealed class NCBIIdentifier : AbstractSealedObject() {
     override fun toString(): String {
         return super.toString().toLowerCase()
     }
+
+    override val simpleName: String
+        get() = super.simpleName.toLowerCase()
+
+    @get:JsonIgnore
+    val rawFormat
+        get() = this::class.memberProperties.map { it.name }.let {
+            it.toMutableList().also { ls ->
+                ls.add(0, simpleName)
+                ls.removeAll(listOf("rawFormat", "simpleName", "raw"))
+            }
+        }.joinToString("|")
+
+    @Suppress("UNCHECKED_CAST")
+    val raw
+        get() = this::class
+            .memberProperties
+            .filter {
+                when (it.name) {
+                    "rawFormat", "simpleName", "raw" -> false
+                    else -> true
+                }
+            }.map {
+                it as KProperty1<Any, *>
+            }.map {
+                it.invoke(this)
+            }.let {
+                it.toMutableList().also { ls ->
+                    ls.add(0, simpleName)
+                }
+            }.joinToString("|")
 
     companion object {
         val types

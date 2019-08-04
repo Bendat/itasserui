@@ -3,6 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <modules>
         <module>fasta</module>
+        <module>filemanager</module>
     </modules>
 
     <parent>
@@ -10,7 +11,7 @@
         <artifactId>itasserui</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
+    <groupId>itasserui.lib</groupId>
     <artifactId>lib</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>

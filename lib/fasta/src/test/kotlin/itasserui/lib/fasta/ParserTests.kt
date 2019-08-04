@@ -8,16 +8,14 @@ import io.kotlintest.be
 import io.kotlintest.matchers.beInstanceOf
 import io.kotlintest.should
 import io.kotlintest.specs.DescribeSpec
-import itasserui.common.errors.*
 import itasserui.common.extensions.remove
 import itasserui.common.utils.uuid
 import java.nio.file.Paths
-
 class ParserTests : DescribeSpec({
     describe("Functions") {
-        describe("Get Description Indices") {
-            describe("Single Sequence fastas") {
-                describe("Determine description index of short fasta") {
+        context("Get Description Indices") {
+            context("Single Sequence fastas") {
+                context("Determine description index of short fasta") {
                     val fasta = listOf(
                         ">description 1",
                         "AABBCC"
@@ -34,8 +32,8 @@ class ParserTests : DescribeSpec({
                     }
                 }
             }
-            describe("Multi Sequence fastas") {
-                describe("Determine description index of longer fasta") {
+            context("Multi Sequence fastas") {
+                context("Determine description index of longer fasta") {
                     val fasta = listOf(
                         ">description 1",
                         "AABBCC",
@@ -56,7 +54,7 @@ class ParserTests : DescribeSpec({
                         index[1] should be(2)
                     }
                 }
-                describe("Determine description index of longer fasta with a missing body") {
+                context("Determine description index of longer fasta with a missing body") {
                     val fasta = listOf(
                         ">description 1",
                         "AABBCC",
@@ -78,8 +76,8 @@ class ParserTests : DescribeSpec({
                 }
             }
         }
-        describe("Map Character Validity") {
-            describe("Should validate with no bad characters") {
+        context("Map Character Validity") {
+            context("Should validate with no bad characters") {
                 val sequent = "AAGGCC"
                 lateinit var badchars: Option<BadChar>
                 it("Should parse the sequence") {
@@ -87,11 +85,11 @@ class ParserTests : DescribeSpec({
                 }
 
                 it("Should verify bad chars is $None") {
-                    badchars should be(None)
+                    badchars should be<Option<BadChar>>(None)
                 }
             }
 
-            describe("Should validate with bad characters") {
+            context("Should validate with bad characters") {
                 val sequent = "]AAG,GC{C-G*l"
                 val expected = hashSetOf('l', ',', '{', ']', 'l')
                 lateinit var badcharsOpt: Option<BadChar>
@@ -119,8 +117,8 @@ class ParserTests : DescribeSpec({
 
 
         }
-        describe("Determine Sequence Type") {
-            describe("An Invalid Sequence") {
+        context("Determine Sequence Type") {
+            context("An Invalid Sequence") {
                 val sequence = arrayListOf("GGC[")
                 lateinit var sequenceString: String
                 lateinit var sequenceResult: Sequence
@@ -140,7 +138,7 @@ class ParserTests : DescribeSpec({
                     sequenceResult.body should beInstanceOf<SequenceChain.InvalidSequenceChain>()
                 }
             }
-            describe("A valid Sequence") {
+            context("A valid Sequence") {
                 val sequence = arrayListOf("GGCG")
                 lateinit var sequenceString: String
                 lateinit var sequenceResult: Sequence
@@ -160,7 +158,7 @@ class ParserTests : DescribeSpec({
                     sequenceResult.body should beInstanceOf<SequenceChain.ValidSequenceChain>()
                 }
             }
-            describe("An Empty Sequence") {
+            context("An Empty Sequence") {
                 val sequence = arrayListOf("")
                 lateinit var sequenceString: String
                 lateinit var sequenceResult: Sequence
@@ -182,27 +180,13 @@ class ParserTests : DescribeSpec({
             }
         }
 
-        describe("Between") {
-            describe("between") {
-                val fasta = listOf(
-                    ">1",
-                    "A",
-                    ">2",
-                    "B"
-                )
-                it("Tests between") {
-                    val res = fasta.joinToString("\n").split(">")
-                    print(res)
-                }
-            }
-        }
-        describe("Map Descriptions to bodies") {
-            describe("Single fasta") {
+
+        context("Map Descriptions to bodies") {
+            context("Single fasta") {
                 val fasta = ">title 1\nAAGGCC"
                 lateinit var sequences: List<Sequence>
                 it("Should parse the fasta") {
                     sequences = SeqParser.mapDescriptionToBodies(fasta, Paths.get(fasta)).toList()
-                    print(sequences)
                 }
 
                 it("Should verify the size of the result") {
@@ -221,12 +205,11 @@ class ParserTests : DescribeSpec({
                     sequences[0].body.chain should be("AAGGCC")
                 }
             }
-            describe("Longer Single fasta") {
+            context("Longer Single fasta") {
                 val fasta = ">title 1\nAAGGCC\nBCGA"
                 lateinit var sequences: List<Sequence>
                 it("Should parse the fasta") {
                     sequences = SeqParser.mapDescriptionToBodies(fasta, null).toList()
-                    print(sequences)
                 }
 
                 it("Should verify the size of the result") {
@@ -246,7 +229,7 @@ class ParserTests : DescribeSpec({
                 }
             }
 
-            describe("Double fasta") {
+            context("Double fasta") {
                 val fasta = ">title 1\nAAGGCC\n>2\nBBGGCC"
                 lateinit var sequences: List<Sequence>
                 it("Should parse the fasta") {
@@ -269,17 +252,16 @@ class ParserTests : DescribeSpec({
                     sequences[1].description.value should be("2")
                 }
 
-                it("Should verify the sequence body") {
+                it("Should verify the second sequence body") {
                     sequences[1].body.chain should be("BBGGCC")
                 }
             }
 
-            describe("Longer Double fasta") {
+            context("Longer Double fasta") {
                 val fasta = ">title 1\nAAGGCC\nGGGEEE\n>2\nBBGGCCG\nGGHHH"
                 lateinit var sequences: List<Sequence>
                 it("Should parse the fasta") {
                     sequences = SeqParser.mapDescriptionToBodies(fasta, Paths.get(fasta)).toList()
-                    print(sequences)
                 }
 
                 it("Should verify the size of the result") {
@@ -298,16 +280,16 @@ class ParserTests : DescribeSpec({
                     sequences[0].body.chain should be("AAGGCCGGGEEE")
                 }
 
-                it("Should verify the sequence description") {
+                it("Should verify the second sequence description") {
                     sequences[1].description.value should be("2")
                 }
 
-                it("Should verify the sequence body") {
+                it("Should verify the second sequence body") {
                     sequences[1].body.chain should be("BBGGCCGGGHHH")
                 }
             }
 
-            describe("Empty fasta") {
+            context("Empty fasta") {
                 val fasta = ""
                 lateinit var sequences: List<Sequence>
                 it("Should parse the fasta") {
@@ -322,8 +304,8 @@ class ParserTests : DescribeSpec({
     }
 
     describe("Single Sequence Fasta File Tests") {
-        describe("Bad IO tests") {
-            describe("Empty file") {
+        context("Bad IO tests") {
+            context("Empty file") {
                 val file = empty
                 lateinit var parsed: Either<SequenceError, SeqFile>
 
@@ -342,7 +324,7 @@ class ParserTests : DescribeSpec({
                 }
             }
 
-            describe("Null file") {
+            context("Null file") {
                 val file = nullStart
                 lateinit var parsed: Either<SequenceError, SeqFile>
 
@@ -357,11 +339,11 @@ class ParserTests : DescribeSpec({
                 it("Should verify parsing resulted is EmptyFile") {
                     val left = parsed
                     left as Either.Left
-                    left.a should beInstanceOf<EmptyFile>()
+                    left.a should beInstanceOf<NoSuchFile>()
                 }
             }
 
-            describe("Sequence with no starting description") {
+            context("Sequence with no starting description") {
                 val file = missingDescriptionpPart
                 lateinit var parsed: Either<SequenceError, SeqFile>
 
@@ -380,7 +362,7 @@ class ParserTests : DescribeSpec({
                 }
             }
 
-            describe("Bad file") {
+            context("Bad file") {
                 val file = Paths.get("/nowhere$uuid")
                 lateinit var parse: Either<SequenceError, SeqFile>
                 it("Should parse the imaginary file [$file]") {
@@ -399,8 +381,8 @@ class ParserTests : DescribeSpec({
 
             }
         }
-        describe("Valid parse with syntax errors") {
-            describe("Description with no sequence body") {
+        context("Valid parse with syntax errors") {
+            context("Description with no sequence body") {
                 val file = missingSequencePart
                 lateinit var parsed: Either<SequenceError, SeqFile>
                 lateinit var seqFile: SeqFile
@@ -433,7 +415,7 @@ class ParserTests : DescribeSpec({
 
             }
 
-            describe("Bad characters in sequence") {
+            context("Bad characters in sequence") {
                 val file = badCharacters
                 val expectedBadChar = setOf('0', '%', '{')
                 lateinit var parsed: Either<SequenceError, SeqFile>
@@ -478,13 +460,12 @@ class ParserTests : DescribeSpec({
                 }
             }
         }
-        describe("Valid parse test") {
+        context("Valid parse test") {
             val file = validSequence
             lateinit var parsed: Either<SequenceError, SeqFile>
             lateinit var seqFile: SeqFile
             lateinit var sequence: SequenceChain.ValidSequenceChain
             it("Should to parse the file [$file]") {
-                println(file)
                 parsed = SeqParser.parse(file)
             }
 

@@ -1,9 +1,8 @@
 package itasserui.lib.fasta
 
 import arrow.core.Either
-import io.kotlintest.TestCaseOrder
 import io.kotlintest.specs.DescribeSpec
-import itasserui.common.errors.SequenceError
+import itasserui.common.errors.Failure
 import itasserui.common.serialization.Serializer
 import java.nio.file.Paths
 
@@ -17,7 +16,7 @@ class LargeFastaTest : DescribeSpec({
         }
 
         it("Should verify parsing resulted in IOError") {
-            println(Serializer.toJson(parsed.map { it.map { seq -> seq.description } }))
+            Serializer.toJson(parsed.map { it.map { seq -> seq.description } })
         }
     }
 })

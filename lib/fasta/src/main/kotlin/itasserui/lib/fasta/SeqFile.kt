@@ -2,7 +2,6 @@
 
 package itasserui.lib.fasta
 
-import itasserui.common.errors.SequenceError
 import itasserui.common.utils.uuid
 import itasserui.lib.fasta.description.Description
 import java.util.*

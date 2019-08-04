@@ -5,8 +5,8 @@ package itasserui.lib.fasta.description
 import arrow.core.Either
 import arrow.core.Try
 import arrow.core.left
-import itasserui.common.errors.NoStartingHeader
-import itasserui.common.errors.SequenceError
+import itasserui.lib.fasta.NoStartingHeader
+import itasserui.lib.fasta.SequenceError
 import itasserui.common.logger.Logger
 
 
