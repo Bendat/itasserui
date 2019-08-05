@@ -2,7 +2,6 @@ package itasserui.lib.fasta
 
 import arrow.core.Either
 import io.kotlintest.specs.DescribeSpec
-import itasserui.common.errors.Failure
 import itasserui.common.serialization.Serializer
 import java.nio.file.Paths
 

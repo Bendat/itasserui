@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture
 import kotlin.streams.toList
 
 class WatchedDirectory(
-    path: Path,
+    private val path: Path,
     val category: FileDomain.FileCategory,
     val watcher: DirectoryWatcher,
     val future: CompletableFuture<Void>
@@ -26,8 +26,8 @@ class WatchedDirectory(
     }
 
     fun update() {
-        count = Files.list(this).count()
-        deepCount = Files.walk(this).map {
+        count = Files.list(path).count()
+        deepCount = Files.walk(path).map {
             if (Files.isDirectory(it))
                 Files.list(it)?.count()
             else null

@@ -1,16 +1,14 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
 package itasserui.lib.filemanager
 
 import arrow.core.Either
 import arrow.core.Try
-import itasserui.common.errors.Outcome
+import itasserui.common.`typealias`.Outcome
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.nio.file.attribute.BasicFileAttributeView
 import java.nio.file.attribute.BasicFileAttributes
-import java.nio.file.attribute.PosixFileAttributeView
 import java.nio.file.attribute.PosixFileAttributes
 
 typealias FS = FileSystem
@@ -26,6 +24,15 @@ object FileSystem {
         fun directories(path: String) =
             directories(Paths.get(path))
 
+        fun directory(path: Path) = Try { Files.createDirectory(path) }
+            .toEither { CannotCreateFile(path, it) }
+
+        fun directory(path: String) =
+            directory(Paths.get(path))
+    }
+
+    object Update {
+        fun realPath(path: Path) = path.toRealPath()
     }
 
     object Read {
@@ -46,5 +53,10 @@ object FileSystem {
             fun basic(path: Path) = Try { Files.readAttributes(path, BasicFileAttributes::class.java) }
             fun posix(path: Path) = Try { Files.readAttributes(path, PosixFileAttributes::class.java) }
         }
+    }
+
+    object Delete {
+        fun delete(path: Path) = Try { Files.delete(path) }
+            .toEither { CannotDeleteFile(path, it) }
     }
 }

@@ -1,7 +1,11 @@
+@file:Suppress("unused")
+
 package itasserui.lib.filemanager
+
 import arrow.core.*
 import io.methvin.watcher.DirectoryChangeEvent
 import io.methvin.watcher.DirectoryWatcher
+import itasserui.common.`typealias`.Outcome
 import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.list.ObservableListWrapper
 import lk.kotlin.observable.list.filtering
@@ -21,7 +25,7 @@ class LocalFileManager(
         domain: FileDomain,
         new: Path,
         op: (DirectoryChangeEvent) -> Unit
-    ): Either<FileSystemError, WatchedDirectory> {
+    ): Outcome<WatchedDirectory> {
         val dir = basedir.resolve(domain.directoryPath).resolve(new)
         return when (val res = FileSystem.Create.directories(dir)) {
             is Either.Left -> res
@@ -44,7 +48,7 @@ class LocalFileManager(
     override fun new(
         domain: FileDomain,
         op: (DirectoryChangeEvent) -> Unit
-    ): Either<FileSystemError, WatchedDirectory> =
+    ): Outcome<WatchedDirectory> =
         new(domain, Paths.get(""), op)
 
     override fun watchDirectory(

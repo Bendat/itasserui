@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package itasserui.lib.filemanager
 
 import itasserui.common.errors.RuntimeError

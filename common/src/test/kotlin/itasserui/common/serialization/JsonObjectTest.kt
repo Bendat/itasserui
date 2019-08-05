@@ -4,6 +4,7 @@ import io.kotlintest.should
 import io.kotlintest.shouldNot
 import io.kotlintest.specs.StringSpec
 import itasserui.test_utils.matchers.be
+
 data class JsonTestClass(val a: String, val b: Int) : JsonObject
 
 class JsonObjectTest : StringSpec({

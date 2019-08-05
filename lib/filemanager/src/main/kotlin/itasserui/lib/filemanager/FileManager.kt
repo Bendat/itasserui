@@ -7,6 +7,7 @@ import arrow.core.None
 import arrow.core.Option
 import arrow.core.Try
 import io.methvin.watcher.DirectoryChangeEvent
+import itasserui.common.`typealias`.Outcome
 import itasserui.common.logger.Logger
 import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.list.filtering
@@ -22,7 +23,7 @@ interface FileManager : Logger {
         domain: FileDomain,
         new: Path,
         op: (DirectoryChangeEvent) -> Unit = {}
-    ): Either<FileSystemError, WatchedDirectory>
+    ): Outcome<WatchedDirectory>
 
     fun watchDirectory(
         path: Path,
@@ -44,7 +45,7 @@ interface FileManager : Logger {
     fun new(
         domain: FileDomain,
         op: (DirectoryChangeEvent) -> Unit = {}
-    ): Either<FileSystemError, WatchedDirectory>
+    ): Outcome<WatchedDirectory>
 
     fun delete(domain: FileDomain): Option<FileSystemError>
 }

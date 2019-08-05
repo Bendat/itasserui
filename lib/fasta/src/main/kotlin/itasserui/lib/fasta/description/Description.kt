@@ -5,9 +5,9 @@ package itasserui.lib.fasta.description
 import arrow.core.Either
 import arrow.core.Try
 import arrow.core.left
+import itasserui.common.logger.Logger
 import itasserui.lib.fasta.NoStartingHeader
 import itasserui.lib.fasta.SequenceError
-import itasserui.common.logger.Logger
 
 
 data class Description(private val initialValue: String) : Logger {

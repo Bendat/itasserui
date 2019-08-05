@@ -5,8 +5,7 @@ import io.kotlintest.eventually
 import io.kotlintest.matchers.beInstanceOf
 import io.kotlintest.seconds
 import io.kotlintest.should
-import itasserui.common.errors.Success
-import itasserui.common.logger.Logger
+import itasserui.common.`typealias`.OK
 import itasserui.lib.filemanager.FS
 import itasserui.lib.filemanager.FileSystem
 import itasserui.test_utils.specs.DescribeSpecification
@@ -15,7 +14,6 @@ import java.nio.file.Path
 import java.nio.file.attribute.PosixFileAttributes
 
 class FileSystemTest : DescribeSpecification({
-    val log = object : Logger {}
     describe("Retrieving a Path from the FileSystem object") {
         context("Path which exists") {
             val dir = System.getProperty("user.dir")
@@ -80,7 +78,7 @@ class FileSystemTest : DescribeSpecification({
                 }
 
                 it("Verifies the tmp directory exsits") {
-                    FileSystem.Read.exists(tmp) should beInstanceOf<Success<Boolean>>()
+                    FileSystem.Read.exists(tmp) should beInstanceOf<OK<Boolean>>()
                 }
             }
 
@@ -89,14 +87,14 @@ class FileSystemTest : DescribeSpecification({
 
                 it("Retrieves the text") {
                     FileSystem.Read.text(textFile)
-                        .map { it.size should be(3) } as Success
+                        .map { it.size should be(3) } as OK
                 }
             }
         }
 
         context("Resource") {
             it("Accesses a resource") {
-                FileSystem.Read.Resource["/hello.txt"] as Success
+                FileSystem.Read.Resource["/hello.txt"] as OK
             }
         }
 

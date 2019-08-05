@@ -30,7 +30,7 @@ interface FileDomain : Identifiable {
         }
     }
 
-    interface Subcategory{
+    interface Subcategory {
         val directory: Path
     }
 }

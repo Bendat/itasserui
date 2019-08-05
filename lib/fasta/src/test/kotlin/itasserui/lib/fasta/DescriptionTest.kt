@@ -58,7 +58,7 @@ class DescriptionParserTest : DescribeSpec({
             }
 
             it("Checks the description") {
-                parser.value should be ("NUDIX | hydrolase [Acaryochloris marina MBIC11017]")
+                parser.value should be("NUDIX | hydrolase [Acaryochloris marina MBIC11017]")
             }
         }
 

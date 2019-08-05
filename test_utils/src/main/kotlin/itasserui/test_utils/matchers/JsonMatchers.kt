@@ -6,7 +6,9 @@ import arrow.core.Try
 import io.kotlintest.Matcher
 import io.kotlintest.Result
 import org.skyscreamer.jsonassert.JSONAssert
+
 val be = Be
+
 object Be {
     fun json(strict: Boolean = false, other: () -> String) = object : Matcher<String> {
         override fun test(value: String): Result {
