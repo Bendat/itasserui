@@ -5,15 +5,15 @@ import io.kotlintest.eventually
 import io.kotlintest.matchers.beInstanceOf
 import io.kotlintest.seconds
 import io.kotlintest.should
+import io.kotlintest.specs.DescribeSpec
 import itasserui.common.`typealias`.OK
 import itasserui.lib.filemanager.FS
 import itasserui.lib.filemanager.FileSystem
-import itasserui.test_utils.specs.DescribeSpecification
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.PosixFileAttributes
 
-class FileSystemTest : DescribeSpecification({
+class FileSystemTest : DescribeSpec({
     describe("Retrieving a Path from the FileSystem object") {
         context("Path which exists") {
             val dir = System.getProperty("user.dir")

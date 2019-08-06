@@ -14,6 +14,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 class LocalFileManagerTest : DescribeSpec({
+    val fs = Jimfs.newFileSystem(Configuration.unix())
     val root = Files.createTempDirectory("fmtest")
     @Suppress("UNUSED_VARIABLE") val log = object : Logger {}
 

@@ -4,6 +4,7 @@
     <modules>
         <module>fasta</module>
         <module>filemanager</module>
+        <module>store</module>
     </modules>
 
     <parent>
@@ -30,6 +31,12 @@
         <dependency>
             <groupId>itasserui</groupId>
             <artifactId>test_utils</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>itasserui</groupId>
+            <artifactId>common</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>

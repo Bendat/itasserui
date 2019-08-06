@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue
 import itasserui.common.extensions.validPassword
 import org.mindrot.jbcrypt.BCrypt
 
-inline class RawPassword(val value: String) {
+data class RawPassword(val value: String) {
     val hashed get() = RawPassword(BCrypt.hashpw(value, BCrypt.gensalt(10)))
     val isValid get() = value.validPassword()
 }

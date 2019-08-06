@@ -7,4 +7,4 @@ typealias Result<TOK> = Either<RuntimeError, TOK>
 typealias Outcome<T> = Either<RuntimeError, T>
 
 typealias OK<TOK> = Either.Right<TOK>
-typealias Err<TErr> = Either.Left<TErr>
+typealias Err = Either.Left<RuntimeError>
