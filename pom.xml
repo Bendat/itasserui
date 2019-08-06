@@ -36,6 +36,7 @@
         <arrow-core.version>0.8.1</arrow-core.version>
         <kotlintest-runner-junit5.version>3.3.2</kotlintest-runner-junit5.version>
         <directory-watcher.version>0.9.5</directory-watcher.version>
+        <jackson-module-kotlin.version>2.9.9</jackson-module-kotlin.version>
 
         <!-- Property Flags -->
         <skipITs>false</skipITs>

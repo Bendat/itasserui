@@ -3,21 +3,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>itasserui.lib</groupId>
         <artifactId>lib</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>store</artifactId>
+    <artifactId>Process</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Database and Storage Tools</name>
-    <properties>
-        <jackson-module-kotlin.version>2.9.9</jackson-module-kotlin.version>
+    <name>Process Execution and Management Library</name>
 
+    <properties>
+        <zt-exec.version>1.10</zt-exec.version>
+        <zt-process-killer.version>1.9</zt-process-killer.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -30,29 +31,18 @@
             <version>${kotlin.version}</version>
         </dependency>
 
-        <!-- Databases -->
+        <!-- Process Execution -->
         <dependency>
-            <groupId>org.dizitart</groupId>
-            <artifactId>nitrite</artifactId>
-            <version>${nitrite.version}</version>
+            <groupId>org.zeroturnaround</groupId>
+            <artifactId>zt-exec</artifactId>
+            <version>${zt-exec.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.dizitart</groupId>
-            <artifactId>potassium-nitrite</artifactId>
-            <version>${nitrite.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.jimfs</groupId>
-            <artifactId>jimfs</artifactId>
-            <version>1.1</version>
+            <groupId>org.zeroturnaround</groupId>
+            <artifactId>zt-process-killer</artifactId>
+            <version>${zt-process-killer.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-kotlin</artifactId>
-            <version>${jackson-module-kotlin.version}</version>
-        </dependency>
     </dependencies>
 
     <build>

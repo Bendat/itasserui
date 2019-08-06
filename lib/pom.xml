@@ -5,6 +5,7 @@
         <module>fasta</module>
         <module>filemanager</module>
         <module>store</module>
+        <module>Process</module>
     </modules>
 
     <parent>
@@ -18,7 +19,9 @@
     <packaging>pom</packaging>
 
     <name>ITasser Lib Framework</name>
-
+    <properties>
+        <slf4j.version>1.7.25</slf4j.version>
+    </properties>
 
     <dependencies>
         <!-- Kotlin -->
@@ -38,7 +41,6 @@
             <groupId>itasserui</groupId>
             <artifactId>common</artifactId>
             <version>1.0-SNAPSHOT</version>
-            <scope>test</scope>
         </dependency>
 
         <!-- Junit 5 -->
@@ -86,6 +88,24 @@
             <version>${directory-watcher.version}</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson-module-kotlin.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+
     </dependencies>
 
 </project>
