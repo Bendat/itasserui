@@ -8,7 +8,7 @@
         <artifactId>lib</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>Process</artifactId>
+    <artifactId>process</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 

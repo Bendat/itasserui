@@ -38,7 +38,7 @@ class TerminateProcessTest : DescribeSpec({
         }
 
         it("Should destroy the process") {
-            runner.executor.kill() should beInstanceOf<Err>()
+            runner.executor.kill() shouldNot beInstanceOf<Err>()
         }
 
         it("Should wait for a result for no more than 1 second") {
