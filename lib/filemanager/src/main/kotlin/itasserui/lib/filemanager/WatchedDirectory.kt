@@ -3,6 +3,8 @@
 package itasserui.lib.filemanager
 
 
+import arrow.core.None
+import arrow.core.Option
 import io.methvin.watcher.DirectoryWatcher
 import lk.kotlin.observable.property.StandardObservableProperty
 import java.nio.file.Files
@@ -13,9 +15,9 @@ import kotlin.streams.toList
 class WatchedDirectory(
     private val path: Path,
     val category: FileDomain.FileCategory,
-    val watcher: DirectoryWatcher,
-    val future: CompletableFuture<Void>
+    val watcher: Option<DirectoryWatcher> = None
 ) : Path by path {
+    val future = watcher.map { it.watchAsync() }
     val countProperty = StandardObservableProperty(0L)
     var count by countProperty
     val deepCountProperty = StandardObservableProperty(0L)
@@ -35,6 +37,24 @@ class WatchedDirectory(
     }
 
     override fun toString(): String {
-        return "WatchedDirectory(path=${super.toString()}, category=$category, count=$count, deepCount=$deepCount)"
+        return "WatchedDirectory(path=${path.toAbsolutePath()}, category=$category, count=$count, deepCount=$deepCount)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as WatchedDirectory
+
+        if (path != other.path) return false
+        if (category != other.category) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = path.hashCode()
+        result = 31 * result + category.hashCode()
+        return result
     }
 }

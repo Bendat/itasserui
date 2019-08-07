@@ -14,17 +14,17 @@ typealias CannotDeleteUserProfile = ProfileError.CannotDeleteUserDirectoryError
 typealias WrongPassword = ProfileError.WrongPasswordError
 
 sealed class ProfileError : RuntimeError() {
-    class UserAlreadyExists(val user: UnregisteredUser) : ProfileError()
-    class UsernameAlreadyExists(val user: UnregisteredUser, val match: Option<User>) : ProfileError()
-    class UserEmailAlreadyExists(val user: UnregisteredUser, val match: Option<User>) : ProfileError()
-    class NoSuchUserError(val user: User) : ProfileError()
-    class DatabaseWriteError(val user: UnregisteredUser, val error: RuntimeError) : ProfileError()
-    class CannotDeleteUserDirectoryError(val user: User, val error: RuntimeError) : ProfileError()
-    class CannotDeleteUserProfileError(val user: User, val error: RuntimeError) : ProfileError()
-    class FileWriteError(val user: User, val error: RuntimeError) : ProfileError()
-    class WrongPasswordError(val user: User) : ProfileError()
+    class UserAlreadyExists(val user: Account) : ProfileError()
+    class UsernameAlreadyExists(val user: Account, val match: Option<Account>) : ProfileError()
+    class UserEmailAlreadyExists(val user: Account, val match: Option<Account>) : ProfileError()
+    class NoSuchUserError(val user: Account) : ProfileError()
+    class DatabaseWriteError(val user: Account, val error: RuntimeError) : ProfileError()
+    class CannotDeleteUserDirectoryError(val user: Account, val error: RuntimeError) : ProfileError()
+    class CannotDeleteUserProfileError(val user: Account, val error: RuntimeError) : ProfileError()
+    class FileWriteError(val user: Account, val error: RuntimeError) : ProfileError()
+    class WrongPasswordError(val user: Account) : ProfileError()
     class InvalidUserPasswordError(
-        val user: UnregisteredUser,
+        val user: Account,
         val error: PasswordValidationError
     ) : ProfileError()
 }

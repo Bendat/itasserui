@@ -9,6 +9,7 @@ import io.kotlintest.specs.DescribeSpec
 import itasserui.common.`typealias`.OK
 import itasserui.lib.filemanager.FS
 import itasserui.lib.filemanager.FileSystem
+import itasserui.test_utils.matchers.Be
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.PosixFileAttributes
@@ -78,7 +79,7 @@ class FileSystemTest : DescribeSpec({
                 }
 
                 it("Verifies the tmp directory exsits") {
-                    FileSystem.Read.exists(tmp) should beInstanceOf<OK<Boolean>>()
+                    FileSystem.Read.exists(tmp) should Be.ok()
                 }
             }
 
@@ -87,7 +88,7 @@ class FileSystemTest : DescribeSpec({
 
                 it("Retrieves the text") {
                     FileSystem.Read.text(textFile)
-                        .map { it.size should be(3) } as OK
+                        .map { it.size should be(3) } should Be.ok()
                 }
             }
         }

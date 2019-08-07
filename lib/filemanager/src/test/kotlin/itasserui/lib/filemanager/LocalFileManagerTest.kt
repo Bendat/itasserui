@@ -7,7 +7,9 @@ import itasserui.common.`typealias`.OK
 import itasserui.common.logger.Logger
 import itasserui.common.utils.safeWait
 import itasserui.common.utils.uuid
+import itasserui.lib.filemanager.FileDomain.FileCategory.Test
 import itasserui.lib.filemanager.utils.TestDomain
+import itasserui.test_utils.matchers.Be
 import lk.kotlin.observable.list.observableListOf
 import java.nio.file.Files
 import java.nio.file.Path
@@ -29,13 +31,14 @@ class LocalFileManagerTest : DescribeSpec({
 
         it("Creates a new directory") {
             fm.new(
+                Test,
                 domain = testDomain,
                 new = FileSystem["first"]
             ) as OK
         }
 
         it("Creates new subdirectory") {
-            fm.new(testDomain, FileSystem["first/2"])
+            fm.new(Test, testDomain, FileSystem["first/2"])
             safeWait(100)
         }
 
@@ -60,8 +63,8 @@ class LocalFileManagerTest : DescribeSpec({
         }
 
         it("Creates a new path") {
-            FileSystem.Create.directories(path)
-            safeWait(200)
+            FileSystem.Create.directories(path) should Be.ok()
+            safeWait(500)
         }
 
         it("Verifies the created path") {
@@ -74,38 +77,55 @@ class LocalFileManagerTest : DescribeSpec({
 
         val testDomain = TestDomain(
             category = FileDomain.FileCategory.Test,
-            directoryName = "testchild",
+            relativeRootName = "testchild",
             directories = observableListOf(),
             id = uuid
         )
 
         val fillerDomain = TestDomain(
             category = FileDomain.FileCategory.Test,
-            directoryName = "ignored",
+            relativeRootName = "ignored",
             directories = observableListOf(),
             id = uuid
         )
 
         context("Creating a directory hierarchy under testDomain1") {
             it("Creates the domain root") {
-                fm.new(testDomain)
+                fm.new(Test, testDomain)
             }
 
             arrayListOf(1, 2, 3, 4).map { Paths.get(it.toString()) }.forEach {
                 it("Adds path $it to the file manager") {
-                    fm.new(testDomain, it)
+                    fm.new(Test, testDomain)
                 }
             }
         }
 
         context("Creating filler directories") {
             it("Creates the domain root") {
-                fm.new(fillerDomain)
+                fm.new(Test, fillerDomain)
             }
 
             arrayListOf(1, 2, 3, 4).map { Paths.get(it.toString()) }.forEach {
+                lateinit var watchedDirectory: WatchedDirectory
+                lateinit var returnedDirectory: WatchedDirectory
                 it("Adds path $it to the file manager") {
-                    fm.new(fillerDomain, it)
+                    fm.new(Test, fillerDomain)
+                        .map { ret -> watchedDirectory = ret }
+                    print("First watch is $watchedDirectory")
+                }
+
+                it("Should verify a WatchedDirectory is returned with get") {
+                    fm[Test, fillerDomain].map { ret ->
+                        returnedDirectory = ret;
+                        return@map ret
+                    } should Be.some()
+                    print("Second watch is $returnedDirectory")
+
+                }
+
+                it("Should verify the the two Watched Directories are the same") {
+                    watchedDirectory should be(returnedDirectory)
                 }
             }
         }
@@ -113,10 +133,6 @@ class LocalFileManagerTest : DescribeSpec({
         context("Result verification") {
             it("Should verify the total size") {
                 fm.size should be(10)
-            }
-
-            it("Should get only those elements who are part of 'testDomain'") {
-                fm[testDomain].size should be(5)
             }
         }
     }

@@ -20,10 +20,10 @@ data class User(
     override val username: Username,
     override val password: HashedPassword,
     override val emailAddress: EmailAddress
-) : FileDomain, DBObject, Account {
+) : Account, FileDomain, DBObject{
     override var directories: ObservableList<WatchedDirectory> = observableListOf()
     override val category = FileDomain.FileCategory.Users
-    override val directoryName get() = username.value
+    override val relativeRootName get() = username.value
 
     fun checkPassword(password: RawPassword) =
         BCrypt.checkpw(password.value, this.password.value)

@@ -1,4 +1,4 @@
-package itasserui.app.user
+package itasserui.app.user.units
 
 import arrow.data.Invalid
 import arrow.data.Valid

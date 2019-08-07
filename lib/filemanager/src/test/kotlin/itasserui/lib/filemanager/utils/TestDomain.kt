@@ -7,7 +7,7 @@ import java.util.*
 
 class TestDomain(
     override val category: FileDomain.FileCategory,
-    override val directoryName: String,
+    override val relativeRootName: String,
     override var directories: ObservableList<WatchedDirectory>,
     override val id: UUID
 ) : FileDomain

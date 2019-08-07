@@ -6,13 +6,13 @@ import arrow.core.*
 import io.methvin.watcher.DirectoryChangeEvent
 import io.methvin.watcher.DirectoryWatcher
 import itasserui.common.`typealias`.Outcome
+import itasserui.lib.filemanager.FileDomain.FileCategory
 import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.list.ObservableListWrapper
 import lk.kotlin.observable.list.filtering
 import lk.kotlin.observable.list.observableListOf
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 
 class LocalFileManager(
@@ -22,69 +22,35 @@ class LocalFileManager(
     override val inner: ObservableList<WatchedDirectory> = inner
 
     override fun new(
+        category: FileCategory,
         domain: FileDomain,
         new: Path,
         op: (DirectoryChangeEvent) -> Unit
     ): Outcome<WatchedDirectory> {
-        val dir = basedir.resolve(domain.directoryPath).resolve(new)
+        val dir = fullPath(category, domain).resolve(new)
         return when (val res = FileSystem.Create.directories(dir)) {
             is Either.Left -> res
             is Either.Right -> watchDirectory(dir, domain.category, op).also {
                 domain.directories = inner.filtering {
-                    Files.exists(basedir.resolve(domain.directoryPath))
+                    Files.exists(fullPath(category, domain))
                 }
             }.right()
         }
     }
 
-    override fun delete(domain: FileDomain): Option<FileSystemError> {
-        val dir = basedir.resolve(domain.directoryPath)
-        return when (val res = Try { Files.delete(dir) }) {
-            is Success -> None
-            is Failure -> Some(FileSystemError.CannotDeleteFileError(dir, res.exception))
-        }
-    }
-
     override fun new(
+        category: FileCategory,
         domain: FileDomain,
         op: (DirectoryChangeEvent) -> Unit
-    ): Outcome<WatchedDirectory> =
-        new(domain, Paths.get(""), op)
-
-    override fun watchDirectory(
-        path: Path,
-        category: FileDomain.FileCategory,
-        op: (DirectoryChangeEvent) -> Unit
-    ): WatchedDirectory {
-        return DirectoryWatcher
-            .builder()
-            .path(path)
-            .listener { event ->
-                op(event)
-                findByPath(event.path()).map { res -> res.update() }
-            }.build()
-            .let {
-                WatchedDirectory(
-                    path = path,
-                    watcher = it,
-                    future = it.watchAsync(),
-                    category = category
-                )
-            }.also {
-                inner += it
-            }
+    ): Outcome<WatchedDirectory> {
+        return new(category, domain, domain.relativeRoot, op)
     }
 
-    private fun findByPath(path: Path): Option<WatchedDirectory> {
-        return inner.firstOrNone { dir ->
-            dir.toRealPath() == path.toRealPath()
-        }
-    }
 
     override fun wait(path: Path): Try<None> = Try {
         findByPath(path)
             .flatMap {
-                it.watcher.watchAsync().getNow(null).toOption()
+                it.watcher.flatMap { dir -> dir.watchAsync().getNow(null).toOption() }
             } as None
     }
 
@@ -96,8 +62,70 @@ class LocalFileManager(
         Runtime.getRuntime().addShutdownHook(Thread {
             hook { "Closing directory watchers" }
             inner.forEach {
-                it.watcher.close()
+                it.watcher.map { watcher -> watcher.close() }
             }
         })
+    }
+
+
+    override fun delete(domain: FileDomain): Option<FileSystemError> {
+        val dir = basedir.resolve(domain.relativeRoot)
+        return when (val res = Try { Files.delete(dir) }) {
+            is Success -> None
+            is Failure -> Some(FileSystemError.CannotDeleteFileError(dir, res.exception))
+        }
+    }
+
+    override fun watchDirectory(
+        path: Path,
+        category: FileCategory,
+        op: (DirectoryChangeEvent) -> Unit
+    ): WatchedDirectory {
+        val shouldWatch = System.getProperty("itasserui.directory.watch") ?: true
+        info { "Should watch $shouldWatch" }
+        return when (shouldWatch) {
+            false -> createUnwatchedDirectory(path, category)
+            else -> createWatchedDirectory(path, op, category)
+        }
+    }
+
+    private fun createUnwatchedDirectory(
+        path: Path,
+        category: FileCategory
+    ) = WatchedDirectory(
+        path = path,
+        watcher = None,
+        category = category
+    ).also {
+        inner += it
+    }
+
+
+    private fun createWatchedDirectory(
+        path: Path,
+        op: (DirectoryChangeEvent) -> Unit,
+        category: FileCategory
+    ) = DirectoryWatcher
+        .builder()
+        .path(path)
+        .listener { event ->
+            op(event)
+            findByPath(event.path()).map { res -> res.update() }
+        }.build()
+        .let {
+            WatchedDirectory(
+                path = path,
+                watcher = Some(it),
+                category = category
+            )
+        }.also {
+            inner += it
+        }
+
+
+    private fun findByPath(path: Path): Option<WatchedDirectory> {
+        return inner.firstOrNone { dir ->
+            dir.toRealPath() == path.toRealPath()
+        }
     }
 }

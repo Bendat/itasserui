@@ -12,10 +12,11 @@ interface FileDomain : Identifiable {
     @get:JsonIgnore
     val category: FileCategory
     @get:JsonIgnore
-    val directoryName: String
+    val relativeRootName: String
     @get:JsonIgnore
-    val directoryPath: Path
-        get() = Paths.get("$category/$directoryName")
+    val relativeRoot: Path
+        get() = Paths.get("$category/$relativeRootName")
+
     @get:JsonIgnore
     var directories: ObservableList<WatchedDirectory>
 
