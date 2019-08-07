@@ -33,7 +33,7 @@ sealed class Database(
     protected var dbOptional: Option<Nitrite> = None
     val db get() = dbOptional
 
-    abstract fun launch(): Option<InitError>
+    abstract fun launch(): Option<DatabaseError>
     abstract fun init(): Database
     abstract fun deleteDatabase(): Option<DatabaseError>
     abstract fun exists(): Option<Boolean>
@@ -51,6 +51,7 @@ sealed class Database(
     inline fun <reified TRepo : DBObject, reified TReturn> perform(op: (Nitrite) -> TReturn):
             Outcome<TReturn> {
         return db.toEither {
+            info { "Database perform is $db" }
             NoDatabase(path)
         }.flatMap {
             when (val attempt = Try { op(it) }) {

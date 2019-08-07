@@ -41,6 +41,7 @@
 
         <!-- Property Flags -->
         <skipITs>false</skipITs>
+        <kotlintest-assertions-arrow.version>3.1.2</kotlintest-assertions-arrow.version>
     </properties>
 
     <dependencyManagement>

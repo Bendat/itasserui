@@ -1,8 +1,6 @@
 package itasserui.test_utils.matchers
 
-import arrow.core.Failure
-import arrow.core.Success
-import arrow.core.Try
+import arrow.core.*
 import io.kotlintest.Matcher
 import io.kotlintest.Result
 import org.skyscreamer.jsonassert.JSONAssert
@@ -23,6 +21,35 @@ object Be {
                 "Json [$value] should not equal [$other()]"
             )
         }
-
     }
+
+    fun some() = object : Matcher<Option<*>> {
+        override fun test(value: Option<*>): Result {
+            val result = value.fold({ false }) { true }
+            return Result(result, "Option [$value] should be Some", "Option [$value] should not be Some")
+        }
+    }
+
+    fun none() = object : Matcher<Option<*>> {
+        override fun test(value: Option<*>): Result {
+            val result = value.fold({ true }) { false }
+            return Result(result, "Option [$value] should be None", "Option [$value] should not be None")
+        }
+    }
+
+    fun ok() = object : Matcher<Either<*, *>> {
+        override fun test(value: Either<*, *>): Result {
+            val result = value.fold({ false }) { true }
+            return Result(result, "Outcome [$value] should be OK", "Outcome [$value] should not be OK")
+        }
+    }
+
+    fun err() = object : Matcher<Either<*, *>> {
+        override fun test(value: Either<*, *>): Result {
+            val result = value.fold({ true }) { false }
+            return Result(result, "Outcome [$value] should be Err", "Outcome [$value] should not be Err")
+        }
+    }
+
+
 }
