@@ -1,8 +1,11 @@
+@file:Suppress("unused")
+
 package itasserui.app.user
 
 import arrow.core.Option
 import itasserui.common.errors.PasswordValidationError
 import itasserui.common.errors.RuntimeError
+import java.nio.file.Path
 
 typealias BadWrite = ProfileError.DatabaseWriteError
 typealias NoSuchUser = ProfileError.NoSuchUserError
@@ -16,6 +19,7 @@ typealias WrongPassword = ProfileError.WrongPasswordError
 sealed class ProfileError : RuntimeError() {
     class UserAlreadyExists(val user: Account) : ProfileError()
     class UsernameAlreadyExists(val user: Account, val match: Option<Account>) : ProfileError()
+    class UserDirectoryAlreadyExists(val user: Account, val path: Path) : ProfileError()
     class UserEmailAlreadyExists(val user: Account, val match: Option<Account>) : ProfileError()
     class NoSuchUserError(val user: Account) : ProfileError()
     class DatabaseWriteError(val user: Account, val error: RuntimeError) : ProfileError()
@@ -27,4 +31,6 @@ sealed class ProfileError : RuntimeError() {
         val user: Account,
         val error: PasswordValidationError
     ) : ProfileError()
+
+
 }

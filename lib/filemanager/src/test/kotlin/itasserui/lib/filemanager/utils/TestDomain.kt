@@ -5,7 +5,7 @@ import itasserui.lib.filemanager.WatchedDirectory
 import lk.kotlin.observable.list.ObservableList
 import java.util.*
 
-class TestDomain(
+data class TestDomain(
     override val category: FileDomain.FileCategory,
     override val relativeRootName: String,
     override var directories: ObservableList<WatchedDirectory>,

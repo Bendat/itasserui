@@ -1,6 +1,5 @@
 package itasserui.app.user
 
-import itasserui.common.interfaces.Identifiable
 import itasserui.common.interfaces.inline.EmailAddress
 import itasserui.common.interfaces.inline.Password
 import itasserui.common.interfaces.inline.RawPassword
@@ -18,6 +17,7 @@ interface Account : FileDomain {
     val username: Username
     val password: Password
     val emailAddress: EmailAddress
+    fun toUser(id: UUID = this.id): User
 }
 
 data class UnregisteredUser(
@@ -31,4 +31,11 @@ data class UnregisteredUser(
         get() = "tmp/${username.value}"
     override var directories: ObservableList<WatchedDirectory> = observableListOf()
     override val id: UUID = uuid
+
+    override fun toUser(id: UUID) = User(
+        username = username,
+        password = password.hashed,
+        emailAddress = emailAddress,
+        id = id
+    )
 }

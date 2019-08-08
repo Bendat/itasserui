@@ -48,9 +48,13 @@ interface FileManager : Logger {
         basedir.resolve("$fileCategory/${domain.relativeRoot}").toAbsolutePath()
 
     fun exists(fileCategory: FileCategory, fileDomain: FileDomain): Boolean {
-        return this[fileCategory, fileDomain].flatMap {
+        return this[fileCategory, fileDomain].also{
+            info{"Exist check is $it"}
+        }.flatMap {
             FileSystem.Read
-                .exists(fullPath(fileCategory, fileDomain))
+                .exists(fullPath(fileCategory, fileDomain).also{
+                    info{"Exist check is $it"}
+                })
                 .toOption()
         }.fold({ false }) { it }
     }

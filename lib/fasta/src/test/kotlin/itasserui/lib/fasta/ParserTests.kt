@@ -10,6 +10,7 @@ import io.kotlintest.should
 import io.kotlintest.specs.DescribeSpec
 import itasserui.common.extensions.remove
 import itasserui.common.utils.uuid
+import itasserui.lib.filemanager.FileSystem
 import java.nio.file.Paths
 
 class ParserTests : DescribeSpec({
@@ -82,7 +83,7 @@ class ParserTests : DescribeSpec({
                 val sequent = "AAGGCC"
                 lateinit var badchars: Option<BadChar>
                 it("Should parse the sequence") {
-                    badchars = SeqParser.mapCharValidity(sequent, Paths.get(sequent))
+                    badchars = SeqParser.mapCharValidity(sequent, FileSystem[sequent])
                 }
 
                 it("Should verify bad chars is $None") {
@@ -97,7 +98,7 @@ class ParserTests : DescribeSpec({
                 lateinit var badChars: BadChar
 
                 it("Should parse the sequence") {
-                    badcharsOpt = SeqParser.mapCharValidity(sequent, Paths.get(sequent))
+                    badcharsOpt = SeqParser.mapCharValidity(sequent, FileSystem[sequent])
                 }
 
                 it("Should verify bad chars is $None") {
@@ -131,7 +132,7 @@ class ParserTests : DescribeSpec({
                     sequenceResult = SeqParser.determineSequenceType(
                         body = sequenceString,
                         title = "Test Invalid Sequence",
-                        file = Paths.get(sequenceString)
+                        file = FileSystem[sequenceString]
                     )
                 }
 
@@ -151,7 +152,7 @@ class ParserTests : DescribeSpec({
                     sequenceResult = SeqParser.determineSequenceType(
                         body = sequenceString,
                         title = "Test Valid Sequence",
-                        file = Paths.get(sequenceString)
+                        file = FileSystem[sequenceString]
                     )
                 }
 
@@ -171,7 +172,7 @@ class ParserTests : DescribeSpec({
                     sequenceResult = SeqParser.determineSequenceType(
                         body = sequenceString,
                         title = "Test Empty Sequence",
-                        file = Paths.get(sequenceString)
+                        file = FileSystem[sequenceString]
                     )
                 }
 
@@ -187,7 +188,7 @@ class ParserTests : DescribeSpec({
                 val fasta = ">title 1\nAAGGCC"
                 lateinit var sequences: List<Sequence>
                 it("Should parse the fasta") {
-                    sequences = SeqParser.mapDescriptionToBodies(fasta, Paths.get(fasta)).toList()
+                    sequences = SeqParser.mapDescriptionToBodies(fasta, FileSystem[fasta]).toList()
                 }
 
                 it("Should verify the size of the result") {
@@ -234,7 +235,7 @@ class ParserTests : DescribeSpec({
                 val fasta = ">title 1\nAAGGCC\n>2\nBBGGCC"
                 lateinit var sequences: List<Sequence>
                 it("Should parse the fasta") {
-                    sequences = SeqParser.mapDescriptionToBodies(fasta, Paths.get(fasta)).toList()
+                    sequences = SeqParser.mapDescriptionToBodies(fasta, FileSystem[fasta]).toList()
                 }
 
                 it("Should verify the size of the result") {
@@ -262,7 +263,7 @@ class ParserTests : DescribeSpec({
                 val fasta = ">title 1\nAAGGCC\nGGGEEE\n>2\nBBGGCCG\nGGHHH"
                 lateinit var sequences: List<Sequence>
                 it("Should parse the fasta") {
-                    sequences = SeqParser.mapDescriptionToBodies(fasta, Paths.get(fasta)).toList()
+                    sequences = SeqParser.mapDescriptionToBodies(fasta, FileSystem[fasta]).toList()
                 }
 
                 it("Should verify the size of the result") {
@@ -364,7 +365,7 @@ class ParserTests : DescribeSpec({
             }
 
             context("Bad file") {
-                val file = Paths.get("/nowhere$uuid")
+                val file = FileSystem["/nowhere$uuid"]
                 lateinit var parse: Either<SequenceError, SeqFile>
                 it("Should parse the imaginary file [$file]") {
                     parse = SeqParser.parse(file)

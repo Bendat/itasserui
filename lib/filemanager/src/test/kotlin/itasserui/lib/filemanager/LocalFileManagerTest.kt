@@ -13,7 +13,6 @@ import itasserui.test_utils.matchers.Be
 import lk.kotlin.observable.list.observableListOf
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 class LocalFileManagerTest : DescribeSpec({
     val root = Files.createTempDirectory("fmtest")
@@ -45,6 +44,15 @@ class LocalFileManagerTest : DescribeSpec({
         it("Validates the correct number of entries") {
             testDomain.directories.size should be(2)
         }
+
+        it("Verifies the directory exists") {
+            fm.exists(Test, testDomain) should be(true)
+        }
+
+        it("Verifies a non existent domain is not returned") {
+            fm.exists(Test, testDomain.copy(relativeRootName = "Nope")) should be(false)
+        }
+
     }
 
     describe("Watching a directory") {
@@ -94,7 +102,7 @@ class LocalFileManagerTest : DescribeSpec({
                 fm.new(Test, testDomain)
             }
 
-            arrayListOf(1, 2, 3, 4).map { Paths.get(it.toString()) }.forEach {
+            arrayListOf(1, 2, 3, 4).map { FileSystem[it.toString()] }.forEach {
                 it("Adds path $it to the file manager") {
                     fm.new(Test, testDomain)
                 }
@@ -106,13 +114,12 @@ class LocalFileManagerTest : DescribeSpec({
                 fm.new(Test, fillerDomain)
             }
 
-            arrayListOf(1, 2, 3, 4).map { Paths.get(it.toString()) }.forEach {
+            arrayListOf(1, 2, 3, 4).map { FileSystem[it.toString()] }.forEach {
                 lateinit var watchedDirectory: WatchedDirectory
                 lateinit var returnedDirectory: WatchedDirectory
                 it("Adds path $it to the file manager") {
                     fm.new(Test, fillerDomain)
                         .map { ret -> watchedDirectory = ret }
-                    print("First watch is $watchedDirectory")
                 }
 
                 it("Should verify a WatchedDirectory is returned with get") {
@@ -120,8 +127,6 @@ class LocalFileManagerTest : DescribeSpec({
                         returnedDirectory = ret;
                         return@map ret
                     } should Be.some()
-                    print("Second watch is $returnedDirectory")
-
                 }
 
                 it("Should verify the the two Watched Directories are the same") {

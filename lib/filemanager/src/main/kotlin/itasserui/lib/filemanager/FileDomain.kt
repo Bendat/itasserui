@@ -15,7 +15,7 @@ interface FileDomain : Identifiable {
     val relativeRootName: String
     @get:JsonIgnore
     val relativeRoot: Path
-        get() = Paths.get("$category/$relativeRootName")
+        get() = FileSystem["$category/$relativeRootName"]
 
     @get:JsonIgnore
     var directories: ObservableList<WatchedDirectory>

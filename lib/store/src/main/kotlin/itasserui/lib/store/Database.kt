@@ -8,6 +8,7 @@ import itasserui.common.`typealias`.Outcome
 import itasserui.common.logger.Logger
 import itasserui.common.serialization.DBObject
 import itasserui.common.serialization.Serializer
+import itasserui.lib.filemanager.FileSystem
 import org.dizitart.kno2.filters.eq
 import org.dizitart.kno2.getRepository
 import org.dizitart.kno2.nitrite
@@ -22,7 +23,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-val memoryDbPath: Path = Paths.get("itasser/memorydb.db")
+val memoryDbPath: Path = FileSystem["itasser/memorydb.db"]
 
 sealed class Database(
     val username: String,

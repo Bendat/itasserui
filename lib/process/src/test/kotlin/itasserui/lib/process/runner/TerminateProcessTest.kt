@@ -13,6 +13,7 @@ import io.kotlintest.specs.DescribeSpec
 import itasserui.common.`typealias`.Err
 import itasserui.common.`typealias`.OK
 import itasserui.common.utils.until
+import itasserui.lib.filemanager.FileSystem
 import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.details.ExecutionState.Paused
 import itasserui.lib.process.details.ExecutionState.Running
@@ -21,7 +22,7 @@ import itasserui.lib.process.process.ITasser
 import java.nio.file.Paths
 
 class TerminateProcessTest : DescribeSpec({
-    val file = Paths.get(javaClass.getResource("/Loop5.pl").file)
+    val file = FileSystem[javaClass.getResource("/Loop5.pl").file]
     describe("Gracefully destroying a long running process") {
         lateinit var runner: ITasser
         it("Creates the process") {

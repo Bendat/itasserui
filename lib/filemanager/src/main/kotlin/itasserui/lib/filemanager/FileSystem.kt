@@ -22,13 +22,13 @@ object FileSystem {
             .toEither { CannotCreateFile(path, it) }
 
         fun directories(path: String) =
-            directories(Paths.get(path))
+            directories(FileSystem[path])
 
         fun directory(path: Path) = Try { Files.createDirectory(path) }
             .toEither { CannotCreateFile(path, it) }
 
         fun directory(path: String) =
-            directory(Paths.get(path))
+            directory(FileSystem[path])
     }
 
     object Update {
@@ -45,7 +45,7 @@ object FileSystem {
         object Resource {
             operator fun get(path: String): Either<CannotRead, Path> {
                 return Try { FS[javaClass.getResource(path).file] }
-                    .toEither { CannotRead(Paths.get(path), it) }
+                    .toEither { CannotRead(FileSystem[path], it) }
             }
         }
 

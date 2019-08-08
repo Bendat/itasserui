@@ -1,5 +1,6 @@
 package itasserui.lib.process.runner
 
+import itasserui.lib.filemanager.FileSystem
 import itasserui.lib.process.ArgNames
 import itasserui.lib.process.process.CCRCProcess
 import itasserui.lib.process.process.ITasser
@@ -18,7 +19,7 @@ fun getProcess(file: Path): ITasser {
             args = params,
             createdAt = Date(),
             createdBy = UUID.randomUUID(),
-            dataDir = Paths.get("")
+            dataDir = FileSystem[""]
         )
     )
 }
