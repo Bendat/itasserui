@@ -16,7 +16,6 @@ import itasserui.lib.filemanager.FileManager
 import itasserui.lib.filemanager.WatchedDirectory
 import itasserui.lib.store.Database
 import org.dizitart.kno2.filters.eq
-import org.dizitart.no2.WriteResult
 import org.dizitart.no2.objects.ObjectFilter
 
 class ProfileManager(
@@ -30,7 +29,7 @@ class ProfileManager(
     ): Ior<Nel<RuntimeError>, Account> {
         val realUser = user.toUser()
         val mkdir = createProfileDir(realUser, fileCategory)
-        val mkdb = createProfileEntry(realUser)
+        val mkdb = trySaveToDb(realUser)
         return when {
             mkdir is Err && mkdb is Err -> Ior.Left(Nel(mkdir.a, listOf(mkdb.a)))
             mkdir is Err && mkdb is OK -> Both(Nel(mkdir.a), realUser)
@@ -45,9 +44,12 @@ class ProfileManager(
     ) = fileManager.exists(fileCategory, user)
 
     fun existsInDatabase(user: Account): Option<ProfileError> = when {
-        userExists(user) is Some -> UserExists(user).some()
-        usernameExists(user) is Some -> UsernameAlreadyExists(user, usernameExists(user)).some()
-        emailExists(user) is Some -> UserEmailAlreadyExists(user, emailExists(user)).some()
+        userExists(user) is Some ->
+            UserExists(user).some()
+        usernameExists(user) is Some ->
+            UsernameAlreadyExists(user, usernameExists(user)).some()
+        emailExists(user) is Some ->
+            UserEmailAlreadyExists(user, emailExists(user)).some()
         else -> None
     }
 
@@ -60,8 +62,14 @@ class ProfileManager(
     fun userExists(user: Account): Option<User> =
         usernameExists(user) and emailExists(user)
 
-    private fun saveToDb(user: User) =
-        database.create(user)
+    private fun saveToDb(user: User): Outcome<User> =
+        database.create(user).map { user }
+
+    private fun trySaveToDb(user: User): Outcome<User> =
+        when (val exists = existsInDatabase(user)) {
+            is None -> saveToDb(user)
+            is Some -> CannotCreateUserProfileError(user, exists.t).left()
+        }
 
     private fun createProfileDir(
         user: Account,
@@ -69,13 +77,10 @@ class ProfileManager(
     ): Outcome<WatchedDirectory> =
         if (!existsInFileSystem(user, fileCategory))
             fileManager.new(fileCategory, user)
-        else UserAlreadyExists(user).left()
-
-    private fun createProfileEntry(user: User): Outcome<WriteResult> = when (
-        val exists = existsInDatabase(user)) {
-        is Some -> UserAlreadyExists(user).left()
-        is None -> saveToDb(user)
-    }
+        else UserDirectoryAlreadyExists(
+            user,
+            fileManager.fullPath(fileCategory, user)
+        ).left()
 
     private fun anyUserExists(op: () -> ObjectFilter): Option<User> =
         database.find<User>(op).toOption().flatMap { it.firstOrNone() }

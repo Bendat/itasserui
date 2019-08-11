@@ -21,7 +21,6 @@ import org.dizitart.no2.objects.ObjectFilter
 import org.dizitart.no2.objects.ObjectRepository
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 val memoryDbPath: Path = FileSystem["itasser/memorydb.db"]
 

@@ -21,13 +21,14 @@ object Serializer : Logger {
     val mapper: ObjectMapper = ObjectMapper()
         .enable(SerializationFeature.INDENT_OUTPUT)
         .registerModule(KotlinModule())
+        .configure(SerializationFeature.INDENT_OUTPUT, true)
         .registerModule(Serializer.Jackson.InlineModule)
 
     fun toJson(obj: Any?): String =
-        Serializer.Jackson.mapper.writeValueAsString(obj)
+        mapper.writeValueAsString(obj)
 
     inline fun <reified T> fromJson(value: String): T =
-        Serializer.Jackson.mapper.readValue(value, T::class.java)
+        mapper.readValue(value, T::class.java)
 
     fun tryToJson(obj: Any?) =
         Try { toJson(obj) }

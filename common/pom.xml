@@ -147,7 +147,11 @@
             <artifactId>json</artifactId>
             <version>${json.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.cedarsoftware</groupId>
+            <artifactId>json-io</artifactId>
+            <version>4.10.1</version>
+        </dependency>
         <!-- Misc -->
         <dependency>
             <groupId>org.mindrot</groupId>

@@ -16,8 +16,9 @@ typealias CannotDeleteUserDirectory = ProfileError.CannotDeleteUserDirectoryErro
 typealias CannotDeleteUserProfile = ProfileError.CannotDeleteUserDirectoryError
 typealias WrongPassword = ProfileError.WrongPasswordError
 
-sealed class ProfileError : RuntimeError() {
+sealed class ProfileError(parentError: RuntimeError? = null) : RuntimeError(parentError) {
     class UserAlreadyExists(val user: Account) : ProfileError()
+    class CannotCreateUserProfileError(val user: Account, parent: RuntimeError) : ProfileError(parent)
     class UsernameAlreadyExists(val user: Account, val match: Option<Account>) : ProfileError()
     class UserDirectoryAlreadyExists(val user: Account, val path: Path) : ProfileError()
     class UserEmailAlreadyExists(val user: Account, val match: Option<Account>) : ProfileError()
