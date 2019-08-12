@@ -22,28 +22,26 @@ class LocalFileManager(
     override val inner: ObservableList<WatchedDirectory> = inner
 
     override fun new(
-        category: FileCategory,
         domain: FileDomain,
         new: Path,
         op: (DirectoryChangeEvent) -> Unit
     ): Outcome<WatchedDirectory> {
-        val dir = fullPath(category, domain).resolve(new)
+        val dir = fullPath(domain).resolve(new)
         return when (val res = FileSystem.Create.directories(dir)) {
             is Either.Left -> res
             is Either.Right -> watchDirectory(dir, domain.category, op).also {
                 domain.directories = inner.filtering {
-                    Files.exists(fullPath(category, domain))
+                    Files.exists(fullPath(domain))
                 }
             }.right()
         }
     }
 
     override fun new(
-        category: FileCategory,
         domain: FileDomain,
         op: (DirectoryChangeEvent) -> Unit
     ): Outcome<WatchedDirectory> {
-        return new(category, domain, domain.relativeRoot, op)
+        return new(domain, domain.relativeRoot, op)
     }
 
 
@@ -78,14 +76,14 @@ class LocalFileManager(
 
     override fun watchDirectory(
         path: Path,
-        category: FileCategory,
+        domain: FileCategory,
         op: (DirectoryChangeEvent) -> Unit
     ): WatchedDirectory {
         val shouldWatch = System.getProperty("itasserui.directory.watch") ?: true
         info { "Should watch $shouldWatch" }
         return when (shouldWatch) {
-            false -> createUnwatchedDirectory(path, category)
-            else -> createWatchedDirectory(path, op, category)
+            false -> createUnwatchedDirectory(path, domain)
+            else -> createWatchedDirectory(path, op, domain)
         }
     }
 

@@ -46,15 +46,15 @@ class UserExistsTests : DescribeSpec({
         }
 
         it("Verifies the profile manager cannot find an existing users file") {
-            pm.existsInFileSystem(user, Test) should be(false)
+            pm.existsInFileSystem(user) should be(false)
         }
 
         it("Creates a user file manually") {
-            fm.new(Test, user) should Be.ok()
+            fm.new(user) should Be.ok()
         }
 
         it("Verifies the profile manager can find an existing users file") {
-            pm.existsInFileSystem(user, Test) should be(true)
+            pm.existsInFileSystem(user) should be(true)
         }
     }
 })

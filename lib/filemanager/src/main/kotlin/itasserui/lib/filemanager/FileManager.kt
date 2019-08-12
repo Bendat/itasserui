@@ -10,6 +10,7 @@ import io.methvin.watcher.DirectoryChangeEvent
 import itasserui.common.`typealias`.Outcome
 import itasserui.common.logger.Logger
 import itasserui.lib.filemanager.FileDomain.FileCategory
+import itasserui.lib.filemanager.FileDomain.Subcategory
 import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.list.filtering
 import java.nio.file.Path
@@ -21,7 +22,6 @@ interface FileManager : Logger {
     val size get() = inner.size
 
     fun new(
-        category: FileCategory,
         domain: FileDomain,
         new: Path,
         op: (DirectoryChangeEvent) -> Unit = {}
@@ -29,38 +29,42 @@ interface FileManager : Logger {
 
     fun watchDirectory(
         path: Path,
-        category: FileDomain.FileCategory,
+        domain: FileCategory,
         op: (DirectoryChangeEvent) -> Unit
     ): WatchedDirectory
 
     fun wait(path: Path): Try<None>
 
-    operator fun get(category: FileDomain.FileCategory) =
+    operator fun get(category: FileCategory) =
         inner.filtering { it.category == category }
 
-    operator fun get(fileCategory: FileCategory, domain: FileDomain): Option<WatchedDirectory> =
+    operator fun get(domain: FileDomain): Option<WatchedDirectory> =
         inner.firstOrNone {
-            it.toAbsolutePath()
-                .startsWith(fullPath(fileCategory, domain))
+            it.toAbsolutePath().startsWith(fullPath(domain))
         }
 
-    fun fullPath(fileCategory: FileCategory, domain: FileDomain): Path =
-        basedir.resolve("$fileCategory/${domain.relativeRoot}").toAbsolutePath()
+    @Suppress("ReplaceGetOrSet")
+    operator fun get(
+        domain: FileDomain,
+        path: List<Subcategory>
+    ): List<Path> =
+        FileSystem.Create.get(fullPath(domain), *path.toTypedArray())
 
-    fun exists(fileCategory: FileCategory, fileDomain: FileDomain): Boolean {
-        return this[fileCategory, fileDomain].also{
-            info{"Exist check is $it"}
+    fun fullPath(domain: FileDomain): Path =
+        basedir.resolve("${domain.relativeRoot}").toAbsolutePath()
+
+    fun exists(fileDomain: FileDomain): Boolean {
+        return this[fileDomain].also {
+            info { "Exist check is $it" }
         }.flatMap {
             FileSystem.Read
-                .exists(fullPath(fileCategory, fileDomain).also{
-                    info{"Exist check is $it"}
-                })
-                .toOption()
+                .exists(fullPath(fileDomain).also {
+                    info { "Exist check is $it" }
+                }).toOption()
         }.fold({ false }) { it }
     }
 
     fun new(
-        category: FileCategory,
         domain: FileDomain,
         op: (DirectoryChangeEvent) -> Unit = {}
     ): Outcome<WatchedDirectory>

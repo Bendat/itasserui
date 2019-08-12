@@ -7,6 +7,7 @@ import io.kotlintest.should
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.DescribeSpec
 import itasserui.app.user.ProfileError.*
+import itasserui.app.user.units.utils.SetupObject
 import itasserui.common.`typealias`.Errors
 import itasserui.common.`typealias`.ErrorsList
 import itasserui.common.`typealias`.SoftErrors
@@ -14,18 +15,10 @@ import itasserui.common.errors.RuntimeError
 import itasserui.common.interfaces.inline.EmailAddress
 import itasserui.common.interfaces.inline.Username
 import itasserui.common.utils.Fake
-import itasserui.lib.filemanager.FileManager
-import itasserui.lib.filemanager.LocalFileManager
-import itasserui.lib.store.Database.MemoryDatabase
-import itasserui.test_utils.matchers.Be.none
 import itasserui.test_utils.matchers.Be.ok
 import org.dizitart.kno2.filters.eq
-import java.nio.file.Files
-import java.nio.file.Path
 
 class CreateUserTest : DescribeSpec({
-    System.setProperty("itasserui.directory.watch", false.toString())
-
     describe("Creating a user in an empty database") {
         val data = SetupObject()
         lateinit var user: Account
@@ -36,6 +29,12 @@ class CreateUserTest : DescribeSpec({
 
         it("Checks the user against the database") {
             data.db.find<User> { User::id eq user.id } shouldBe ok()
+        }
+
+        it("Verifies the users directory path") {
+            data.fm.fullPath(user) should be(
+                data.fm.basedir.resolve("${user.category}/${user.username.value}")
+            )
         }
 
         context("Creating a duplicate user") {
@@ -49,8 +48,11 @@ class CreateUserTest : DescribeSpec({
                 retry.all.size should be(2)
             }
 
-            it("Verifies the appropriate errors are present") {
+            it("Verifies the ${CannotCreateUserProfileError::class.simpleName} error is present resent") {
                 retry.all.any { it is CannotCreateUserProfileError } should be(true)
+            }
+
+            it("Verifies the ${UserDirectoryAlreadyExists::class.simpleName} error is present resent") {
                 retry.all.any { it is UserDirectoryAlreadyExists } should be(true)
             }
         }
@@ -63,21 +65,18 @@ class CreateUserTest : DescribeSpec({
                     .mapLeft { errors = it } should beInstanceOf<Errors>()
             }
 
-
-            it("Prints the error") {
-                println("Errors is $errors")
-            }
-
             it("Verifies there is only one error") {
                 errors.all.size should be(2)
             }
 
-            it("Verifies the appropriate errors are present") {
+            it("Verifies the ${CannotCreateUserProfileError::class.simpleName} errors are present") {
                 errors.all.any { it is CannotCreateUserProfileError } should be(true)
+            }
+            it("Verifies the ${UserDirectoryAlreadyExists::class.simpleName} errors are present") {
                 errors.all.any { it is UserDirectoryAlreadyExists } should be(true)
             }
 
-            it("Verifies the CannotCreateUserProfile error was caused by a duplicated username") {
+            it("Verifies the ${CannotCreateUserProfileError::class.simpleName} error was caused by a duplicated username") {
                 errors.all.first { it is CannotCreateUserProfileError }
                     .parentError should beInstanceOf<UsernameAlreadyExists>()
             }
@@ -91,16 +90,11 @@ class CreateUserTest : DescribeSpec({
                     .mapLeft { errors = it; it } should beInstanceOf<SoftErrors>()
             }
 
-
-            it("Prints the error") {
-                println("Errors is $errors")
-            }
-
             it("Verifies there is only one error") {
                 errors.all.size should be(1)
             }
 
-            it("Verifies the appropriate errors are present") {
+            it("Verifies the the ${CannotCreateUserProfileError::class.simpleName} error is present") {
                 errors.all.any { it is CannotCreateUserProfileError } should be(true)
             }
 
@@ -109,17 +103,6 @@ class CreateUserTest : DescribeSpec({
                     .parentError should beInstanceOf<UserEmailAlreadyExists>()
             }
         }
-
     }
 })
 
-private class SetupObject(testRootPath: Path = Files.createTempDirectory("pmtest")) {
-    var fm: FileManager = LocalFileManager(testRootPath)
-    val db = MemoryDatabase(Fake.name().username(), Fake.internet().password())
-    val pm = ProfileManager(fm, db)
-    val user = UserMocks.unregisteredUser
-
-    init {
-        db.launch() shouldBe none()
-    }
-}

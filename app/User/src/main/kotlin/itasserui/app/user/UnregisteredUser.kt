@@ -8,6 +8,7 @@ import itasserui.common.utils.uuid
 import itasserui.lib.filemanager.FileDomain
 import itasserui.lib.filemanager.FileDomain.FileCategory
 import itasserui.lib.filemanager.FileDomain.FileCategory.Users
+import itasserui.lib.filemanager.FileDomain.Subcategory
 import itasserui.lib.filemanager.WatchedDirectory
 import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.list.observableListOf
@@ -31,6 +32,7 @@ data class UnregisteredUser(
         get() = "tmp/${username.value}"
     override var directories: ObservableList<WatchedDirectory> = observableListOf()
     override val id: UUID = uuid
+    override val categories: List<Subcategory> = listOf()
 
     override fun toUser(id: UUID) = User(
         username = username,

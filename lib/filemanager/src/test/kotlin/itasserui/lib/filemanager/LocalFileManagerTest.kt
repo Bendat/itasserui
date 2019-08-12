@@ -22,7 +22,7 @@ class LocalFileManagerTest : DescribeSpec({
         val fm = LocalFileManager(root) as FileManager
 
         val testDomain = TestDomain(
-            FileDomain.FileCategory.Test,
+            Test,
             "testchild",
             observableListOf(),
             uuid
@@ -30,14 +30,13 @@ class LocalFileManagerTest : DescribeSpec({
 
         it("Creates a new directory") {
             fm.new(
-                Test,
                 domain = testDomain,
                 new = FileSystem["first"]
             ) as OK
         }
 
         it("Creates new subdirectory") {
-            fm.new(Test, testDomain, FileSystem["first/2"])
+            fm.new(testDomain, FileSystem["first/2"])
             safeWait(100)
         }
 
@@ -46,24 +45,32 @@ class LocalFileManagerTest : DescribeSpec({
         }
 
         it("Verifies the directory exists") {
-            fm.exists(Test, testDomain) should be(true)
+            fm.exists(testDomain) should be(true)
         }
 
         it("Verifies a non existent domain is not returned") {
-            fm.exists(Test, testDomain.copy(relativeRootName = "Nope")) should be(false)
+            fm.exists(testDomain.copy(relativeRootName = "Nope")) should be(false)
         }
 
     }
 
     describe("Watching a directory") {
         val fm = LocalFileManager(root) as FileManager
-
         val path = root.resolve("test1")
+        val testDomain = TestDomain(
+            Test,
+            "test1",
+            observableListOf(),
+            uuid
+        )
         lateinit var eventPath: Path
+        it("Creates the path"){
+            eventPath = Files.createDirectories(path)
+        }
         it("Creates a watcher") {
             fm.watchDirectory(
-                root,
-                FileDomain.FileCategory.Test
+                path,
+                testDomain.category
             ) { event ->
                 if (event.path().toRealPath() == path.toRealPath())
                     eventPath = event.path().toRealPath()
@@ -76,7 +83,7 @@ class LocalFileManagerTest : DescribeSpec({
         }
 
         it("Verifies the created path") {
-            eventPath should be(FileSystem.Update.realPath(path))
+            FileSystem.Update.realPath(eventPath).toString() should be(FileSystem.Update.realPath(path).toString())
         }
     }
 
@@ -84,46 +91,44 @@ class LocalFileManagerTest : DescribeSpec({
         val fm = LocalFileManager(root) as FileManager
 
         val testDomain = TestDomain(
-            category = FileDomain.FileCategory.Test,
+            Test,
             relativeRootName = "testchild",
             directories = observableListOf(),
             id = uuid
         )
 
         val fillerDomain = TestDomain(
-            category = FileDomain.FileCategory.Test,
+            category = Test,
             relativeRootName = "ignored",
             directories = observableListOf(),
             id = uuid
         )
 
         context("Creating a directory hierarchy under testDomain1") {
-            it("Creates the domain root") {
-                fm.new(Test, testDomain)
-            }
+            val path = fm.fullPath(testDomain)
 
             arrayListOf(1, 2, 3, 4).map { FileSystem[it.toString()] }.forEach {
                 it("Adds path $it to the file manager") {
-                    fm.new(Test, testDomain)
+                    fm.new(testDomain)
                 }
             }
         }
 
         context("Creating filler directories") {
             it("Creates the domain root") {
-                fm.new(Test, fillerDomain)
+                fm.new(fillerDomain)
             }
 
             arrayListOf(1, 2, 3, 4).map { FileSystem[it.toString()] }.forEach {
                 lateinit var watchedDirectory: WatchedDirectory
                 lateinit var returnedDirectory: WatchedDirectory
                 it("Adds path $it to the file manager") {
-                    fm.new(Test, fillerDomain)
+                    fm.new(fillerDomain)
                         .map { ret -> watchedDirectory = ret }
                 }
 
                 it("Should verify a WatchedDirectory is returned with get") {
-                    fm[Test, fillerDomain].map { ret ->
+                    fm[fillerDomain].map { ret ->
                         returnedDirectory = ret;
                         return@map ret
                     } should Be.some()

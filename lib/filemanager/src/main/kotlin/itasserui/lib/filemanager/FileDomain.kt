@@ -17,6 +17,7 @@ interface FileDomain : Identifiable {
     val relativeRoot: Path
         get() = FileSystem["$category/$relativeRootName"]
 
+    val categories: List<Subcategory>
     @get:JsonIgnore
     var directories: ObservableList<WatchedDirectory>
 
@@ -32,6 +33,7 @@ interface FileDomain : Identifiable {
     }
 
     interface Subcategory {
-        val directory: Path
+        val directory: Path get() =
+            FileSystem[javaClass.simpleName.toLowerCase()]
     }
 }
