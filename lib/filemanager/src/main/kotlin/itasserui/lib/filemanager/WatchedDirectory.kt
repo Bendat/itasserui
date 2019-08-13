@@ -6,6 +6,7 @@ package itasserui.lib.filemanager
 import arrow.core.None
 import arrow.core.Option
 import io.methvin.watcher.DirectoryWatcher
+import itasserui.common.logger.Logger
 import lk.kotlin.observable.property.StandardObservableProperty
 import java.nio.file.Files
 import java.nio.file.Path
@@ -13,10 +14,10 @@ import java.util.concurrent.CompletableFuture
 import kotlin.streams.toList
 
 class WatchedDirectory(
-    private val path: Path,
+    val path: Path,
     val category: FileDomain.FileCategory,
     val watcher: Option<DirectoryWatcher> = None
-) : Path by path {
+) : Path by path, Logger {
     val future = watcher.map { it.watchAsync() }
     val countProperty = StandardObservableProperty(0L)
     var count by countProperty
@@ -28,6 +29,7 @@ class WatchedDirectory(
     }
 
     fun update() {
+        info{"Updating $this"}
         count = Files.list(path).count()
         deepCount = Files.walk(path).map {
             if (Files.isDirectory(it))

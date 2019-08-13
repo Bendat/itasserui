@@ -4,6 +4,7 @@ package itasserui.lib.filemanager
 
 import arrow.core.Try
 import itasserui.common.`typealias`.Outcome
+import itasserui.common.logger.Logger
 import itasserui.lib.filemanager.FileDomain.Subcategory
 import java.nio.file.Files
 import java.nio.file.Path
@@ -18,8 +19,12 @@ object FileSystem {
     operator fun get(root: Path, vararg path: Subcategory): List<Path> =
         path.map { root.resolve(it.toString().toLowerCase()) }
 
-    object Create {
+    object Create : Logger {
         operator fun get(root: Path, vararg path: Subcategory): List<Path> =
+            path.map { root.resolve(it.toString().toLowerCase()) }
+                .map { directory(it); it }
+
+        operator fun get(root: WatchedDirectory, vararg path: Subcategory): List<Path> =
             path.map { root.resolve(it.toString().toLowerCase()) }
                 .map { directory(it); it }
 

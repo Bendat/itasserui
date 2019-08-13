@@ -21,12 +21,6 @@ interface FileManager : Logger {
     val inner: ObservableList<WatchedDirectory>
     val size get() = inner.size
 
-    fun new(
-        domain: FileDomain,
-        new: Path,
-        op: (DirectoryChangeEvent) -> Unit = {}
-    ): Outcome<WatchedDirectory>
-
     fun watchDirectory(
         path: Path,
         domain: FileCategory,
@@ -46,9 +40,12 @@ interface FileManager : Logger {
     @Suppress("ReplaceGetOrSet")
     operator fun get(
         domain: FileDomain,
-        path: List<Subcategory>
+        path: List<Subcategory>,
+        event: (DirectoryChangeEvent) -> Unit = {}
     ): List<Path> =
-        FileSystem.Create.get(fullPath(domain), *path.toTypedArray())
+        FileSystem.Create.get(fullPath(domain), *path.toTypedArray()).also {
+            info { "Created directories are $it" }
+        }
 
     fun fullPath(domain: FileDomain): Path =
         basedir.resolve("${domain.relativeRoot}").toAbsolutePath()

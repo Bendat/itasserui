@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import itasserui.common.interfaces.Identifiable
 import lk.kotlin.observable.list.ObservableList
 import java.nio.file.Path
-import java.nio.file.Paths
 
 interface FileDomain : Identifiable {
     @get:JsonIgnore
@@ -20,6 +19,7 @@ interface FileDomain : Identifiable {
     val categories: List<Subcategory>
     @get:JsonIgnore
     var directories: ObservableList<WatchedDirectory>
+
 
     enum class FileCategory {
         Users,

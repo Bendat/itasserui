@@ -23,11 +23,12 @@ class LocalFileManager(
 
     override fun new(
         domain: FileDomain,
-        new: Path,
         op: (DirectoryChangeEvent) -> Unit
     ): Outcome<WatchedDirectory> {
-        val dir = fullPath(domain).resolve(new)
-        return when (val res = FileSystem.Create.directories(dir)) {
+        val dir = fullPath(domain)
+        return when (val res = FileSystem.Create.directories(dir).also {
+            info { "Created res is $dir" }
+        }) {
             is Either.Left -> res
             is Either.Right -> watchDirectory(dir, domain.category, op).also {
                 domain.directories = inner.filtering {
@@ -37,12 +38,7 @@ class LocalFileManager(
         }
     }
 
-    override fun new(
-        domain: FileDomain,
-        op: (DirectoryChangeEvent) -> Unit
-    ): Outcome<WatchedDirectory> {
-        return new(domain, domain.relativeRoot, op)
-    }
+
 
 
     override fun wait(path: Path): Try<None> = Try {
@@ -108,7 +104,8 @@ class LocalFileManager(
         .path(path)
         .listener { event ->
             op(event)
-            findByPath(event.path()).map { res -> res.update() }
+            findByPath(event.path())
+                .map { res: WatchedDirectory -> res.update() }
         }.build()
         .let {
             WatchedDirectory(

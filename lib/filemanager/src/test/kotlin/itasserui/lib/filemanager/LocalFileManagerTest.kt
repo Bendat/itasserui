@@ -14,10 +14,16 @@ import lk.kotlin.observable.list.observableListOf
 import java.nio.file.Files
 import java.nio.file.Path
 
+enum class TestCategories : FileDomain.Subcategory {
+    First,
+    Second,
+    Third,
+}
+
 class LocalFileManagerTest : DescribeSpec({
     val root = Files.createTempDirectory("fmtest")
     @Suppress("UNUSED_VARIABLE") val log = object : Logger {}
-
+    System.setProperty("itasserui.directory.watch", true.toString())
     describe("Creating a new directory") {
         val fm = LocalFileManager(root) as FileManager
 
@@ -29,19 +35,17 @@ class LocalFileManagerTest : DescribeSpec({
         )
 
         it("Creates a new directory") {
-            fm.new(
-                domain = testDomain,
-                new = FileSystem["first"]
-            ) as OK
+            fm.new(domain = testDomain) as OK
         }
 
-        it("Creates new subdirectory") {
-            fm.new(testDomain, FileSystem["first/2"])
-            safeWait(100)
+        it("Creates numeric subcategories") {
+            fm[testDomain, TestCategories.values().toList()]
         }
 
         it("Validates the correct number of entries") {
-            testDomain.directories.size should be(2)
+            safeWait(500)
+            println("Blah blah is ${testDomain.directories.map { it }}")
+            testDomain.directories.size should be(3)
         }
 
         it("Verifies the directory exists") {
@@ -64,7 +68,7 @@ class LocalFileManagerTest : DescribeSpec({
             uuid
         )
         lateinit var eventPath: Path
-        it("Creates the path"){
+        it("Creates the path") {
             eventPath = Files.createDirectories(path)
         }
         it("Creates a watcher") {
@@ -105,8 +109,6 @@ class LocalFileManagerTest : DescribeSpec({
         )
 
         context("Creating a directory hierarchy under testDomain1") {
-            val path = fm.fullPath(testDomain)
-
             arrayListOf(1, 2, 3, 4).map { FileSystem[it.toString()] }.forEach {
                 it("Adds path $it to the file manager") {
                     fm.new(testDomain)
@@ -142,7 +144,7 @@ class LocalFileManagerTest : DescribeSpec({
 
         context("Result verification") {
             it("Should verify the total size") {
-                fm.size should be(10)
+                fm.size should be(9)
             }
         }
     }
