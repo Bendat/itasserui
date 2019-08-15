@@ -21,7 +21,10 @@ object FileSystem {
 
     object Create : Logger {
         operator fun get(root: Path, vararg path: Subcategory): List<Path> =
-            path.map { root.resolve(it.toString().toLowerCase()) }
+            this[root, path.toList()]
+
+        operator fun get(root: Path, paths: List<Subcategory>): List<Path> =
+            paths.map { root.resolve(it.toString().toLowerCase()) }
                 .map { directory(it); it }
 
         operator fun get(root: WatchedDirectory, vararg path: Subcategory): List<Path> =
