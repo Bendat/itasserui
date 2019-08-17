@@ -15,12 +15,15 @@ import itasserui.lib.filemanager.WatchedDirectory
 import itasserui.lib.store.Database
 import org.dizitart.kno2.filters.eq
 import org.dizitart.no2.objects.ObjectFilter
+import org.kodein.di.Kodein
+import org.kodein.di.conf.global
 
-class ProfileManager(
-    private val fileManager: FileManager,
+class ProfileManager : Logger {
+    init{
+        Kodein.global.addImport()
+    }
+    private val fileManager: FileManager
     private val database: Database
-) : Logger {
-
     fun createUserProfile(user: Account): Ior<Nel<RuntimeError>, Account> {
         val realUser = user.toUser()
         val mkdir = createProfileDir(realUser)

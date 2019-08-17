@@ -5,6 +5,8 @@ package itasserui.lib.store
 import arrow.core.*
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import itasserui.common.`typealias`.Outcome
+import itasserui.common.interfaces.inline.Password
+import itasserui.common.interfaces.inline.Username
 import itasserui.common.logger.Logger
 import itasserui.common.serialization.DBObject
 import itasserui.common.serialization.Serializer
@@ -126,6 +128,14 @@ sealed class Database(
         username: String,
         password: String
     ) : Database(username, password, directory) {
+        constructor(
+            directory: Path,
+            name: String,
+            username: Username,
+            password: Password
+        ) : this(directory, name, username.value, password.value)
+
+
         override fun launch(): Option<InitError> {
             return when (val result = Try {
                 dbOptional = nitrite(userId = username, password = password) {

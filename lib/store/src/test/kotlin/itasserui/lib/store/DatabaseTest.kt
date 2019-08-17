@@ -18,8 +18,6 @@ import itasserui.common.serialization.DBObject
 import itasserui.common.utils.uuid
 import itasserui.lib.store.Database.PersistentDatabase
 import org.dizitart.kno2.filters.eq
-import org.dizitart.no2.WriteResult
-import org.dizitart.no2.objects.Cursor
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
@@ -37,19 +35,13 @@ class DatabaseTest : DescribeSpec({
         }
 
         context("Create") {
-            lateinit var res: WriteResult
             it("Creates a valid TestObject $testObject") {
-                db.create(testObject)
-                    .map { res = it } as OK
-            }
-
-            it("Analysis the WriteResult"){
-                println("----- TUCO -----")
+                db.create(testObject) as OK
             }
         }
 
         context("Read") {
-            lateinit var toResult: Cursor<TestDBObject>
+            lateinit var toResult: List<TestDBObject>
             context("Reading existing repo") {
                 it("Reads the $testObject from the database") {
                     db.read<TestDBObject> { TestDBObject::id eq testObject.id }
@@ -64,7 +56,7 @@ class DatabaseTest : DescribeSpec({
 
         context("Update") {
             val newTestObject = testObject.copy(foo = "rab")
-            lateinit var toResult: Cursor<TestDBObject>
+            lateinit var toResult: List<TestDBObject>
             context("Successfully") {
                 it("The $testObject with $newTestObject") {
                     db.update(newTestObject)
@@ -97,7 +89,7 @@ class DatabaseTest : DescribeSpec({
         }
 
         context("Delete") {
-            lateinit var toResult: Cursor<TestDBObject>
+            lateinit var toResult: List<TestDBObject>
             it("The $testObject from the database") {
                 db.delete(testObject)
             }
@@ -106,7 +98,7 @@ class DatabaseTest : DescribeSpec({
                     .map { toResult = it }
             }
             it("Verifies the $testObject was deleted") {
-                toResult.size() should be(0)
+                toResult.size should be(0)
             }
         }
     }
