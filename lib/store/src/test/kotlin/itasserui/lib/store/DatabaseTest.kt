@@ -18,6 +18,7 @@ import itasserui.common.serialization.DBObject
 import itasserui.common.utils.uuid
 import itasserui.lib.store.Database.PersistentDatabase
 import org.dizitart.kno2.filters.eq
+import org.dizitart.no2.WriteResult
 import org.dizitart.no2.objects.Cursor
 import java.nio.file.Files
 import java.nio.file.Path
@@ -36,8 +37,14 @@ class DatabaseTest : DescribeSpec({
         }
 
         context("Create") {
+            lateinit var res: WriteResult
             it("Creates a valid TestObject $testObject") {
-                db.create(testObject).print() as OK
+                db.create(testObject)
+                    .map { res = it } as OK
+            }
+
+            it("Analysis the WriteResult"){
+                println("----- TUCO -----")
             }
         }
 

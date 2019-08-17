@@ -2,6 +2,7 @@ package itasserui.common.errors
 
 import arrow.core.Failure
 import arrow.core.Success
+import itasserui.common.errors.MonadError.EmptyOptionError
 import itasserui.common.serialization.JsonObject
 import itasserui.common.serialization.Serializer
 
@@ -13,4 +14,8 @@ abstract class RuntimeError(val parentError: RuntimeError? = null) : JsonObject 
             is Success -> res.value
         }
     }
+}
+typealias EmptyOption = EmptyOptionError
+sealed class MonadError(parent: RuntimeError?): RuntimeError(parent){
+    class EmptyOptionError(parent: RuntimeError?): MonadError(parent)
 }

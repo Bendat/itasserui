@@ -30,7 +30,6 @@ data class UnregisteredUser(
         get() = Users
     override val relativeRootName: String
         get() = "tmp/${username.value}"
-    override var directories: ObservableList<WatchedDirectory> = observableListOf()
     override val id: UUID = uuid
     override val categories: List<Subcategory> = listOf()
 

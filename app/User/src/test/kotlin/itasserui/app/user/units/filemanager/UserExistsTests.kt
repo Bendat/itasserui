@@ -5,7 +5,6 @@ import io.kotlintest.should
 import io.kotlintest.specs.DescribeSpec
 import itasserui.app.user.units.utils.SetupObject
 import itasserui.test_utils.matchers.Be
-import java.nio.file.Path
 
 class UserExistsTests : DescribeSpec({
     val data = SetupObject()

@@ -8,7 +8,7 @@
         <artifactId>app</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>User</artifactId>
+    <artifactId>user</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -30,7 +30,6 @@
             <artifactId>store</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-
     </dependencies>
 
     <build>

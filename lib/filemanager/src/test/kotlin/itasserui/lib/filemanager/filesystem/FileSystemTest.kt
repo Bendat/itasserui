@@ -2,13 +2,11 @@ package itasserui.lib.filemanager.filesystem
 
 import io.kotlintest.be
 import io.kotlintest.eventually
-import io.kotlintest.matchers.beInstanceOf
 import io.kotlintest.seconds
 import io.kotlintest.should
 import io.kotlintest.specs.DescribeSpec
 import itasserui.common.`typealias`.OK
 import itasserui.lib.filemanager.FS
-import itasserui.lib.filemanager.FileSystem
 import itasserui.test_utils.matchers.Be
 import java.nio.file.Files
 import java.nio.file.Path
@@ -60,7 +58,7 @@ class FileSystemTest : DescribeSpec({
             }
 
             it("Prints the path") {
-                FileSystem.Create.directories(tmp.resolve("oppa/goppa/doppa"))
+                FS.Create.directories(tmp.resolve("oppa/goppa/doppa"))
                     .map { result = it }
             }
 
@@ -79,7 +77,7 @@ class FileSystemTest : DescribeSpec({
                 }
 
                 it("Verifies the tmp directory exsits") {
-                    FileSystem.Read.exists(tmp) should Be.ok()
+                    FS.Read.exists(tmp) should Be.ok()
                 }
             }
 
@@ -87,7 +85,7 @@ class FileSystemTest : DescribeSpec({
                 val textFile = FS[javaClass.getResource("/hello.txt").file]
 
                 it("Retrieves the text") {
-                    FileSystem.Read.text(textFile)
+                    FS.Read.text(textFile)
                         .map { it.size should be(3) } should Be.ok()
                 }
             }
@@ -95,7 +93,7 @@ class FileSystemTest : DescribeSpec({
 
         context("Resource") {
             it("Accesses a resource") {
-                FileSystem.Read.Resource["/hello.txt"] as OK
+                FS.Read.Resource["/hello.txt"] as OK
             }
         }
 
@@ -103,13 +101,13 @@ class FileSystemTest : DescribeSpec({
             lateinit var path: Path
             lateinit var attributes: PosixFileAttributes
             it("Retrieves the file") {
-                FileSystem.Read.Resource["/hello.txt"]
+                FS.Read.Resource["/hello.txt"]
                     .map { path = it }
             }
 
             context("Basic") {
                 it("Gets the basic attributes") {
-                    FileSystem.Read.Attributes.posix(path)
+                    FS.Read.Attributes.posix(path)
                         .map { attributes = it }
                 }
 

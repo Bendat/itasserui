@@ -6,10 +6,10 @@ import arrow.core.*
 import io.methvin.watcher.DirectoryChangeEvent
 import io.methvin.watcher.DirectoryWatcher
 import itasserui.common.`typealias`.Outcome
-import itasserui.lib.filemanager.FileDomain.FileCategory
+import itasserui.common.datastructures.observable.ObservableSet
+import itasserui.common.datastructures.observable.observableSetOf
 import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.list.ObservableListWrapper
-import lk.kotlin.observable.list.filtering
 import lk.kotlin.observable.list.observableListOf
 import java.nio.file.Files
 import java.nio.file.Path
@@ -17,35 +17,25 @@ import java.nio.file.Path
 
 class LocalFileManager(
     override val basedir: Path,
-    inner: ObservableListWrapper<WatchedDirectory> = observableListOf()
+    inner: ObservableSet<WatchedDirectory> = observableSetOf()
 ) : FileManager {
-    override val inner: ObservableList<WatchedDirectory> = inner
+    override val inner: ObservableSet<WatchedDirectory> = inner
 
     override fun new(
         domain: FileDomain,
         op: (DirectoryChangeEvent) -> Unit
     ): Outcome<WatchedDirectory> {
         val dir = fullPath(domain)
-        return when (val res = FileSystem.Create.directories(dir).also {
-            info { "Created res is $dir" }
-        }) {
+        return when (val res = FS.Create.directories(dir)) {
             is Either.Left -> res
-            is Either.Right -> watchDirectory(dir, domain.category, op).also {
-                domain.directories = inner.filtering {
-                    Files.exists(fullPath(domain))
-                }
-            }.right()
+            is Either.Right -> watchDirectory(dir, domain, op).right()
         }
     }
 
-
-
-
     override fun wait(path: Path): Try<None> = Try {
-        findByPath(path)
-            .flatMap {
-                it.watcher.flatMap { dir -> dir.watchAsync().getNow(null).toOption() }
-            } as None
+        findByPath(path).flatMap {
+            it.watcher.flatMap { dir -> dir.watchAsync().getNow(null).toOption() }
+        } as None
     }
 
     override fun toString(): String {
@@ -72,24 +62,23 @@ class LocalFileManager(
 
     override fun watchDirectory(
         path: Path,
-        domain: FileCategory,
+        domain: FileDomain,
         op: (DirectoryChangeEvent) -> Unit
     ): WatchedDirectory {
         val shouldWatch = System.getProperty("itasserui.directory.watch") ?: true
         info { "Should watch $shouldWatch" }
         return when (shouldWatch) {
-            false -> createUnwatchedDirectory(path, domain)
-            else -> createWatchedDirectory(path, op, domain)
+            false -> createWatchedDirectory(path, domain, op)
+            else -> createWatchedDirectory(path, domain, op)
         }
     }
 
     private fun createUnwatchedDirectory(
-        path: Path,
-        category: FileCategory
+        file: FileDomain
     ) = WatchedDirectory(
-        path = path,
-        watcher = None,
-        category = category
+        rootDir = basedir,
+        file = file,
+        watcher = None
     ).also {
         inner += it
     }
@@ -97,8 +86,8 @@ class LocalFileManager(
 
     private fun createWatchedDirectory(
         path: Path,
-        op: (DirectoryChangeEvent) -> Unit,
-        category: FileCategory
+        domain: FileDomain,
+        op: (DirectoryChangeEvent) -> Unit
     ) = DirectoryWatcher
         .builder()
         .path(path)
@@ -109,9 +98,9 @@ class LocalFileManager(
         }.build()
         .let {
             WatchedDirectory(
-                path = path,
-                watcher = Some(it),
-                category = category
+                rootDir = basedir,
+                file = domain,
+                watcher = Some(it)
             )
         }.also {
             inner += it

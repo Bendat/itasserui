@@ -9,7 +9,6 @@ import java.util.*
 data class TestDomain(
     override val category: FileDomain.FileCategory,
     override val relativeRootName: String,
-    override var directories: ObservableList<WatchedDirectory>,
     override val id: UUID,
     override val categories: List<Subcategory> = listOf()
 ) : FileDomain

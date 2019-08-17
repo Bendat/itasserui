@@ -12,9 +12,11 @@ import java.nio.file.Paths
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.attribute.PosixFileAttributes
 
-typealias FS = FileSystem
-
-object FileSystem {
+object FS {
+    val create = Create
+    val read = Read
+    val update = Update
+    val delete = Delete
     operator fun get(path: String): Path = Paths.get(path)
     operator fun get(root: Path, vararg path: Subcategory): List<Path> =
         path.map { root.resolve(it.toString().toLowerCase()) }
@@ -36,14 +38,14 @@ object FileSystem {
                 .toEither { CannotCreateFile(path, it) }
 
         fun directories(path: String): Outcome<Path> =
-            directories(FileSystem[path])
+            directories(FS[path])
 
         fun directory(path: Path): Outcome<Path> =
             Try { Files.createDirectory(path) }
                 .toEither { CannotCreateFile(path, it) }
 
         fun directory(path: String): Outcome<Path> =
-            directory(FileSystem[path])
+            directory(FS[path])
 
         fun temp(path: String): Path =
             Files.createTempDirectory(path)
@@ -65,7 +67,7 @@ object FileSystem {
         object Resource {
             operator fun get(path: String): Outcome<Path> =
                 Try { FS[javaClass.getResource(path).file] }
-                    .toEither { CannotRead(FileSystem[path], it) }
+                    .toEither { CannotRead(FS[path], it) }
         }
 
         object Attributes {

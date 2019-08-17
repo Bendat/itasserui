@@ -1,23 +1,20 @@
 package itasserui.lib.process.runner
 
 import arrow.core.None
-import io.kotlintest.TestCaseOrder
 import io.kotlintest.be
 import io.kotlintest.matchers.beInstanceOf
 import io.kotlintest.should
 import io.kotlintest.shouldNot
 import io.kotlintest.specs.DescribeSpec
 import itasserui.common.`typealias`.Err
-import itasserui.common.utils.safeWait
 import itasserui.common.utils.until
-import itasserui.lib.filemanager.FileSystem
+import itasserui.lib.filemanager.FS
 import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.process.ITasser
-import java.nio.file.Paths
 
 class ErrorTest : DescribeSpec({
     describe("Receiving an error message") {
-        val file = FileSystem[javaClass.getResource("/Error.pl").file]
+        val file = FS[javaClass.getResource("/Error.pl").file]
 
         lateinit var runner: ITasser
         it("Creates the process") {

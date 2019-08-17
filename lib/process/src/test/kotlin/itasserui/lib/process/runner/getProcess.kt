@@ -1,11 +1,10 @@
 package itasserui.lib.process.runner
 
-import itasserui.lib.filemanager.FileSystem
+import itasserui.lib.filemanager.FS
 import itasserui.lib.process.ArgNames
 import itasserui.lib.process.process.CCRCProcess
 import itasserui.lib.process.process.ITasser
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.*
 
 fun getProcess(file: Path): ITasser {
@@ -19,7 +18,7 @@ fun getProcess(file: Path): ITasser {
             args = params,
             createdAt = Date(),
             createdBy = UUID.randomUUID(),
-            dataDir = FileSystem[""]
+            dataDir = FS[""]
         )
     )
 }

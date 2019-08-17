@@ -36,7 +36,7 @@ object Serializer : Logger {
     inline fun <reified T> tryFromJson(value: String) =
         Try { fromJson<T>(value) }
 
-    fun logJson(indent: Int = 2, obj: () -> Any?) {
+    fun logJson(obj: () -> Any?) {
         when (val json = tryToJson(obj())) {
             is Success -> trace { json }
             is Failure -> warn { json }

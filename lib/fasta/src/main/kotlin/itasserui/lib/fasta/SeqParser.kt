@@ -7,10 +7,9 @@ import itasserui.common.extensions.isFalse
 import itasserui.common.extensions.remove
 import itasserui.common.logger.Logger
 import itasserui.lib.fasta.description.Description
-import itasserui.lib.filemanager.FileSystem
+import itasserui.lib.filemanager.FS
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 
 /**
@@ -29,7 +28,7 @@ object SeqParser : Logger {
 
     fun parse(
         input: List<String>?,
-        file: Path? = FileSystem["-- Input was a List object --"]
+        file: Path? = FS["-- Input was a List object --"]
     ): Either<SequenceError, SeqFile> = when {
         input == null || input.isEmpty() -> when {
             !Files.exists(file) -> Left(NoSuchFile(file))

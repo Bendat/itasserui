@@ -5,8 +5,6 @@ import io.kotlintest.be
 import io.kotlintest.matchers.beGreaterThan
 import io.kotlintest.should
 import io.kotlintest.specs.DescribeSpec
-import itasserui.common.extensions.map
-import itasserui.common.utils.Fake
 import itasserui.lib.fasta.description.Description
 import itasserui.lib.fasta.description.NCBIIdentifier
 import itasserui.lib.fasta.description.NCBIIdentifierRule
@@ -27,10 +25,6 @@ class DescriptionParserTest : DescribeSpec({
 
                 it("Should verify the discovered identifier has the correct number of fields") {
                     identifier.memberProperties.size.minus(3) should be(rule.items)
-                }
-
-                it("Should construct an object instance for each") {
-                    val params = rule.items.map { Fake.ancient().primordial() }.toTypedArray()
                 }
             }
         }

@@ -10,6 +10,7 @@
 
     <modules>
         <module>User</module>
+        <module>itasser</module>
     </modules>
 
     <groupId>itasserui.app</groupId>
@@ -107,6 +108,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.25</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.kodein.di</groupId>
+            <artifactId>kodein-di-conf-jvm</artifactId>
         </dependency>
     </dependencies>
 </project>

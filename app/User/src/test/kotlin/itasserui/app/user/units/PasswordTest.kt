@@ -10,10 +10,8 @@ import itasserui.common.errors.MissingLower
 import itasserui.common.errors.MissingUpper
 import itasserui.common.errors.ShortPassword
 import itasserui.common.extensions.validPassword
-import itasserui.common.logger.Logger
 
 class PasswordTest : DescribeSpec({
-    val log = object : Logger {}
     describe("RawPassword Validation Tests") {
         context("Invalid Passwords") {
             it("Should be too short") {

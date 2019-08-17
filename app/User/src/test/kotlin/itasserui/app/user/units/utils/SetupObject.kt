@@ -5,13 +5,13 @@ import itasserui.app.user.ProfileManager
 import itasserui.app.user.UserMocks
 import itasserui.common.utils.Fake
 import itasserui.lib.filemanager.FileManager
-import itasserui.lib.filemanager.FileSystem
+import itasserui.lib.filemanager.FS
 import itasserui.lib.filemanager.LocalFileManager
 import itasserui.lib.store.Database.MemoryDatabase
 import itasserui.test_utils.matchers.Be.none
 import java.nio.file.Path
 
-internal class SetupObject(testRootPath: Path = FileSystem.Create.temp("pmtest")) {
+internal class SetupObject(testRootPath: Path = FS.Create.temp("pmtest")) {
     var fm: FileManager = LocalFileManager(testRootPath)
     val db = MemoryDatabase(Fake.name().username(), Fake.internet().password())
     val pm = ProfileManager(fm, db)

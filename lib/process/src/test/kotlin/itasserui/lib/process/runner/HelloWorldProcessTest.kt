@@ -8,14 +8,13 @@ import io.kotlintest.shouldNot
 import io.kotlintest.specs.DescribeSpec
 import itasserui.common.`typealias`.Err
 import itasserui.common.utils.until
-import itasserui.lib.filemanager.FileSystem
+import itasserui.lib.filemanager.FS
 import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.process.ITasser
-import java.nio.file.Paths
 
 class HelloWorldProcessTest : DescribeSpec({
     describe("Creating a basic process which prints 'hello world' and exits") {
-        val file = FileSystem[javaClass.getResource("/HelloWorld.pl").file]
+        val file = FS[javaClass.getResource("/HelloWorld.pl").file]
 
         lateinit var runner: ITasser
         it("Creates the process") {
@@ -52,7 +51,7 @@ class HelloWorldProcessTest : DescribeSpec({
     }
 
     describe("Creating a looping process which writes to stdout 5 times") {
-        val file = FileSystem[javaClass.getResource("/Loop5.pl").file]
+        val file = FS[javaClass.getResource("/Loop5.pl").file]
         lateinit var runner: ITasser
         it("Creates the process") {
             runner = getProcess(file)

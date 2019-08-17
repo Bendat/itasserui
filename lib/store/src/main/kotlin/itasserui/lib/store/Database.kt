@@ -8,21 +8,19 @@ import itasserui.common.`typealias`.Outcome
 import itasserui.common.logger.Logger
 import itasserui.common.serialization.DBObject
 import itasserui.common.serialization.Serializer
-import itasserui.lib.filemanager.FileSystem
+import itasserui.lib.filemanager.FS
 import org.dizitart.kno2.filters.eq
 import org.dizitart.kno2.getRepository
 import org.dizitart.kno2.nitrite
 import org.dizitart.no2.Nitrite
-import org.dizitart.no2.WriteResult
 import org.dizitart.no2.mapper.JacksonFacade
 import org.dizitart.no2.mapper.JacksonMapper
-import org.dizitart.no2.objects.Cursor
 import org.dizitart.no2.objects.ObjectFilter
 import org.dizitart.no2.objects.ObjectRepository
 import java.nio.file.Files
 import java.nio.file.Path
 
-val memoryDbPath: Path = FileSystem["itasser/memorydb.db"]
+val memoryDbPath: Path = FS["itasser/memorydb.db"]
 
 sealed class Database(
     val username: String,
@@ -44,12 +42,13 @@ sealed class Database(
     inline fun <reified TRepo : DBObject> size(): Outcome<Long> =
         perform<TRepo, Long> { it.getRepository<TRepo>().size() }
 
-    inline fun <reified TRepo : DBObject> insert(vararg item: TRepo): Outcome<WriteResult> {
-        return perform<TRepo, WriteResult> { it.getRepository<TRepo>().insert(item) }
+    inline fun <reified TRepo : DBObject> insert(vararg item: TRepo): Outcome<Long> {
+        return perform<TRepo, Long> { it.getRepository<TRepo>().insert(item).affectedCount.toLong() }
     }
 
-    inline fun <reified TRepo : DBObject, reified TReturn> perform(op: (Nitrite) -> TReturn):
-            Outcome<TReturn> {
+    inline fun <reified TRepo : DBObject, reified TReturn> perform(
+        op: (Nitrite) -> TReturn
+    ): Outcome<TReturn> {
         return db.toEither {
             info { "Database perform is $db" }
             NoDatabase(path)
@@ -66,17 +65,17 @@ sealed class Database(
     inline fun <reified TRepo : DBObject> context(op: ObjectRepository<TRepo>.() -> Unit) =
         perform<TRepo, Unit> { it.getRepository<TRepo>().apply(op) }
 
-    inline fun <reified TRepo : DBObject> update(obj: TRepo): Outcome<WriteResult> =
-        perform<TRepo, WriteResult> { it.getRepository<TRepo>().update(DBObject::id eq obj.id, obj) }
+    inline fun <reified TRepo : DBObject> update(obj: TRepo): Outcome<Long> =
+        perform<TRepo, Long> { it.getRepository<TRepo>().update(DBObject::id eq obj.id, obj).affectedCount.toLong() }
 
-    inline fun <reified TRepo : DBObject> delete(obj: TRepo): Outcome<WriteResult> =
-        perform<TRepo, WriteResult> { it.getRepository<TRepo>().remove(DBObject::id eq obj.id) }
+    inline fun <reified TRepo : DBObject> delete(obj: TRepo): Outcome<Long> =
+        perform<TRepo, Long> { it.getRepository<TRepo>().remove(DBObject::id eq obj.id).affectedCount.toLong() }
 
-    inline fun <reified TRepo : DBObject> find(filter: () -> ObjectFilter): Outcome<Cursor<TRepo>> =
-        perform<TRepo, Cursor<TRepo>> { it.getRepository<TRepo>().find(filter()) }
+    inline fun <reified TRepo : DBObject> find(filter: () -> ObjectFilter): Outcome<List<TRepo>> =
+        perform<TRepo, List<TRepo>> { it.getRepository<TRepo>().find(filter()).toList() }
 
-    inline fun <reified TRepo : DBObject> find(): Outcome<Cursor<TRepo>> =
-        perform<TRepo, Cursor<TRepo>> { it.getRepository<TRepo>().find() }
+    inline fun <reified TRepo : DBObject> find(): Outcome<List<TRepo>> =
+        perform<TRepo, List<TRepo>> { it.getRepository<TRepo>().find().toList() }
 
     inline fun <reified T : DBObject> findFirst(): Outcome<T> {
         return perform<T, T> { it.getRepository<T>().find().first() }

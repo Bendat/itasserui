@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package itasserui.common.logger
 
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -59,6 +61,6 @@ interface Logger {
         )//.substring(0, min(3000, msg.toString().length))
         else msg
 
-        logType(msg.toString())
+        logType(sb.toString())
     }
 }

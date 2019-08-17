@@ -4,7 +4,6 @@ package itasserui.lib.filemanager
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import itasserui.common.interfaces.Identifiable
-import lk.kotlin.observable.list.ObservableList
 import java.nio.file.Path
 
 interface FileDomain : Identifiable {
@@ -14,12 +13,9 @@ interface FileDomain : Identifiable {
     val relativeRootName: String
     @get:JsonIgnore
     val relativeRoot: Path
-        get() = FileSystem["$category/$relativeRootName"]
+        get() = FS["$category/$relativeRootName"]
 
     val categories: List<Subcategory>
-    @get:JsonIgnore
-    var directories: ObservableList<WatchedDirectory>
-
 
     enum class FileCategory {
         Users,
@@ -34,6 +30,6 @@ interface FileDomain : Identifiable {
 
     interface Subcategory {
         val directory: Path get() =
-            FileSystem[javaClass.simpleName.toLowerCase()]
+            FS[javaClass.simpleName.toLowerCase()]
     }
 }

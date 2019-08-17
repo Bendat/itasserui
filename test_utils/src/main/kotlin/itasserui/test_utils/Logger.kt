@@ -1,3 +1,5 @@
+@file:Suppress("unused", "DEPRECATION")
+
 package itasserui.test_utils
 
 
@@ -8,7 +10,7 @@ import java.lang.Thread.currentThread
 typealias LogLevel = (String) -> Unit
 
 internal interface Logger {
-    val klog
+    val klog: org.slf4j.Logger
         get() = LoggerFactory.getLogger(this::class.java)
 
     /*
@@ -52,12 +54,16 @@ internal interface Logger {
         logType: LogLevel
     ) {
 
-        val sb = if (format) WordUtils.wrap(
-            msg.toString(), 180, "\n\t",
-            false, " "
-        )//.substring(0, min(3000, msg.toString().length))
-        else msg
+        @Suppress("DEPRECATION")
+        val data = if (format)
+            WordUtils.wrap(
+                msg.toString(),
+                180,
+                "\n\t",
+                false, " "
+            )
+        else msg.toString()
 
-        logType(msg.toString())
+        logType(data)
     }
 }

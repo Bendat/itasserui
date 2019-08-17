@@ -1,70 +1,84 @@
-@file:Suppress("unused")
-
 package itasserui.lib.filemanager
 
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Try
-import arrow.core.firstOrNone
+import arrow.core.*
 import io.methvin.watcher.DirectoryChangeEvent
 import itasserui.common.`typealias`.Outcome
+import itasserui.common.datastructures.observable.ObservableSet
 import itasserui.common.logger.Logger
 import itasserui.lib.filemanager.FileDomain.FileCategory
 import itasserui.lib.filemanager.FileDomain.Subcategory
-import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.list.filtering
+import java.nio.file.Files
 import java.nio.file.Path
 
 
 interface FileManager : Logger {
     val basedir: Path
-    val inner: ObservableList<WatchedDirectory>
+    val inner: ObservableSet<WatchedDirectory>
     val size get() = inner.size
 
     fun watchDirectory(
         path: Path,
-        domain: FileCategory,
+        domain: FileDomain,
         op: (DirectoryChangeEvent) -> Unit
     ): WatchedDirectory
 
     fun wait(path: Path): Try<None>
 
     operator fun get(category: FileCategory) =
-        inner.filtering { it.category == category }
+        inner.filtering { it.file.category == category }
 
     operator fun get(domain: FileDomain): Option<WatchedDirectory> =
         inner.firstOrNone {
-            it.toAbsolutePath().startsWith(fullPath(domain))
-        }
+            it.toAbsolutePath()
+                .startsWith(fullPath(domain))
+        }.map { it.update(); it }
 
-    @Suppress("ReplaceGetOrSet")
+
     operator fun get(
         domain: FileDomain,
-        path: List<Subcategory>,
-        event: (DirectoryChangeEvent) -> Unit = {}
-    ): List<Path> =
-        FileSystem.Create.get(fullPath(domain), *path.toTypedArray()).also {
-            info { "Created directories are $it" }
-        }
+        path: List<Subcategory>
+    ): List<Path> = FS.create[fullPath(domain), path.toList()]
+
+    fun mkdirs(
+        domain: FileDomain,
+        vararg path: Path
+    ): List<Path> = inner
+        .firstOrNone { directory -> directory.file == domain }
+        .map { directory -> resolvePaths(path, directory) }
+        .map { paths ->
+            paths.map { path -> Files.createDirectories(path) }
+        }.getOrElse { listOf() }
 
     fun fullPath(domain: FileDomain): Path =
         basedir.resolve("${domain.relativeRoot}").toAbsolutePath()
 
-    fun exists(fileDomain: FileDomain): Boolean {
-        return this[fileDomain].also {
-            info { "Exist check is $it" }
-        }.flatMap {
-            FileSystem.Read
-                .exists(fullPath(fileDomain).also {
-                    info { "Exist check is $it" }
-                }).toOption()
-        }.fold({ false }) { it }
-    }
+    fun exists(fileDomain: FileDomain): Boolean = this[fileDomain]
+        .flatMap {
+            FS.Read
+                .exists(fullPath(fileDomain))
+                .toOption()
+        }.fold(
+            { false },
+            { it }
+        )
 
     fun new(
         domain: FileDomain,
         op: (DirectoryChangeEvent) -> Unit = {}
     ): Outcome<WatchedDirectory>
+
+    private fun resolveDomain(
+        file: WatchedDirectory,
+        path: Path
+    ): Path = fullPath(file.file).resolve(path)
+
+    fun resolvePaths(
+        path: Array<out Path>,
+        file: WatchedDirectory
+    ): List<Path> = path
+        .map { path -> resolveDomain(file, path) }
+        .mapNotNull { FS.create.directories(it).getOrElse { null } }
 
     fun delete(domain: FileDomain): Option<FileSystemError>
 }

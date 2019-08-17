@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package itasserui.common.itasser
 
 sealed class Param(val commandlineParameter: CommandlineParameter) {
@@ -69,7 +71,7 @@ sealed class Param(val commandlineParameter: CommandlineParameter) {
 
 }
 
-inline class CommandlineParameter(val name: String) {
+data class CommandlineParameter(val name: String) {
     val param get() = toString()
     override fun toString(): String {
         return "-$name"
