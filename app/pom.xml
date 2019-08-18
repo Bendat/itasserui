@@ -9,8 +9,9 @@
     </parent>
 
     <modules>
-        <module>User</module>
-        <module>itasser</module>
+        <module>user</module>
+        <module>itasser_old</module>
+        <module>mytasser</module>
     </modules>
 
     <groupId>itasserui.app</groupId>
