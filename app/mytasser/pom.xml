@@ -80,6 +80,7 @@
     </dependencies>
 
     <build>
+        <testSourceDirectory>src/test/groovy</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>

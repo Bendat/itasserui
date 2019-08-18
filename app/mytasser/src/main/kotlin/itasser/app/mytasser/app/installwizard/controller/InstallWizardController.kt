@@ -1,7 +1,7 @@
 package itasser.app.mytasser.app.installwizard.controller
 
-import itasserui.app.itasserui.kodeinmodules.databaseModule
-import itasserui.app.itasserui.kodeinmodules.fileManagerModule
+import itasser.app.mytasser.kodeinmodules.databaseModule
+import itasser.app.mytasser.kodeinmodules.fileManagerModule
 import itasserui.app.user.UnregisteredUser
 import itasserui.common.interfaces.inline.EmailAddress
 import itasserui.common.interfaces.inline.RawPassword
