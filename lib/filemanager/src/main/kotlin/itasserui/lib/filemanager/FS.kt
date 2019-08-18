@@ -17,9 +17,16 @@ object FS {
     val read = Read
     val update = Update
     val delete = Delete
+    val itasserhome =
+        Paths.get(System.getProperty("user.home"))
+            .resolve("itasserui")
+
     operator fun get(path: String): Path = Paths.get(path)
     operator fun get(root: Path, vararg path: Subcategory): List<Path> =
         path.map { root.resolve(it.toString().toLowerCase()) }
+
+    fun makeItasserHome() =
+        create.directories(itasserhome)
 
     object Create : Logger {
         operator fun get(root: Path, vararg path: Subcategory): List<Path> =

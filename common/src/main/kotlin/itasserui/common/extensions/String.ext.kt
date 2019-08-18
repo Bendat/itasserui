@@ -25,9 +25,9 @@ fun String.validPassword(
     length < minLength ->
         Invalid(ShortPassword(length, minLength))
     !any { it.isUpperCase() } && capitals ->
-        Invalid(MissingUpper("Requires at least one uppercase character"))
+        Invalid(MissingUpper())
     !any { it.isLowerCase() } && capitals ->
-        Invalid(MissingLower("Requires at least one uppercase character"))
+        Invalid(MissingLower())
     !any { specialChars.contains(it) } && specials ->
         Invalid(MissingCharset(spcharset))
     else -> Valid(this)
