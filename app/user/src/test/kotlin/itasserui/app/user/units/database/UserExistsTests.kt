@@ -12,6 +12,7 @@ import itasserui.app.user.ProfileManager
 import itasserui.app.user.User
 import itasserui.app.user.UserExists
 import itasserui.app.user.UserMocks
+import itasserui.app.user.units.utils.SetupObject
 import itasserui.app.user.units.utils.testModule
 import itasserui.common.interfaces.inline.EmailAddress
 import itasserui.common.interfaces.inline.Username
@@ -30,46 +31,41 @@ class UserExistsTests : DescribeSpec({
 
 
     describe("User Exists Tests") {
-        lateinit var db: Database
-        lateinit var pm: ProfileManager
         val user = UserMocks.user
         val sameNameUser =
             User(user.id, user.username, user.password, EmailAddress(Fake.internet().emailAddress()))
         val sameEmailUser =
             User(user.id, Username(Fake.name().username()), user.password, user.emailAddress)
+        val data = SetupObject()
 
-        eventually(1.seconds) {
-            pm = ProfileManager()
-        }
 
         it("Writes a user directly to the database") {
-            db.launch() should Be.none()
-            db.create(user) should Be.ok()
+            data.pm.database.create(user) should Be.ok()
         }
 
         it("Verifies the user is an exact match") {
-            pm.userExists(user) should Be.some()
+            data.pm.userExists(user) should Be.some()
         }
 
         it("Verifies the user has a duplicate username") {
-            pm.usernameExists(sameNameUser) should Be.some()
+            data.pm.usernameExists(sameNameUser) should Be.some()
         }
 
         it("Verifies the user has a duplicate email address") {
-            pm.emailExists(sameEmailUser) should Be.some()
+            data.pm.emailExists(sameEmailUser) should Be.some()
         }
 
         context("ExistsInDatabase") {
             it("Verifies the user is an exact match") {
-                pm.existsInDatabase(user) should Be.someOf<UserExists>()
+                data.pm.existsInDatabase(user) should Be.someOf<UserExists>()
             }
 
             it("Verifies the user has a duplicate username") {
-                pm.existsInDatabase(sameNameUser) should Be.someOf<UsernameAlreadyExists>()
+                data.pm.existsInDatabase(sameNameUser) should Be.someOf<UsernameAlreadyExists>()
             }
 
             it("Verifies the user has a duplicate email address") {
-                pm.existsInDatabase(sameEmailUser) should Be.someOf<UserEmailAlreadyExists>()
+                data.pm.existsInDatabase(sameEmailUser) should Be.someOf<UserEmailAlreadyExists>()
             }
         }
     }

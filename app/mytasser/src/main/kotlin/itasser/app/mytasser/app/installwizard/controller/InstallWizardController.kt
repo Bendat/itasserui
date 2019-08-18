@@ -31,8 +31,9 @@ data class Settings(
     override val id: UUID = uuid
 ) : DBObject
 
-class InstallWizardController : Logger, KodeinAware {
-    override val kodein: Kodein get() = Kodein.global
+class InstallWizardController(
+    override val kodein: Kodein = Kodein.global
+) : Logger, KodeinAware {
     val database: Database by instance()
     val nameProperty = SimpleStringProperty()
     var name by nameProperty

@@ -2,6 +2,7 @@ package itasser.app.mytasser.app.installwizard
 
 import itasser.app.mytasser.app.installwizard.controller.InstallWizardController
 import itasser.app.mytasser.app.installwizard.viewmodel.InstallWizardViewModel
+import itasser.app.mytasser.app.installwizard.views.ITasserSetupPage
 import itasser.app.mytasser.app.installwizard.views.RegistrationPage
 import tornadofx.Wizard
 
@@ -14,6 +15,6 @@ class InstallWizard : Wizard() {
 
     init {
         add(RegistrationPage::class)
-//        add(ITasserSetupPage::class)
+        add(ITasserSetupPage::class)
     }
 }

@@ -10,7 +10,6 @@
 
     <modules>
         <module>user</module>
-        <module>itasser_old</module>
         <module>mytasser</module>
     </modules>
 

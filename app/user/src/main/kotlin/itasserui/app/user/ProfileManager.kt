@@ -20,8 +20,10 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.conf.global
 import org.kodein.di.generic.instance
 
-class ProfileManager : Logger, KodeinAware {
-    override val kodein: Kodein get() = Kodein.global
+class ProfileManager(
+    override val kodein: Kodein = Kodein.global
+) : Logger, KodeinAware {
+
     val fileManager: FileManager by instance()
     val database: Database by instance()
 

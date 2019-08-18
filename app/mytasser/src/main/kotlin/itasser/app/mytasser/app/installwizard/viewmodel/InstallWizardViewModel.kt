@@ -16,7 +16,7 @@ class InstallWizardViewModel :
     ItemViewModel<InstallWizardController>(InstallWizardController()),
     KodeinAware {
     override val kodein: Kodein get() = item.kodein
-    val db by instance<Database>()
+//    val db by instance<Database>()
     val name = bind(InstallWizardController::nameProperty, autocommit = true)
     val email = bind(InstallWizardController::emailProperty, autocommit = true)
     val password = bind(InstallWizardController::passwordProperty, autocommit = true)

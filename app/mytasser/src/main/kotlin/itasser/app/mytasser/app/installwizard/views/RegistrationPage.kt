@@ -4,19 +4,49 @@ import arrow.data.Invalid
 import itasser.app.mytasser.app.installwizard.viewmodel.InstallWizardViewModel
 import itasserui.common.extensions.validPassword
 import itasserui.common.logger.Logger
+import javafx.beans.value.ObservableValue
+import javafx.event.EventTarget
 import javafx.geometry.Orientation.VERTICAL
+import javafx.scene.control.TextField
 import org.apache.commons.validator.routines.EmailValidator
 import tornadofx.*
 
+fun EventTarget.textinput(
+    property: ObservableValue<String>,
+    op: TextField.() -> Unit = {}
+): TextField {
+    return textfield(property, op)
+        .apply {
+            setOnMouseClicked {
+                if (System.getProperty("itasserui.testmode") == "true"){
+                    clear()
+                }
+            }
+        }
+}
+fun EventTarget.passwordinput(
+    property: ObservableValue<String>,
+    op: TextField.() -> Unit = {}
+): TextField {
+    return passwordfield(property, op)
+        .apply {
+            setOnMouseClicked {
+                if (System.getProperty("itasserui.testmode") == "true"){
+                    clear()
+                }
+            }
+        }
+}
+
 class RegistrationPage : View("Create Admin Account"), Logger {
     val model by inject<InstallWizardViewModel>()
-    override val complete = model.valid(model.name, model.email, model.password, model.passwordRepeat)
+    override val complete get() = model.valid(model.name, model.email, model.password, model.passwordRepeat)
 
     override val root = form {
         minWidth = 250.0
         fieldset("Create an Administrator Account", labelPosition = VERTICAL) {
             field("Name") {
-                textfield(model.name) {
+                textinput(model.name) {
                     addClass("name")
                     validator {
                         if (text.isNullOrBlank()) error()
@@ -25,7 +55,7 @@ class RegistrationPage : View("Create Admin Account"), Logger {
                 }.required(message = "Name cannot be empty.")
             }
             field("Email") {
-                textfield(model.email) {
+                textinput(model.email) {
                     addClass("email")
                     validator {
                         val vld = EmailValidator.getInstance()
@@ -35,9 +65,9 @@ class RegistrationPage : View("Create Admin Account"), Logger {
                 }.required(message = "Email address is optional but must be valid")
             }
             field("Password") {
-                passwordfield(model.password) {
+                passwordinput(model.password) {
                     addClass("password")
-                    validator{
+                    validator {
                         val vldtr = text?.validPassword()
                         when (vldtr) {
                             is Invalid -> error(vldtr.e.message)
@@ -49,11 +79,11 @@ class RegistrationPage : View("Create Admin Account"), Logger {
 
             }
             field("Repeat") {
-                passwordfield(model.passwordRepeat) {
+                passwordinput(model.passwordRepeat) {
                     addClass("password-repeat")
                     setOnMouseClicked { text = null }
                     validator(ValidationTrigger.OnBlur) {
-                        if(text == model.password.value) null
+                        if (text == model.password.value) null
                         else error()
                     }
                 }.required()

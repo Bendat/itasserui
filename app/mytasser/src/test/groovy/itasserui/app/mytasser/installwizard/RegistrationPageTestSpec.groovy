@@ -4,6 +4,7 @@ import itasser.app.mytasser.app.launcher.InstallWizardLauncher
 import itasserui.common.utils.FakeKt
 import javafx.stage.Stage
 import javafx.stage.StageStyle
+import org.kodein.di.Kodein
 import org.testfx.api.FxAssert
 import org.testfx.api.FxToolkit
 import org.testfx.framework.spock.ApplicationSpec
@@ -80,7 +81,7 @@ class RegistrationPageTestSpec extends ApplicationSpec {
         def next = lookup(".button").nth(2).queryButton()
 
         when:
-        clickOn(".name").write(faker.name.fullName())
+        clickOn(".name").write(faker.name().fullName())
         clickOn(".email").write(faker.internet().emailAddress())
         clickOn(".password").write("nogood")
         clickOn(".password-repeat").write(password)
@@ -108,7 +109,8 @@ class RegistrationPageTestSpec extends ApplicationSpec {
 
     void "should validate to progression"() {
         given:
-        def password = faker.internet().password(8, 10, true, true)
+        def password = faker.internet()
+                .password(8, 10, true, true) +"{"
         def next = lookup(".button").nth(2).queryButton()
 
         when:
@@ -118,7 +120,7 @@ class RegistrationPageTestSpec extends ApplicationSpec {
         clickOn(".password-repeat").write(password)
 
         then:
-        safeWait(15000)
+        safeWait(500)
         FxAssert.verifyThat(next, NodeMatchers.isEnabled())
     }
 
