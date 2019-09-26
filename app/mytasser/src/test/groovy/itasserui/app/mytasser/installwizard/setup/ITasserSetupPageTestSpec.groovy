@@ -3,9 +3,9 @@ package itasserui.app.mytasser.installwizard.setup
 
 import itasserui.app.mytasser.installwizard.InstallWizardSpec
 import org.testfx.api.FxAssert
+import org.testfx.api.FxToolkit
 import org.testfx.matcher.base.NodeMatchers
 
-import static itasserui.common.utils.SafeWaitKt.safeWait
 
 class ITasserSetupPageTestSpec extends InstallWizardSpec {
 
@@ -112,6 +112,8 @@ class ITasserSetupPageTestSpec extends InstallWizardSpec {
         then:
         FxAssert.verifyThat(finish_node  , NodeMatchers.isEnabled())
         clickOn(finish_node.queryButton())
+        FxToolkit.hideStage()
+
     }
 
 

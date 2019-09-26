@@ -2,6 +2,7 @@ package itasserui.app.mytasser.installwizard.registration
 
 import itasserui.app.mytasser.installwizard.InstallWizardSpec
 import org.testfx.api.FxAssert
+import org.testfx.api.FxToolkit
 import org.testfx.matcher.base.NodeMatchers
 import org.testfx.matcher.control.TextInputControlMatchers
 
@@ -58,5 +59,6 @@ class PasswordValidationSpec extends InstallWizardSpec {
 
         then:
         verifyThat(next_node, NodeMatchers.isDisabled())
+        FxToolkit.hideStage()
     }
 }

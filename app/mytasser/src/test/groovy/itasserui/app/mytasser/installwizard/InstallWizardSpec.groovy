@@ -4,7 +4,13 @@ import arrow.core.Either
 import itasser.app.mytasser.app.installwizard.InstallWizard
 import itasserui.app.mytasser.AppSpec
 import itasserui.lib.filemanager.FS
+import javafx.scene.input.KeyCode
+import javafx.scene.input.MouseButton
+import org.junit.After
+import org.junit.AfterClass
+import org.junit.jupiter.api.AfterAll
 import org.testfx.api.FxAssert
+import org.testfx.api.FxToolkit
 import org.testfx.matcher.base.NodeMatchers
 import org.testfx.service.query.NodeQuery
 import spock.lang.Shared
@@ -47,6 +53,5 @@ abstract class InstallWizardSpec extends AppSpec<InstallWizard> {
         dataCreated instanceof Either.Right
         libCreated instanceof Either.Right
         javaCreated instanceof Either.Right
-
     }
 }

@@ -11,7 +11,8 @@ fun diInitializer(
     password: String,
     settings: ITasserSettings
 ) {
-    //        Kodein.global.mutable = true
+    Kodein.global.mutable = true
+    Kodein.global.clear()
     val log = object : Logger {}
     log.info { "Initializing the app from Install Wizard" }
     FS.create

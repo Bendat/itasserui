@@ -10,7 +10,7 @@ import javafx.scene.input.KeyCode
 import org.testfx.api.FxAssert
 import org.testfx.matcher.control.ComboBoxMatchers
 
-class BasicLoginTest extends LoginTest {
+class BasicLoginSpec extends LoginSpec {
     void "Create the admin user"() {
         given:
         def timeUnit = lookup(".timeout_unit")

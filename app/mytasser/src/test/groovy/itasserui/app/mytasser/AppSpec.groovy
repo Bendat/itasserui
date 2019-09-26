@@ -32,11 +32,7 @@ abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {
     void setup() {
         System.setProperty("itasserui.testmode", true.toString())
         System.setProperty("itasser.home", tmpdirPath.toString())
-    }
-
-    @Override
-    void init() throws Exception {
-        FxToolkit.registerStage { new Stage(StageStyle.UNIFIED) }
+        print("Test is: ${this.class.simpleName}")
     }
 
     @Override

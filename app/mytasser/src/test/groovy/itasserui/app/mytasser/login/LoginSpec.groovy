@@ -8,7 +8,7 @@ import spock.lang.Shared
 
 import java.nio.file.Path
 
-abstract class LoginTest extends AppSpec<LoginModal> {
+abstract class LoginSpec extends AppSpec<LoginModal> {
     @Shared Path pkg = tmpdirPath.resolve("runI-TASSER.pl").toAbsolutePath()
     @Shared Path datadir = tmpdirPath.resolve("datadir").toAbsolutePath()
     @Shared Path libdir = tmpdirPath.resolve("lib").toAbsolutePath()

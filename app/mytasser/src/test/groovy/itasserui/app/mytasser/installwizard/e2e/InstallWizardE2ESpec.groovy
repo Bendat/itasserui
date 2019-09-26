@@ -4,6 +4,7 @@ package itasserui.app.mytasser.installwizard.e2e
 import arrow.core.None
 import itasserui.app.mytasser.installwizard.InstallWizardSpec
 import org.testfx.api.FxAssert
+import org.testfx.api.FxToolkit
 import org.testfx.matcher.base.NodeMatchers
 
 import java.nio.file.Files
@@ -65,5 +66,6 @@ class InstallWizardE2ESpec extends InstallWizardSpec {
         expect:
         view.settings.itasser.dataDir.normalize() == tmpdirPath.resolve("datadir").normalize()
         view.settings.itasser.runStyle == "gnuparallel"
+        FxToolkit.hideStage()
     }
 }

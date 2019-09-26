@@ -46,6 +46,7 @@ class LoginModal(titleText: String = "User Login") : View() {
                         spinner(-1, 100000, 0, 1, false, model.duration, true) { maxWidth = 80.0 }.id("user_timeout")
                         combobox(model.timeUnit, values) { value = Seconds }.id("timeout_unit")
                     }
+
                 }
             }
             hbox {

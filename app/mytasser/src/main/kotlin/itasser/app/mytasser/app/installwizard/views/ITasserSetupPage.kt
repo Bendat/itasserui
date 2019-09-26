@@ -1,5 +1,6 @@
 package itasser.app.mytasser.app.installwizard.views
 
+import itasser.app.mytasser.app.components.extensions.textinput
 import itasser.app.mytasser.app.installwizard.viewmodel.InstallWizardViewModel
 import javafx.collections.FXCollections
 import javafx.geometry.Orientation
@@ -33,34 +34,34 @@ class ITasserSetupPage : View("ITasser setup"), InstallWizardPage {
     override val root: Parent = form {
         fieldset("ITasser Parameters", labelPosition = Orientation.VERTICAL) {
             field("Package Dir") {
-                textfield(model.pkgDir) {
+                textinput(model.pkgDir) {
                     addClass("pkgdir")
                     promptText = "Directory containing the runITASSER.pl script"
-                    validator { validatePkgdir(this@textfield, this) }
+                    validator { validatePkgdir(this@textinput, this) }
                 }
             }
 
             field("Lib Dir") {
-                textfield(model.libDir) {
+                textinput(model.libDir) {
                     addClass("libdir")
                     promptText = "Directory of the ITASSER template library"
-                    validator { validateDirectory(this@textfield, this) }
+                    validator { validateDirectory(this@textinput, this) }
                 }
             }
 
             field("Data Dir") {
-                textfield(model.dataDir) {
+                textinput(model.dataDir) {
                     addClass("datadir")
                     promptText = "Directory where datadirs will be created for sequences"
-                    validator { validateDirectory(this@textfield, this) }
+                    validator { validateDirectory(this@textinput, this) }
                 }
             }
 
             field("Java Home") {
-                textfield(model.javaHome) {
+                textinput(model.javaHome) {
                     addClass("java_home")
                     promptText = "The directory containing bin/java"
-                    validator { validateDirectory(this@textfield, this) }
+                    validator { validateDirectory(this@textinput, this) }
                 }
             }
 

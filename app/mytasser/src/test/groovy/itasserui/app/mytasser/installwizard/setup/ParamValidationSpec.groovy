@@ -1,6 +1,7 @@
 package itasserui.app.mytasser.installwizard.setup
 
 import itasserui.app.mytasser.installwizard.InstallWizardSpec
+import org.testfx.api.FxToolkit
 import org.testfx.service.query.NodeQuery
 import spock.lang.Shared
 
@@ -25,9 +26,6 @@ class ParamValidationSpec extends InstallWizardSpec {
     NodeQuery javaHomeNode = null
 
     void "Proceed to setup page"() {
-        given:
-        def password = fake.internet().password() + "S}"
-
         when:
         clickOn(".name").write(fake.name().username())
         clickOn(".email").write(fake.internet().emailAddress())
@@ -83,5 +81,6 @@ class ParamValidationSpec extends InstallWizardSpec {
 
         then:
         verifyThat(finish_node, isDisabled())
+        FxToolkit.hideStage()
     }
 }
