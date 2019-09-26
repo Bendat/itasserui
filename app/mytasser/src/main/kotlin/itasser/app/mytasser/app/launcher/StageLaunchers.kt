@@ -16,7 +16,7 @@ import kotlin.reflect.KClass
 abstract class Launcher(
     primaryView: KClass<out UIComponent> = NoPrimaryViewSpecified::class,
     stylesheet: KClass<out Stylesheet>
-): App(primaryView, stylesheet), KodeinAware{
+) : App(primaryView, stylesheet), KodeinAware {
     override val kodein: Kodein
         get() = Kodein.global
 

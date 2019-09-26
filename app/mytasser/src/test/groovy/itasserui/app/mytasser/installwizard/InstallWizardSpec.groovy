@@ -1,27 +1,52 @@
 package itasserui.app.mytasser.installwizard
 
+import arrow.core.Either
 import itasser.app.mytasser.app.installwizard.InstallWizard
 import itasserui.app.mytasser.AppSpec
-import org.hamcrest.Matcher
+import itasserui.lib.filemanager.FS
 import org.testfx.api.FxAssert
 import org.testfx.matcher.base.NodeMatchers
-import javafx.scene.Node
 import org.testfx.service.query.NodeQuery
 import spock.lang.Shared
 
+import java.nio.file.Path
+
 abstract class InstallWizardSpec extends AppSpec<InstallWizard> {
-    @Shared NodeQuery next = null
-    @Shared NodeQuery finish = null
-    @Override
-    InstallWizard create() {
+    @Shared NodeQuery next_node = null
+    @Shared NodeQuery finish_node = null
+    @Shared NodeQuery back_node = null
+
+    @Shared Path pkg = tmpdirPath.resolve("runI-TASSER.pl").toAbsolutePath()
+    @Shared Path datadir = tmpdirPath.resolve("datadir").toAbsolutePath()
+    @Shared Path libdir = tmpdirPath.resolve("lib").toAbsolutePath()
+    @Shared Path javaHome = tmpdirPath.resolve("jdk").toAbsolutePath()
+
+    @Override InstallWizard create() {
         return new InstallWizard()
     }
 
-    void "Gather the next button"(){
+    void "Setup: Gather the next button"() {
         given:
-        next = lookup(".button").nth(2)
-        finish = lookup(".button").nth(1)
+        next_node = lookup(".button").nth(2)
+        finish_node = lookup(".button").nth(1)
+        back_node = lookup(".button").nth(0)
+
         expect:
-        FxAssert.verifyThat(next, NodeMatchers.isDisabled())
+        FxAssert.verifyThat(next_node, NodeMatchers.isDisabled())
+    }
+
+    void "Setup: Create Test Directories"() {
+        when:
+        def pkgCreated = FS.create.file(pkg)
+        def dataCreated = FS.create.directories(datadir)
+        def libCreated = FS.create.directories(libdir)
+        def javaCreated = FS.create.directories(javaHome)
+
+        then:
+        pkgCreated instanceof Either.Right
+        dataCreated instanceof Either.Right
+        libCreated instanceof Either.Right
+        javaCreated instanceof Either.Right
+
     }
 }

@@ -4,6 +4,7 @@ import arrow.core.Option
 import itasser.app.mytasser.app.installwizard.controller.InstallWizardController
 import itasserui.common.extensions.Outcomes
 import itasserui.common.extensions.plus
+import itasserui.common.utils.uuid
 import itasserui.lib.store.Database
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -12,9 +13,11 @@ import tornadofx.ItemViewModel
 
 private typealias SettingsUserResult = Pair<Option<Long>, Option<Long>>
 
-class InstallWizardViewModel :
+class InstallWizardViewModel() :
     ItemViewModel<InstallWizardController>(InstallWizardController()),
     KodeinAware {
+    val id = uuid
+
     override val kodein: Kodein get() = item.kodein
 //    val db by instance<Database>()
     val name = bind(InstallWizardController::nameProperty, autocommit = true)
@@ -27,11 +30,4 @@ class InstallWizardViewModel :
     val javaHome = bind(InstallWizardController::javaHomeProperty, autocommit = true)
     val dataDir = bind(InstallWizardController::dataDirProperty, autocommit = true)
     val runStyle = bind(InstallWizardController::runStyleProperty, autocommit = true)
-
-    fun save(): Outcomes<Long> =
-        item.database.create(toSettings()) +
-                item.database.create(toUser().toUser())
-
-    fun toUser() = item.toUser()
-    fun toSettings() = item.toSettings()
 }

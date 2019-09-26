@@ -18,11 +18,11 @@ class PasswordValidationSpec extends InstallWizardSpec {
         clickOn(".email").write(fake.internet().emailAddress())
 
         then:
-        verifyThat(next, NodeMatchers.isDisabled())
+        verifyThat(next_node, NodeMatchers.isDisabled())
         FxAssert.verifyThat(textfield, TextInputControlMatchers.hasText(name))
     }
 
-    void "Can proceed wit valid password"() {
+    void "Can proceed with valid password"() {
         given:
         def password = fake.internet().password() + "S}"
 
@@ -31,7 +31,7 @@ class PasswordValidationSpec extends InstallWizardSpec {
         clickOn(".password-repeat").write(password)
 
         then:
-        verifyThat(next, NodeMatchers.isEnabled())
+        verifyThat(next_node, NodeMatchers.isEnabled())
     }
 
     void "Should not proceed with mismatched repeat password"() {
@@ -39,7 +39,7 @@ class PasswordValidationSpec extends InstallWizardSpec {
         clickOn(".password-repeat").write(fake.internet().password())
 
         then:
-        verifyThat(next, NodeMatchers.isDisabled())
+        verifyThat(next_node, NodeMatchers.isDisabled())
     }
 
     void "Should not proceed with empty passwords"() {
@@ -48,7 +48,7 @@ class PasswordValidationSpec extends InstallWizardSpec {
         clearText(".password-repeat")
 
         then:
-        verifyThat(next, NodeMatchers.isDisabled())
+        verifyThat(next_node, NodeMatchers.isDisabled())
     }
 
     void "Should not proceed with invalid password"() {
@@ -57,6 +57,6 @@ class PasswordValidationSpec extends InstallWizardSpec {
         clickOn(".password-repeat").write("abcd")
 
         then:
-        verifyThat(next, NodeMatchers.isDisabled())
+        verifyThat(next_node, NodeMatchers.isDisabled())
     }
 }

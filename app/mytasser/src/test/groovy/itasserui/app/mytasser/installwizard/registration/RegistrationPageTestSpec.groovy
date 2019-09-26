@@ -1,4 +1,4 @@
-package itasserui.app.mytasser.installwizard
+package itasserui.app.mytasser.installwizard.registration
 
 import itasser.app.mytasser.app.launcher.InstallWizardLauncher
 import itasserui.common.utils.FakeKt
@@ -9,7 +9,6 @@ import org.testfx.api.FxAssert
 import org.testfx.api.FxToolkit
 import org.testfx.framework.spock.ApplicationSpec
 import org.testfx.matcher.base.NodeMatchers
-
 import static itasserui.common.utils.SafeWaitKt.safeWait
 
 class RegistrationPageTestSpec extends ApplicationSpec {

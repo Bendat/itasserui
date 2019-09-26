@@ -1,45 +1,21 @@
 package itasser.app.mytasser.app.installwizard.views
 
 import arrow.data.Invalid
+import itasser.app.mytasser.app.components.extensions.passwordinput
+import itasser.app.mytasser.app.components.extensions.textinput
 import itasser.app.mytasser.app.installwizard.viewmodel.InstallWizardViewModel
 import itasserui.common.extensions.validPassword
 import itasserui.common.logger.Logger
-import javafx.beans.value.ObservableValue
-import javafx.event.EventTarget
 import javafx.geometry.Orientation.VERTICAL
-import javafx.scene.control.TextField
 import org.apache.commons.validator.routines.EmailValidator
 import tornadofx.*
 
-fun EventTarget.textinput(
-    property: ObservableValue<String>,
-    op: TextField.() -> Unit = {}
-): TextField {
-    return textfield(property, op)
-        .apply {
-            setOnMouseClicked {
-                if (System.getProperty("itasserui.testmode") == "true"){
-                    clear()
-                }
-            }
-        }
-}
-fun EventTarget.passwordinput(
-    property: ObservableValue<String>,
-    op: TextField.() -> Unit = {}
-): TextField {
-    return passwordfield(property, op)
-        .apply {
-            setOnMouseClicked {
-                if (System.getProperty("itasserui.testmode") == "true"){
-                    clear()
-                }
-            }
-        }
+interface InstallWizardPage {
+    val model: InstallWizardViewModel
 }
 
-class RegistrationPage : View("Create Admin Account"), Logger {
-    val model by inject<InstallWizardViewModel>()
+class RegistrationPage : View("Create Admin Account"), InstallWizardPage, Logger {
+    override val model by inject<InstallWizardViewModel>()
     override val complete get() = model.valid(model.name, model.email, model.password, model.passwordRepeat)
 
     override val root = form {
@@ -76,7 +52,6 @@ class RegistrationPage : View("Create Admin Account"), Logger {
                         }
                     }
                 }.required(message = "Password cannot be empty")
-
             }
             field("Repeat") {
                 passwordinput(model.passwordRepeat) {

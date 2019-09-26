@@ -4,7 +4,6 @@ import itasserui.app.mytasser.installwizard.InstallWizardSpec
 import org.testfx.service.query.NodeQuery
 import spock.lang.Shared
 
-import java.nio.file.Files
 import java.nio.file.Path
 
 import static org.testfx.api.FxAssert.verifyThat
@@ -12,84 +11,77 @@ import static org.testfx.matcher.base.NodeMatchers.isDisabled
 import static org.testfx.matcher.base.NodeMatchers.isEnabled
 
 class ParamValidationSpec extends InstallWizardSpec {
-    @Shared
-    Path root = Files.createTempDirectory("guitest")
-    @Shared
-    Path pkgdirPath = root.resolve("pkgdir")
-    @Shared
-    Path itasser = pkgdirPath.resolve("runI-TASSER.pl")
-    @Shared
-    Path uncreated = root.resolve("uncreated")
 
     @Shared
-    NodeQuery pkgdir = null
+    Path uncreated = tmpdirPath.resolve("uncreated")
+
     @Shared
-    NodeQuery datadir = null
+    NodeQuery pkgdirNode = null
     @Shared
-    NodeQuery libdir = null
+    NodeQuery dataDirNode = null
     @Shared
-    NodeQuery javaHome = null
+    NodeQuery libDirNode = null
+    @Shared
+    NodeQuery javaHomeNode = null
 
     void "Proceed to setup page"() {
         given:
         def password = fake.internet().password() + "S}"
 
         when:
-        Files.createDirectories(pkgdirPath)
-        Files.createFile(itasser)
         clickOn(".name").write(fake.name().username())
         clickOn(".email").write(fake.internet().emailAddress())
         clickOn(".password").write(password)
         clickOn(".password-repeat").write(password)
-        clickOn(next.query())
+        clickOn(next_node.query())
 
         then:
-        verifyThat(finish, isDisabled())
+        verifyThat(finish_node, isDisabled())
     }
 
 
-    void "Acquiring parameter fields"() {
+    void "Acquiring textfield nodes"() {
         given:
-        pkgdir = lookup(".pkgdir")
-        datadir = lookup(".datadir")
-        libdir = lookup(".libdir")
-        javaHome = lookup('.java_home')
+        pkgdirNode = lookup(".pkgdir")
+        dataDirNode = lookup(".datadir")
+        libDirNode = lookup(".libdir")
+        javaHomeNode = lookup('.java_home')
     }
 
     void "Valid paths should allow wizard completion"() {
         when:
-        clickOn(pkgdir.query()).write(pkgdirPath.toAbsolutePath().toString())
-        clickOn(libdir.query()).write(root.toAbsolutePath().toString())
-        clickOn(datadir.query()).write(root.toAbsolutePath().toString())
-        clickOn(javaHome.query()).write(root.toAbsolutePath().toString())
+        clickOn(pkgdirNode.query()).write(pkg.toString())
+        clickOn(libDirNode.query()).write(libdir.toString())
+        clickOn(dataDirNode.query()).write(datadir.toString())
+        clickOn(javaHomeNode.query()).write(javaHome.toString())
 
         then:
-        verifyThat(finish, isEnabled())
+        verifyThat(finish_node, isEnabled())
     }
 
     void "Pkgdir must contain runI-TASSER.pl"() {
         given:
-        interact { pkgdir.queryTextInputControl().clear() }
+        interact { pkgdirNode.queryTextInputControl().clear() }
 
         when:
-        clickOn(pkgdir.query()).write(root.toAbsolutePath().toString())
+        clickOn(pkgdirNode.query()).write(datadir.toString())
 
         then:
-        verifyThat(finish, isDisabled())
+        verifyThat(finish_node, isDisabled())
     }
 
     void "Other directories must exist"() {
         given:
         interact {
-            pkgdir.queryTextInputControl().clear()
-            datadir.queryTextInputControl().clear()
+            clearText(pkgdirNode)
+            clearText(dataDirNode)
         }
 
         when:
-        clickOn(pkgdir.query()).write(pkgdirPath.toAbsolutePath().toString())
-        clickOn(datadir.query()).write(uncreated.toAbsolutePath().toString())
+        clickOn(pkgdirNode.query()).write(pkg.toString())
+        clickOn(dataDirNode.query()).write(uncreated.toAbsolutePath().toString())
 
         then:
-        verifyThat(finish, isDisabled())
+        verifyThat(finish_node, isDisabled())
     }
 }
