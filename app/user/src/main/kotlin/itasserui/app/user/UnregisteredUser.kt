@@ -9,9 +9,6 @@ import itasserui.lib.filemanager.FileDomain
 import itasserui.lib.filemanager.FileDomain.FileCategory
 import itasserui.lib.filemanager.FileDomain.FileCategory.Users
 import itasserui.lib.filemanager.FileDomain.Subcategory
-import itasserui.lib.filemanager.WatchedDirectory
-import lk.kotlin.observable.list.ObservableList
-import lk.kotlin.observable.list.observableListOf
 import java.util.*
 
 interface Account : FileDomain {

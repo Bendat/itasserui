@@ -61,7 +61,7 @@ class LoginTests : DescribeSpec({
 
             }
 
-            context("Session should become inactive after its duration has passed"){
+            context("Session should become inactive after its duration has passed") {
                 it("Waits a further 400 milliseconds") {
                     safeWait(400)
                 }

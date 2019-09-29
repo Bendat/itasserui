@@ -27,11 +27,9 @@ import java.lang.System.currentTimeMillis
 import java.time.Duration
 
 class ProfileManager(
-    override val kodein: Kodein = Kodein.global
-) : Logger, KodeinAware {
-
-    val fileManager: FileManager by instance()
-    val database: Database by instance()
+    val fileManager: FileManager,
+    val database: Database
+) : Logger {
 
     data class TimeLock(val start: Long, val duration: Duration) {
         val timeRemaining get() = start + duration.toMillis() - currentTimeMillis()

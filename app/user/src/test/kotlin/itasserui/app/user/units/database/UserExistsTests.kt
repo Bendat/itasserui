@@ -2,13 +2,10 @@
 
 package itasserui.app.user.units.database
 
-import io.kotlintest.eventually
-import io.kotlintest.seconds
 import io.kotlintest.should
 import io.kotlintest.specs.DescribeSpec
 import itasserui.app.user.ProfileError.UserEmailAlreadyExists
 import itasserui.app.user.ProfileError.UsernameAlreadyExists
-import itasserui.app.user.ProfileManager
 import itasserui.app.user.User
 import itasserui.app.user.UserExists
 import itasserui.app.user.UserMocks
@@ -17,8 +14,6 @@ import itasserui.app.user.units.utils.testModule
 import itasserui.common.interfaces.inline.EmailAddress
 import itasserui.common.interfaces.inline.Username
 import itasserui.common.utils.Fake
-import itasserui.lib.store.Database
-import itasserui.lib.store.Database.MemoryDatabase
 import itasserui.test_utils.matchers.Be
 import org.kodein.di.Kodein
 import org.kodein.di.conf.global
