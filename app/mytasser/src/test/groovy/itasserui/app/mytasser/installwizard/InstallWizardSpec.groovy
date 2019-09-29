@@ -4,16 +4,11 @@ import arrow.core.Either
 import itasser.app.mytasser.app.installwizard.InstallWizard
 import itasserui.app.mytasser.AppSpec
 import itasserui.lib.filemanager.FS
-import javafx.scene.input.KeyCode
-import javafx.scene.input.MouseButton
-import org.junit.After
-import org.junit.AfterClass
-import org.junit.jupiter.api.AfterAll
 import org.testfx.api.FxAssert
-import org.testfx.api.FxToolkit
 import org.testfx.matcher.base.NodeMatchers
 import org.testfx.service.query.NodeQuery
 import spock.lang.Shared
+import tornadofx.Scope
 
 import java.nio.file.Path
 
@@ -28,7 +23,7 @@ abstract class InstallWizardSpec extends AppSpec<InstallWizard> {
     @Shared Path javaHome = tmpdirPath.resolve("jdk").toAbsolutePath()
 
     @Override InstallWizard create() {
-        return new InstallWizard()
+        return new InstallWizard(new Scope())
     }
 
     void "Setup: Gather the next button"() {

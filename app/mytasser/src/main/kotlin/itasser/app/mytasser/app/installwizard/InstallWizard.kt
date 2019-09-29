@@ -10,9 +10,11 @@ import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.conf.global
 import org.kodein.di.generic.instance
+import tornadofx.Scope
 import tornadofx.Wizard
 
-class InstallWizard : Wizard(), KodeinAware, Logger {
+class InstallWizard @JvmOverloads constructor(scope: Scope? = null) : Wizard(), KodeinAware, Logger {
+    override val scope: Scope = scope ?: super.scope
     override val kodein: Kodein
         get() = Kodein.global
     override val canFinish = allPagesComplete
