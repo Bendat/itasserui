@@ -7,7 +7,7 @@ import tornadofx.ItemViewModel
 
 private typealias SettingsUserResult = Pair<Option<Long>, Option<Long>>
 
-class InstallWizardViewModel() :
+class InstallWizardViewModel :
     ItemViewModel<InstallWizardController>(InstallWizardController()) {
     val id = uuid
     val name = bind(InstallWizardController::nameProperty, autocommit = true)
@@ -21,5 +21,6 @@ class InstallWizardViewModel() :
     val dataDir = bind(InstallWizardController::dataDirProperty, autocommit = true)
     val runStyle = bind(InstallWizardController::runStyleProperty, autocommit = true)
 
-    var databasePath = bind(InstallWizardController::databasePathProperty)
+    val databasePath = bind(InstallWizardController::databasePathProperty)
+    val kodeinModule = bind(InstallWizardController::latestKodeinProperty)
 }

@@ -1,7 +1,9 @@
 package itasserui.app.mytasser.installwizard.e2e
 
 import arrow.core.None
+import itasser.app.mytasser.lib.DI
 import itasserui.app.mytasser.installwizard.InstallWizardSpec
+import org.kodein.di.Kodein
 import org.testfx.api.FxAssert
 import org.testfx.matcher.base.NodeMatchers
 
@@ -14,7 +16,10 @@ class InstallWizardE2ESpec extends InstallWizardSpec {
         return Files.createTempDirectory("new1").toAbsolutePath()
     }
 
-    void "Set up global directories directories and files"() {
+    void "Successful E2E test for the install wizard"() {
+        given:
+        view.model.databasePath = tmpdirPath
+        
         when: "New user is set up"
         clickOn(".name").write(username)
         clickOn(".email").write(email)
@@ -34,6 +39,11 @@ class InstallWizardE2ESpec extends InstallWizardSpec {
         clickOn(".java_home ").write(javaHome.toString())
         clickOn(finish_node.queryButton())
 
+        and: "The generated Kodein is set in scope"
+        def di = view.model.kodeinModule.value as arrow.core.Some<Kodein>
+        view.setInScope(new DI(view.scope, di.t), view.scope)
+        Thread.sleep(1000)
+
         then: "Verify the viewmodel data is accurate"
         view.model.name.value == username
         view.controller.name == view.model.name.value
@@ -50,11 +60,11 @@ class InstallWizardE2ESpec extends InstallWizardSpec {
         model.name.value == username
         controller.name == view.model.name.value
         controller.initStatus as None
-        controller.isInitialized
         Files.exists(file)
         Files.size(file) > 0
 
         and: "Verify the settings have been stored"
+        print("Settings are ${view.di}")
         view.settings.itasser.dataDir.normalize() == tmpdirPath.resolve("datadir").normalize()
         view.settings.itasser.runStyle == "gnuparallel"
     }

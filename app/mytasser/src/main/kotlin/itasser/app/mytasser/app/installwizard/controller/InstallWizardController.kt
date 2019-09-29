@@ -2,17 +2,15 @@
 
 package itasser.app.mytasser.app.installwizard.controller
 
-import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.some
+import arrow.core.*
 import arrow.data.Ior
 import arrow.data.NonEmptyList
 import arrow.data.nel
-import itasser.app.mytasser.kodeinmodules.DependencyInjector
+import itasser.app.mytasser.kodeinmodules.DependencyInjector.initializeKodein
 import itasser.app.mytasser.lib.ITasserSettings
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.UnregisteredUser
+import itasserui.common.`typealias`.NelOutcome
 import itasserui.common.errors.RuntimeError
 import itasserui.common.interfaces.inline.EmailAddress
 import itasserui.common.interfaces.inline.RawPassword
@@ -24,8 +22,6 @@ import itasserui.lib.store.Database
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.conf.global
 import org.kodein.di.generic.instance
 import tornadofx.Controller
 import tornadofx.getValue
@@ -34,17 +30,12 @@ import java.nio.file.Path
 import java.util.*
 
 @Suppress("unused")
-class InstallWizardController(
-    override val kodein: Kodein = Kodein.global
-) : Controller(), Logger, KodeinAware {
+class InstallWizardController : Controller(), Logger {
     val id: UUID = uuid
 
     init {
         info { "Created new controller $id" }
     }
-
-    val database: Database by instance()
-    val pm: ProfileManager by instance()
 
     val nameProperty = SimpleStringProperty()
     var name: String by nameProperty
@@ -76,6 +67,9 @@ class InstallWizardController(
     val databasePathProperty = SimpleObjectProperty<Path>()
     var databasePath: Path by databasePathProperty
 
+    val latestKodeinProperty = SimpleObjectProperty<Option<Kodein>>(None)
+    var latestKodein: Option<Kodein> by latestKodeinProperty
+
     @Volatile
     var isInitialized = false
     internal var initStatus: Option<NonEmptyList<RuntimeError>> = None
@@ -99,29 +93,26 @@ class InstallWizardController(
         )
     }
 
-    fun initialize(): Option<NonEmptyList<RuntimeError>> {
-        DependencyInjector.initializeKodein(name, password, toSettings(), databasePath)
-        database.launch()
+    fun initialize(): NelOutcome<Kodein> {
+        val di = initializeKodein(name, password, toSettings(), databasePath)
+        latestKodein = Some(di)
+        val db by di.instance<Database>()
+        val pm by di.instance<ProfileManager>()
+        db.launch()
         val profile = pm.createUserProfile(toUser())
-        val dbWrite = database.create(toSettings())
+        val dbWrite = db.create(toSettings())
         info { "Creating user profile: $profile" }
         info { "Creating database settings: $dbWrite" }
         return when {
             profile is Ior.Left && dbWrite is Either.Left ->
-                NonEmptyList(dbWrite.a, *profile.value.all.toTypedArray()).some()
+                NonEmptyList(dbWrite.a, *profile.value.all.toTypedArray()).left()
             profile is Ior.Both && dbWrite is Either.Left ->
-                NonEmptyList(dbWrite.a, *profile.leftValue.all.toTypedArray()).some()
-            profile is Ior.Left -> profile.value.some()
-            profile is Ior.Both -> profile.leftValue.some()
-            dbWrite is Either.Left -> dbWrite.a.nel().some()
-            else -> None
-        }.also {
-            initStatus = it
-        }.also {
-            print("Setting is initialized")
-            isInitialized = true
+                NonEmptyList(dbWrite.a, *profile.leftValue.all.toTypedArray()).left()
+            profile is Ior.Left -> profile.value.left()
+            profile is Ior.Both -> profile.leftValue.left()
+            dbWrite is Either.Left -> dbWrite.a.nel().left()
+            else -> di.right()
         }
-
     }
 }
 

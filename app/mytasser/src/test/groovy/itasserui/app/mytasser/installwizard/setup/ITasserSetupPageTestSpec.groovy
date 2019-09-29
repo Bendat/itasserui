@@ -68,6 +68,9 @@ class ITasserSetupPageTestSpec extends InstallWizardSetupSpec {
 
 
     void "Should validate to progression"() {
+        given:
+        view.model.item.databasePath = tmpdirPath
+
         when:
         clickOn(".pkgdir").write(pkg.toString())
         clickOn(".datadir").write(datadir.toString())
@@ -77,7 +80,6 @@ class ITasserSetupPageTestSpec extends InstallWizardSetupSpec {
         then:
         FxAssert.verifyThat(finish_node  , NodeMatchers.isEnabled())
         clickOn(finish_node.queryButton())
-        FxToolkit.hideStage()
 
     }
 }

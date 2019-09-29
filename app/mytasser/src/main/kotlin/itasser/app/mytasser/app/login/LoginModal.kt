@@ -3,6 +3,7 @@ package itasser.app.mytasser.app.login
 import arrow.core.Try
 import itasser.app.mytasser.app.login.LoginModal.LoginDuration
 import itasser.app.mytasser.app.login.LoginModal.LoginDuration.*
+import itasser.app.mytasser.lib.DI
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.ProfileManager.Session
 import itasserui.common.`typealias`.Outcome
@@ -21,12 +22,15 @@ import tornadofx.*
 import java.time.Duration
 
 
-class LoginModal(titleText: String = "User Login") : View() {
+class LoginModal(
+    titleText: String = "User Login"
+) : View() {
     val model: LoginModalModel by inject()
 
-    fun <T : Node> T.id(fxId: String): T =
-        addClass(fxId)
-
+    fun <T : Node> T.id(fxId: String): T {
+        id = fxId
+        return this
+    }
 
     @Suppress("unused")
     enum class LoginDuration {
@@ -48,7 +52,7 @@ class LoginModal(titleText: String = "User Login") : View() {
                     hbox {
                         val values = values().toList()
                         spinner(-1, 100000, 0, 1, false, model.duration, true) { maxWidth = 80.0 }.id("user_timeout")
-                        combobox(model.timeUnit, values) { value = Seconds }.id("timeout_unit")
+                        combobox(model.timeUnit, values) { value = Actions }.id("timeout_unit")
                     }
 
                 }
@@ -69,8 +73,9 @@ class LoginModal(titleText: String = "User Login") : View() {
 
 @Suppress("MemberVisibilityCanBePrivate")
 class LoginModalController : Controller(), KodeinAware {
+    val kdi: DI by inject<DI>()
     override val kodein: Kodein
-        get() = Kodein.global
+        get() = kdi.kodein
     val profileManager: ProfileManager by instance()
     val usernameProperty = SimpleObjectProperty<String>()
     val username: String by usernameProperty
@@ -84,8 +89,8 @@ class LoginModalController : Controller(), KodeinAware {
     val durationProperty = SimpleObjectProperty<Int>()
     val duration: Int by durationProperty
 
-    val userLoginProperty = SimpleObjectProperty<Outcome<Session>>()
-    var userLogin: Outcome<Session> by userLoginProperty
+    val sessionProperty = SimpleObjectProperty<Outcome<Session>>()
+    var session: Outcome<Session> by sessionProperty
 
     fun onLogin() =
         Try {
@@ -93,7 +98,7 @@ class LoginModalController : Controller(), KodeinAware {
                 username = Username(username),
                 password = RawPassword(password),
                 duration = durationStringConverter(duration)
-            ).also { userLogin = it }
+            ).also { session = it }
         }.mapLeft {
             alert(
                 ERROR,
@@ -109,6 +114,7 @@ class LoginModalController : Controller(), KodeinAware {
         when (timeUnit) {
             Minutes -> Duration.ofMinutes(string.toLong())
             Hours -> Duration.ofHours(string.toLong())
+            Seconds -> Duration.ofSeconds(string.toLong())
             else -> Duration.ofMillis(string.toLong())
         }
 
@@ -116,11 +122,12 @@ class LoginModalController : Controller(), KodeinAware {
 }
 
 class LoginModalModel : ItemViewModel<LoginModalController>(LoginModalController()) {
+
     val username = bind(LoginModalController::usernameProperty)
     val password = bind(LoginModalController::passwordProperty)
     val duration = bind(LoginModalController::durationProperty)
     val timeUnit = bind(LoginModalController::timeUnitProperty)
-    val userLogin = bind(LoginModalController::userLoginProperty)
+    val userLogin = bind(LoginModalController::sessionProperty)
     fun login() = commit()
         .also { item.onLogin() }
 }
