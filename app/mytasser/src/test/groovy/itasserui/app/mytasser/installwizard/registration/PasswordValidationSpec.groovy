@@ -4,29 +4,20 @@ import itasserui.app.mytasser.installwizard.InstallWizardSpec
 import org.testfx.api.FxAssert
 import org.testfx.api.FxToolkit
 import org.testfx.matcher.base.NodeMatchers
-import org.testfx.matcher.control.TextInputControlMatchers
 
-import static org.testfx.api.FxAssert.*
+import static org.testfx.api.FxAssert.verifyThat
 
 class PasswordValidationSpec extends InstallWizardSpec {
-    void "Fill untested fields with valid values"() {
-        given:
-        def name = fake.name().username()
-        def textfield = lookup(".name")
-
+    void setup() {
         when:
-        clickOn(".name").write(name)
-        clickOn(".email").write(fake.internet().emailAddress())
+        clickOn(".name").write(fake.name().username())
+        clickOn(".email").write(email)
 
         then:
         verifyThat(next_node, NodeMatchers.isDisabled())
-        FxAssert.verifyThat(textfield, TextInputControlMatchers.hasText(name))
     }
 
     void "Can proceed with valid password"() {
-        given:
-        def password = fake.internet().password() + "S}"
-
         when:
         clickOn(".password").write(password)
         clickOn(".password-repeat").write(password)
@@ -37,6 +28,7 @@ class PasswordValidationSpec extends InstallWizardSpec {
 
     void "Should not proceed with mismatched repeat password"() {
         when:
+        clickOn(".password").write(password)
         clickOn(".password-repeat").write(fake.internet().password())
 
         then:
@@ -44,11 +36,7 @@ class PasswordValidationSpec extends InstallWizardSpec {
     }
 
     void "Should not proceed with empty passwords"() {
-        when:
-        clearText(".password")
-        clearText(".password-repeat")
-
-        then:
+        expect:
         verifyThat(next_node, NodeMatchers.isDisabled())
     }
 
@@ -59,6 +47,5 @@ class PasswordValidationSpec extends InstallWizardSpec {
 
         then:
         verifyThat(next_node, NodeMatchers.isDisabled())
-        FxToolkit.hideStage()
     }
 }

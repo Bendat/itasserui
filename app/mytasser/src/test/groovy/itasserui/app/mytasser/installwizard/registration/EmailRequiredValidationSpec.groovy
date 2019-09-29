@@ -7,25 +7,23 @@ import org.testfx.api.FxToolkit
 import org.testfx.matcher.base.NodeMatchers
 
 class EmailRequiredValidationSpec extends InstallWizardSpec {
-    void "Fills the wizard form with valid values except for email"() {
-        when:
+
+    void setup(){
         clickOn(".name").write(fake.name().username())
         clickOn(".password").write(password)
+        clickOn(".password-repeat").write(password)
+    }
+
+
+    void "Enters an empty email and verifies we cannot proceed"() {
+        when:
         clickOn(".password-repeat").write(password)
 
         then:
         FxAssert.verifyThat(next_node, NodeMatchers.isDisabled())
     }
 
-    void "Enters an empty email"() {
-        when:
-        clickOn(".email").write("")
-
-        then:
-        FxAssert.verifyThat(next_node, NodeMatchers.isDisabled())
-    }
-
-    void "Enters an invalid username and verifies we cannot proceed"() {
+    void "Enters an invalid email address and verifies we cannot proceed"() {
         when:
         clickOn(".email").write(fake.name().username())
 
@@ -39,6 +37,6 @@ class EmailRequiredValidationSpec extends InstallWizardSpec {
 
         then:
         FxAssert.verifyThat(next_node, NodeMatchers.isEnabled())
-        FxToolkit.hideStage()
     }
+
 }

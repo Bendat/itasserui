@@ -4,14 +4,15 @@ import arrow.core.*
 import arrow.data.Ior
 import arrow.data.Ior.Both
 import arrow.data.Nel
-import arrow.data.NonEmptyList
 import itasserui.app.user.ProfileError.*
 import itasserui.common.`typealias`.Err
 import itasserui.common.`typealias`.OK
 import itasserui.common.`typealias`.Outcome
 import itasserui.common.errors.RuntimeError
 import itasserui.common.extensions.isFalse
+import itasserui.common.interfaces.inline.EmailAddress
 import itasserui.common.interfaces.inline.RawPassword
+import itasserui.common.interfaces.inline.Username
 import itasserui.common.logger.Logger
 import itasserui.lib.filemanager.FileManager
 import itasserui.lib.filemanager.WatchedDirectory
@@ -47,16 +48,23 @@ class ProfileManager(
         user: Account,
         password: RawPassword,
         duration: Duration = Duration.ZERO
-    ): Either<NonEmptyList<RuntimeError>, Session> {
+    ): Outcome<Session> {
         return when (val users = database.read<User> { User::username eq user.username }) {
-            is Err -> Either.Left(NonEmptyList.of(users.a))
+            is Err -> Either.Left(users.a)
             is OK -> when {
-                users.b.isEmpty() -> Either.Left(NonEmptyList.of(NoSuchUser(user)))
-                users.b.first().checkPassword(password).isFalse -> Either.Left(NonEmptyList.of(WrongPassword(user)))
+                users.b.isEmpty() -> Either.Left(NoSuchUser(user))
+                users.b.first().checkPassword(password).isFalse -> Either.Left(WrongPassword(user))
                 else -> Either.Right(Session(users.b.first(), TimeLock(currentTimeMillis(), duration)))
             }
         }
     }
+
+    fun login(
+        username: Username,
+        password: RawPassword,
+        duration: Duration
+    ): Outcome<Session> =
+        login(UnregisteredUser(username, password, EmailAddress("")), password, duration)
 
     fun createUserProfile(user: Account): Ior<Nel<RuntimeError>, User> {
         val realUser = user.toUser()

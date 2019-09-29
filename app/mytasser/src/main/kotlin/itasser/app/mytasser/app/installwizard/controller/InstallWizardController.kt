@@ -91,8 +91,7 @@ class InstallWizardController(
     }
 
     fun initialize(): Option<NonEmptyList<RuntimeError>> {
-//        Kodein.global.mutable = true
-        diInitializer(name, password, toSettings())
+        DependencyInjector.initializeKodein(name, password, toSettings())
         database.launch()
         val profile = pm.createUserProfile(toUser())
         val dbWrite = database.create(toSettings())

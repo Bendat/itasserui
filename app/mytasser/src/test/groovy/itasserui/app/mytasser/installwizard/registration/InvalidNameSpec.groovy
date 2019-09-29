@@ -21,7 +21,6 @@ class InvalidNameSpec extends InstallWizardSpec{
         then:
         safeWait(100)
         FxAssert.verifyThat(next_node, NodeMatchers.isDisabled())
-        FxToolkit.hideStage()
     }
 
 }

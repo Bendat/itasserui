@@ -21,13 +21,18 @@ import java.nio.file.Path
 @Stepwise
 abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {
     @Shared Path tmpdirPath = Files.createTempDirectory("e2e").toAbsolutePath()
-    @Shared Stage stage = null
+    Stage stage = null
     @Shared Faker fake = FakeKt.getFake()
-    @Shared T view = null
+    T view = null
 
     @Shared String password = fake.internet().password(8, 10, true, true, true) + "A]a"
     @Shared String username = "admin"
     @Shared String email = fake.internet().emailAddress()
+
+    @Shared Path pkg = tmpdirPath.resolve("runI-TASSER.pl").toAbsolutePath()
+    @Shared Path datadir = tmpdirPath.resolve("datadir").toAbsolutePath()
+    @Shared Path libdir = tmpdirPath.resolve("lib").toAbsolutePath()
+    @Shared Path javaHome = tmpdirPath.resolve("jdk").toAbsolutePath()
 
     void setup() {
         System.setProperty("itasserui.testmode", true.toString())

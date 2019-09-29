@@ -56,6 +56,9 @@ object FS {
 
         fun temp(path: String): Path =
             Files.createTempDirectory(path)
+
+        fun file(path: Path): Path =
+            Files.createFile(path)
     }
 
     object Update {

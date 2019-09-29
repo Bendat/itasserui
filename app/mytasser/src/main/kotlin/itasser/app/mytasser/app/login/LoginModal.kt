@@ -1,10 +1,12 @@
 package itasser.app.mytasser.app.login
 
 import arrow.core.Try
-import itasser.app.mytasser.app.login.LoginDuration.*
+import itasser.app.mytasser.app.login.LoginModal.LoginDuration
+import itasser.app.mytasser.app.login.LoginModal.LoginDuration.*
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.ProfileManager.Session
 import itasserui.common.`typealias`.Outcome
+import itasserui.common.extensions.mapLeft
 import itasserui.common.interfaces.inline.RawPassword
 import itasserui.common.interfaces.inline.Username
 import javafx.beans.property.SimpleObjectProperty
@@ -18,12 +20,6 @@ import org.kodein.di.generic.instance
 import tornadofx.*
 import java.time.Duration
 
-enum class LoginDuration {
-    Actions,
-    Seconds,
-    Minutes,
-    Hours
-}
 
 class LoginModal(titleText: String = "User Login") : View() {
     val model: LoginModalModel by inject()
@@ -31,6 +27,14 @@ class LoginModal(titleText: String = "User Login") : View() {
     fun <T : Node> T.id(fxId: String): T =
         addClass(fxId)
 
+
+    @Suppress("unused")
+    enum class LoginDuration {
+        Actions,
+        Seconds,
+        Minutes,
+        Hours
+    }
 
     override val root: Parent = hbox {
         spacer()
@@ -42,7 +46,7 @@ class LoginModal(titleText: String = "User Login") : View() {
                 field("Password") { passwordfield(model.password) { }.id("password_field") }
                 field("Log in for:") {
                     hbox {
-                        val values = LoginDuration.values().toList()
+                        val values = values().toList()
                         spinner(-1, 100000, 0, 1, false, model.duration, true) { maxWidth = 80.0 }.id("user_timeout")
                         combobox(model.timeUnit, values) { value = Seconds }.id("timeout_unit")
                     }
@@ -63,24 +67,25 @@ class LoginModal(titleText: String = "User Login") : View() {
 }
 
 
+@Suppress("MemberVisibilityCanBePrivate")
 class LoginModalController : Controller(), KodeinAware {
     override val kodein: Kodein
         get() = Kodein.global
     val profileManager: ProfileManager by instance()
     val usernameProperty = SimpleObjectProperty<String>()
-    val username by usernameProperty
+    val username: String by usernameProperty
 
     val passwordProperty = SimpleObjectProperty<String>()
-    val password by passwordProperty
+    val password: String by passwordProperty
 
     val timeUnitProperty = SimpleObjectProperty<LoginDuration>()
-    val timeUnit by timeUnitProperty
+    val timeUnit: LoginDuration by timeUnitProperty
 
     val durationProperty = SimpleObjectProperty<Int>()
-    val duration by durationProperty
+    val duration: Int by durationProperty
 
     val userLoginProperty = SimpleObjectProperty<Outcome<Session>>()
-    var userLogin by userLoginProperty
+    var userLogin: Outcome<Session> by userLoginProperty
 
     fun onLogin() =
         Try {
@@ -89,7 +94,7 @@ class LoginModalController : Controller(), KodeinAware {
                 password = RawPassword(password),
                 duration = durationStringConverter(duration)
             ).also { userLogin = it }
-        }.toEither().mapLeft {
+        }.mapLeft {
             alert(
                 ERROR,
                 "Couldn't log in",
@@ -100,7 +105,7 @@ class LoginModalController : Controller(), KodeinAware {
         }
 
 
-    fun durationStringConverter(string: Int) =
+    fun durationStringConverter(string: Int): Duration =
         when (timeUnit) {
             Minutes -> Duration.ofMinutes(string.toLong())
             Hours -> Duration.ofHours(string.toLong())

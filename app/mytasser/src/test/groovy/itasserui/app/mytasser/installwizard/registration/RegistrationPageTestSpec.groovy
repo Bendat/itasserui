@@ -38,7 +38,6 @@ class RegistrationPageTestSpec extends InstallWizardSpec {
         clickOn(".password-repeat").write(password)
 
         then:
-        safeWait(500)
         FxAssert.verifyThat(next_node, NodeMatchers.isDisabled())
     }
 
@@ -50,7 +49,6 @@ class RegistrationPageTestSpec extends InstallWizardSpec {
         clickOn(".password-repeat").write(password)
 
         then:
-        safeWait(500)
         FxAssert.verifyThat(next_node, NodeMatchers.isDisabled())
     }
 
@@ -62,7 +60,6 @@ class RegistrationPageTestSpec extends InstallWizardSpec {
         clickOn(".password-repeat").write(fake.internet().password())
 
         then:
-        safeWait(500)
         FxAssert.verifyThat(next_node, NodeMatchers.isDisabled())
     }
 
@@ -75,10 +72,7 @@ class RegistrationPageTestSpec extends InstallWizardSpec {
         clickOn(".password-repeat").write(password)
 
         then:
-        safeWait(500)
         FxAssert.verifyThat(next_node, NodeMatchers.isEnabled())
-        FxToolkit.hideStage()
-        view.primaryStage.close()
     }
 
 }

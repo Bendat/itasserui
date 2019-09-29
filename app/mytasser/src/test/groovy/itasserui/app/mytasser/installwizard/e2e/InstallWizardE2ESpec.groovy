@@ -39,6 +39,10 @@ class InstallWizardE2ESpec extends InstallWizardSpec {
         view.controller.initStatus as None
         FxAssert.verifyThat(finish_node, NodeMatchers.isEnabled())
         clickOn(finish)
+
+        and:
+        view.model.name.value == username
+
     }
 
     void "Verify the viewmodel persists"() {

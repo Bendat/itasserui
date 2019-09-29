@@ -1,6 +1,7 @@
 package itasserui.common.extensions
 
 import arrow.core.Either
+import arrow.core.Try
 import arrow.data.Ior
 import arrow.data.Nel
 import itasserui.common.`typealias`.Outcome
@@ -22,3 +23,7 @@ operator fun <T> Outcome<T>.plus(
             Ior.Right(Nel.of(this.b, other.b))
         else -> throw IllegalStateException("This should never happen when adding [$this] and [$other]")
     }
+
+
+fun <T, K> Try<T>.mapLeft(op: (Throwable) -> K) =
+    toEither().mapLeft(op)
