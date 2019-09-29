@@ -18,8 +18,8 @@ class InstallWizardE2ESpec extends InstallWizardSpec {
 
     void "Successful E2E test for the install wizard"() {
         given:
-        view.model.databasePath = tmpdirPath
-        
+        view.model.databasePath.value = tmpdirPath
+
         when: "New user is set up"
         clickOn(".name").write(username)
         clickOn(".email").write(email)

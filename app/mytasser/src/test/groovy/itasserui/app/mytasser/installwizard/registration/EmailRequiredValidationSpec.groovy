@@ -17,7 +17,7 @@ class EmailRequiredValidationSpec extends InstallWizardSpec {
 
     void "Enters an empty email and verifies we cannot proceed"() {
         when:
-        clickOn(".password-repeat").write(password)
+        clickOn(".email").write(fake.name().username())
 
         then:
         FxAssert.verifyThat(next_node, NodeMatchers.isDisabled())
