@@ -20,7 +20,7 @@ import java.nio.file.Path
 
 @Stepwise
 abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {
-    @Shared Path tmpdirPath = Files.createTempDirectory("e2e").toAbsolutePath()
+    @Shared Path tmpdirPath = generateTestDir()
     Stage stage = null
     @Shared Faker fake = FakeKt.getFake()
     T view = null
@@ -34,6 +34,9 @@ abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {
     @Shared Path libdir = tmpdirPath.resolve("lib").toAbsolutePath()
     @Shared Path javaHome = tmpdirPath.resolve("jdk").toAbsolutePath()
 
+    Path generateTestDir(){
+        return Files.createTempDirectory("e2e").toAbsolutePath()
+    }
     void setup() {
         System.setProperty("itasserui.testmode", true.toString())
         System.setProperty("itasser.home", tmpdirPath.toString())

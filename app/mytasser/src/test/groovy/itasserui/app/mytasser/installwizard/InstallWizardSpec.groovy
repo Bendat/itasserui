@@ -16,7 +16,8 @@ abstract class InstallWizardSpec extends AppSpec<InstallWizard> {
     NodeQuery back_node = null
 
     @Override InstallWizard create() {
-        return new InstallWizard(new Scope())
+        def wiz = new InstallWizard(new Scope())
+        return wiz
     }
 
     void setup(){
@@ -25,7 +26,7 @@ abstract class InstallWizardSpec extends AppSpec<InstallWizard> {
         finish_node = lookup(".button").nth(1)
         back_node = lookup(".button").nth(0)
 
-        expect:
+        then:
         FxAssert.verifyThat(next_node, NodeMatchers.isDisabled())
     }
 

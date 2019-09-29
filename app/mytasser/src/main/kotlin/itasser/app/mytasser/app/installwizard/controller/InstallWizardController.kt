@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package itasser.app.mytasser.app.installwizard.controller
 
 import arrow.core.Either
@@ -7,7 +9,7 @@ import arrow.core.some
 import arrow.data.Ior
 import arrow.data.NonEmptyList
 import arrow.data.nel
-import itasser.app.mytasser.kodeinmodules.*
+import itasser.app.mytasser.kodeinmodules.DependencyInjector
 import itasser.app.mytasser.lib.ITasserSettings
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.UnregisteredUser
@@ -19,6 +21,7 @@ import itasserui.common.logger.Logger
 import itasserui.common.utils.uuid
 import itasserui.lib.filemanager.FS
 import itasserui.lib.store.Database
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
@@ -27,11 +30,14 @@ import org.kodein.di.generic.instance
 import tornadofx.Controller
 import tornadofx.getValue
 import tornadofx.setValue
+import java.nio.file.Path
+import java.util.*
 
+@Suppress("unused")
 class InstallWizardController(
     override val kodein: Kodein = Kodein.global
 ) : Controller(), Logger, KodeinAware {
-    val id = uuid
+    val id: UUID = uuid
 
     init {
         info { "Created new controller $id" }
@@ -41,31 +47,34 @@ class InstallWizardController(
     val pm: ProfileManager by instance()
 
     val nameProperty = SimpleStringProperty()
-    var name by nameProperty
+    var name: String by nameProperty
 
     val emailProperty = SimpleStringProperty()
-    var email by emailProperty
+    var email: String by emailProperty
 
     val passwordProperty = SimpleStringProperty()
-    var password by passwordProperty
+    var password: String by passwordProperty
 
     val repeatPasswordProperty = SimpleStringProperty()
-    var repeatPassword by repeatPasswordProperty
+    var repeatPassword: String by repeatPasswordProperty
 
     val pkgDirProperty = SimpleStringProperty()
-    var pkgDir by pkgDirProperty
+    var pkgDir: String by pkgDirProperty
 
     val libDirProperty = SimpleStringProperty()
-    var libDir by libDirProperty
+    var libDir: String by libDirProperty
 
     val javaHomeProperty = SimpleStringProperty()
-    var javaHome by javaHomeProperty
+    var javaHome: String by javaHomeProperty
 
     val dataDirProperty = SimpleStringProperty()
-    var dataDir by dataDirProperty
+    var dataDir: String by dataDirProperty
 
     val runStyleProperty = SimpleStringProperty()
-    var runStyle by runStyleProperty
+    var runStyle: String by runStyleProperty
+
+    val databasePathProperty = SimpleObjectProperty<Path>()
+    var databasePath: Path by databasePathProperty
 
     @Volatile
     var isInitialized = false
@@ -91,7 +100,7 @@ class InstallWizardController(
     }
 
     fun initialize(): Option<NonEmptyList<RuntimeError>> {
-        DependencyInjector.initializeKodein(name, password, toSettings())
+        DependencyInjector.initializeKodein(name, password, toSettings(), databasePath)
         database.launch()
         val profile = pm.createUserProfile(toUser())
         val dbWrite = database.create(toSettings())

@@ -40,6 +40,5 @@ class ParamValidationSpec extends InstallWizardSetupSpec {
 
         then:
         verifyThat(finish_node, isDisabled())
-        FxToolkit.hideStage()
     }
 }

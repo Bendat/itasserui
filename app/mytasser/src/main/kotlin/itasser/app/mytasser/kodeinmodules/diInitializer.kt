@@ -3,17 +3,26 @@ package itasser.app.mytasser.kodeinmodules
 import itasser.app.mytasser.lib.ITasserSettings
 import itasserui.common.logger.Logger
 import itasserui.lib.filemanager.FS
+import itasserui.lib.store.Database
 import org.kodein.di.Kodein
+import org.kodein.di.KodeinAware
 import org.kodein.di.conf.global
+import org.kodein.di.generic.instance
+import java.nio.file.Path
 
-object DependencyInjector {
+object DependencyInjector : KodeinAware {
+    override val kodein: Kodein = Kodein.global
+
     private var wasInitialized = false
     val isInitialized get() = wasInitialized
+
+    private val database: Database by instance()
 
     fun initializeKodein(
         name: String,
         password: String,
-        settings: ITasserSettings
+        settings: ITasserSettings,
+        databasePath: Path = FS.itasserhome
     ) {
         if (!isInitialized) {
             Kodein.global.mutable = true
@@ -25,7 +34,7 @@ object DependencyInjector {
                 .map { log.info { "Creating itasser home directory: $it" } }
                 .map { Kodein.global.addImport(fileManagerModule()) }
             log.trace { "Adding database module with name $name" }
-            Kodein.global.addImport(databaseModule(name, password))
+            Kodein.global.addImport(databaseModule(name, password, databasePath))
             log.trace { "Adding profile manager module" }
             Kodein.global.addImport(profilemanagermodule())
             log.trace { "Adding settings manager module" }

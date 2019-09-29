@@ -17,7 +17,16 @@ class Styles : Stylesheet() {
     init {
         welcomeScreen {
             padding = box(10.px)
-            backgroundColor += LinearGradient(0.0, 0.0, 0.0, 1.0, true, CycleMethod.NO_CYCLE, Stop(0.0, c("#028aff")), Stop(1.0, c("#003780")))
+            backgroundColor += LinearGradient(
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                true,
+                CycleMethod.NO_CYCLE,
+                Stop(0.0, c("#028aff")),
+                Stop(1.0, c("#003780"))
+            )
             heading {
                 fontSize = 3.em
                 textFill = Color.WHITE

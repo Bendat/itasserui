@@ -8,7 +8,6 @@ import tornadofx.passwordfield
 import tornadofx.textfield
 
 
-
 fun <T : TextField> EventTarget.stringInput(
     fieldType: () -> T
 ): T {
