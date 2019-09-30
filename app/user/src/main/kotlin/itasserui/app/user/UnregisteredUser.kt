@@ -15,13 +15,15 @@ interface Account : FileDomain {
     val username: Username
     val password: Password
     val emailAddress: EmailAddress
+    val isAdmin: Boolean
     fun toUser(id: UUID = this.id): User
 }
 
 data class UnregisteredUser(
     override val username: Username,
     override val password: RawPassword,
-    override val emailAddress: EmailAddress
+    override val emailAddress: EmailAddress,
+    override val isAdmin: Boolean = false
 ) : Account {
     override val category: FileCategory
         get() = Users

@@ -5,15 +5,42 @@ import itasser.app.mytasser.kodeinmodules.DependencyInjector
 import itasser.app.mytasser.lib.DI
 import itasser.app.mytasser.lib.ITasserSettings
 import itasserui.app.mytasser.AppSpec
-import spock.lang.Shared
-import tornadofx.Component
+import itasserui.app.user.UnregisteredUser
+import itasserui.common.interfaces.inline.EmailAddress
+import itasserui.common.interfaces.inline.RawPassword
+import itasserui.common.interfaces.inline.Username
+import org.testfx.api.FxAssert
+import org.testfx.api.FxToolkit
+import org.testfx.matcher.control.ComboBoxMatchers
+import org.testfx.service.query.NodeQuery
+import tornadofx.Scope
 
 import java.nio.file.Path
 
 abstract class LoginSpec extends AppSpec<LoginModal> {
+    NodeQuery timeUnit = null
 
-    @Shared private ITasserSettings settins = new ITasserSettings(tmpdirPath, libdir, javaHome, datadir, "gnuparallel", UUID.randomUUID())
+    private ITasserSettings settins = new ITasserSettings(tmpdirPath, libdir, javaHome, datadir, "gnuparallel", UUID.randomUUID())
 
+    void cleanup() {
+        FxToolkit.hideStage()
+    }
+
+    void setup() {
+        setup:
+        def user = new UnregisteredUser(new Username(username), new RawPassword(password), new EmailAddress(email)).toUser(UUID.randomUUID())
+        timeUnit = lookup("#timeout_unit")
+
+        expect:
+        "The combobox to have ${LoginModal.LoginDuration.values().size()}"
+        FxAssert.verifyThat(timeUnit, ComboBoxMatchers.hasItems(4))
+        FxAssert.verifyThat(timeUnit, ComboBoxMatchers.hasSelectedItem(LoginModal.LoginDuration.Actions))
+
+        and:
+        "A new user $username to exist in the database"
+        view.model.item.profileManager.database.launch()
+        view.model.item.profileManager.saveToDb(user)
+    }
 
     @Override
     LoginModal create() {
@@ -24,7 +51,7 @@ abstract class LoginSpec extends AppSpec<LoginModal> {
                 password,
                 settins,
                 path)
-        def view = new LoginModal("User Login")
+        def view = new LoginModal("User Login", new Scope())
         view.setInScope(new DI(view.scope, kodein), view.scope)
         return view
     }

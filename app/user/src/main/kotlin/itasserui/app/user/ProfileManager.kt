@@ -19,10 +19,6 @@ import itasserui.lib.filemanager.WatchedDirectory
 import itasserui.lib.store.Database
 import org.dizitart.kno2.filters.eq
 import org.dizitart.no2.objects.ObjectFilter
-import org.kodein.di.Kodein
-import org.kodein.di.KodeinAware
-import org.kodein.di.conf.global
-import org.kodein.di.generic.instance
 import java.lang.System.currentTimeMillis
 import java.time.Duration
 
@@ -40,6 +36,16 @@ class ProfileManager(
     data class Session(val user: User, val timeLock: TimeLock) {
         val isActive get() = timeLock.isUnlocked
         val sessionTimeRemaining: Long get() = timeLock.timeRemaining
+    }
+
+    fun getAdmin(password: RawPassword): Outcome<User> {
+        val results = database.read<User> { Account::isAdmin eq true }
+        lateinit var user: User
+        return results
+            .map { it.first() }
+            .map { user = it; it }
+            .flatMap { if (it.password.verify(password)) it.right() else WrongPassword(it).left() }
+            .map { user }
     }
 
     fun login(
@@ -103,19 +109,15 @@ class ProfileManager(
             .create(user)
             .map { user }
 
-    private fun trySaveToDb(user: User): Outcome<User> =
-        when (val exists = existsInDatabase(user)) {
-            is None -> saveToDb(user)
-            is Some -> CannotCreateUserProfileError(user, exists.t).left()
-        }
+    private fun trySaveToDb(user: User): Outcome<User> = when (val exists = existsInDatabase(user)) {
+        is None -> saveToDb(user)
+        is Some -> CannotCreateUserProfileError(user, exists.t).left()
+    }
 
-    private fun createProfileDir(user: Account): Outcome<WatchedDirectory> =
-        if (!existsInFileSystem(user))
-            setupUserDirectories(user)
-        else UserDirectoryAlreadyExists(
-            user,
-            fileManager.fullPath(user)
-        ).left()
+    private fun createProfileDir(user: Account): Outcome<WatchedDirectory> = when {
+        !existsInFileSystem(user) -> setupUserDirectories(user)
+        else -> Left(UserDirectoryAlreadyExists(user, fileManager.fullPath(user)))
+    }
 
     internal fun setupUserDirectories(user: Account) =
         fileManager

@@ -38,6 +38,8 @@
         <kotlintest-runner-junit5.version>3.3.2</kotlintest-runner-junit5.version>
         <directory-watcher.version>0.9.5</directory-watcher.version>
         <jackson-module-kotlin.version>2.9.9</jackson-module-kotlin.version>
+        <commons-text.version>1.7</commons-text.version>
+        <commons-lang3.version>3.9</commons-lang3.version>
 
         <!-- Property Flags -->
         <skipITs>false</skipITs>
@@ -118,7 +120,10 @@
                 <artifactId>kodein-di-conf-jvm</artifactId>
                 <version>6.3.3</version>
             </dependency>
+
         </dependencies>
+
+
     </dependencyManagement>
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
@@ -130,6 +135,39 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.22.1</version>
+                    <configuration>
+                        <useFile>false</useFile>
+                        <excludes>
+                            <include>**/*Test.java</include>
+                            <include>**/*Spec.java</include>
+                        </excludes>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>2.22.1</version>
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>verify</id>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <useFile>false</useFile>
+                        <includes>
+                            <include>**/*Test.java</include>
+                            <include>**/*Spec.java</include>
+                        </includes>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

@@ -123,7 +123,7 @@ sealed class Database(
     }
 
     class PersistentDatabase(
-        directory: Path,
+        val directory: Path,
         private val name: String,
         username: String,
         password: String
@@ -135,10 +135,14 @@ sealed class Database(
             password: Password
         ) : this(directory, name, username.value, password.value)
 
+        val filePath get() = directory.resolve("$name.idb")
 
         override fun launch(): Option<InitError> {
+            info { "Launching persistent database $filePath" }
             return when (val result = Try {
                 dbOptional = nitrite(userId = username, password = password) {
+                    file = filePath.toFile()
+                    info { "File is $file" }
                     nitriteMapper = object : JacksonMapper() {
                         init {
                             objectMapper.registerModule(KotlinModule())

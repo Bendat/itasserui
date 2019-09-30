@@ -9,7 +9,7 @@ typealias MissingUpper = PasswordValidationError.MissingUppercaseChars
 typealias MissingLower = PasswordValidationError.MissingLowercaseChars
 
 sealed class PasswordValidationError(val message: String?) : RuntimeError() {
-    sealed class PasswordLengthError(message: String)  : PasswordValidationError(message) {
+    sealed class PasswordLengthError(message: String) : PasswordValidationError(message) {
         abstract val length: Int
         abstract val threshold: Int
 

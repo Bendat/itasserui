@@ -8,13 +8,8 @@ import org.testfx.api.FxAssert
 import org.testfx.matcher.base.NodeMatchers
 
 import java.nio.file.Files
-import java.nio.file.Path
 
 class InstallWizardE2ESpec extends InstallWizardSpec {
-    @Override
-    Path generateTestDir() {
-        return Files.createTempDirectory("new1").toAbsolutePath()
-    }
 
     void "Successful E2E test for the install wizard"() {
         given:
@@ -42,7 +37,6 @@ class InstallWizardE2ESpec extends InstallWizardSpec {
         and: "The generated Kodein is set in scope"
         def di = view.model.kodeinModule.value as arrow.core.Some<Kodein>
         view.setInScope(new DI(view.scope, di.t), view.scope)
-        Thread.sleep(1000)
 
         then: "Verify the viewmodel data is accurate"
         view.model.name.value == username
@@ -50,16 +44,13 @@ class InstallWizardE2ESpec extends InstallWizardSpec {
         view.controller.initStatus as None
         FxAssert.verifyThat(finish_node, NodeMatchers.isEnabled())
 
-        and:
-        def model = view.model
-        def controller = view.controller
+        and: "Given the database file"
         def file = tmpdirPath.resolve("database.idb")
 
-
         then: "Verify controller data is accurate"
-        model.name.value == username
-        controller.name == view.model.name.value
-        controller.initStatus as None
+        view.model.name.value == username
+        view.controller.name == view.model.name.value
+        view.controller.initStatus as None
         Files.exists(file)
         Files.size(file) > 0
 

@@ -104,27 +104,7 @@ class DatabaseTest : DescribeSpec({
     }
 
     describe("IOException tests using real database") {
-        context("Verifying JimFS works as expected") {
-            lateinit var db: PersistentDatabase
-            lateinit var tmpRoot: Path
-            val fs = Jimfs.newFileSystem(Configuration.unix())
 
-            val foo = fs.getPath("/databasetest")
-            eventually(1.seconds) {
-                tmpRoot = Files.createDirectory(foo)
-                db = PersistentDatabase(tmpRoot, "db", "user", "user")
-                db.launch()
-            }
-
-            it("Writes to the non existent db") {
-                db.create(testObject) should beInstanceOf<OK<*>>()
-            }
-
-            eventually(1.seconds) {
-                fs.close()
-            }
-
-        }
 
         context("Deleting the file mid test") {
             lateinit var db: PersistentDatabase

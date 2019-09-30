@@ -1,7 +1,5 @@
 package itasserui.common.serialization
 
-import org.json.JSONObject
-
 interface JsonObject {
     fun toJson(indent: Int = 0): String = Serializer.toJson(this)
 

@@ -5,38 +5,38 @@ import itasserui.common.utils.FakeKt
 import javafx.scene.Scene
 import javafx.scene.control.DialogPane
 import javafx.stage.Stage
-import javafx.stage.StageStyle
 import javafx.stage.Window
 import org.testfx.api.FxRobot
-import org.testfx.api.FxToolkit
 import org.testfx.framework.spock.ApplicationSpec
 import org.testfx.service.query.NodeQuery
-import spock.lang.Shared
 import spock.lang.Stepwise
 import tornadofx.UIComponent
 
 import java.nio.file.Files
 import java.nio.file.Path
 
+import static org.junit.Assert.assertNotNull
+
 @Stepwise
 abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {
-    @Shared Path tmpdirPath = generateTestDir()
+    Path tmpdirPath = generateTestDir()
     Stage stage = null
-    @Shared Faker fake = FakeKt.getFake()
+    Faker fake = FakeKt.getFake()
     T view = null
 
-    @Shared String password = fake.internet().password(8, 10, true, true, true) + "A]a"
-    @Shared String username = "admin"
-    @Shared String email = fake.internet().emailAddress()
+    String password = fake.internet().password(8, 10, true, true, true) + "A]a"
+    String username = "admin"
+    String email = fake.internet().emailAddress()
 
-    @Shared Path pkg = tmpdirPath.resolve("runI-TASSER.pl").toAbsolutePath()
-    @Shared Path datadir = tmpdirPath.resolve("datadir").toAbsolutePath()
-    @Shared Path libdir = tmpdirPath.resolve("lib").toAbsolutePath()
-    @Shared Path javaHome = tmpdirPath.resolve("jdk").toAbsolutePath()
+    Path pkg = tmpdirPath.resolve("runI-TASSER.pl").toAbsolutePath()
+    Path datadir = tmpdirPath.resolve("datadir").toAbsolutePath()
+    Path libdir = tmpdirPath.resolve("lib").toAbsolutePath()
+    Path javaHome = tmpdirPath.resolve("jdk").toAbsolutePath()
 
-    Path generateTestDir(){
+    Path generateTestDir() {
         return Files.createTempDirectory("e2e").toAbsolutePath()
     }
+
     void setup() {
         System.setProperty("itasserui.testmode", true.toString())
         System.setProperty("itasser.home", tmpdirPath.toString())
@@ -45,13 +45,11 @@ abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {
 
     @Override
     void start(Stage stage) {
-        if (this.stage == null) {
-            this.view = create()
-            def scene = new Scene(view.root)
-            stage.setScene(scene)
-            stage.show()
-            this.stage = stage
-        }
+        this.view = create()
+        def scene = new Scene(view.root)
+        stage.setScene(scene)
+        stage.show()
+        this.stage = stage
     }
 
     abstract T create()
@@ -81,6 +79,20 @@ abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {
         assertEquals(expectedContent, dialogPane.getContentText());
     }
 
+    String alertHeader() {
+        final Stage actualAlertDialog = getTopModalStage();
+        assertNotNull("Alert dialog should exist", actualAlertDialog);
+        final DialogPane dialogPane = (DialogPane) actualAlertDialog.getScene().getRoot()
+        return dialogPane.getHeaderText()
+    }
+
+    String alertContent() {
+        final Stage actualAlertDialog = getTopModalStage();
+        assertNotNull("Alert dialog should exist", actualAlertDialog);
+        final DialogPane dialogPane = (DialogPane) actualAlertDialog.getScene().getRoot()
+        return dialogPane.getContentText()
+    }
+
     /**
      * Get the top modal window.
      *
@@ -88,7 +100,7 @@ abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {
      * Licenced under cc by-sa 3.0 with attribution required https://creativecommons.org/licenses/by-sa/3.0/
      * @return the top modal window
      */
-    private Stage getTopModalStage() {
+    Stage getTopModalStage() {
         // Get a list of windows but ordered from top[0] to bottom[n] ones.
         // It is needed to get the first found modal window.
         final List<Window> allWindows = new ArrayList<>(new FxRobot().robotContext().getWindowFinder().listWindows());

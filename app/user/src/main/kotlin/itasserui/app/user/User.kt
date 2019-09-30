@@ -16,7 +16,8 @@ data class User(
     override val id: UUID,
     override val username: Username,
     override val password: HashedPassword,
-    override val emailAddress: EmailAddress
+    override val emailAddress: EmailAddress,
+    override val isAdmin: Boolean = false
 ) : Account, FileDomain, DBObject {
     override val category = FileDomain.FileCategory.Users
     override val relativeRootName get() = username.value

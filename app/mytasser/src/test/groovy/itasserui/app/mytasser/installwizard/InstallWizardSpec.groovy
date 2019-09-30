@@ -28,10 +28,6 @@ abstract class InstallWizardSpec extends AppSpec<InstallWizard> {
 
         then:
         FxAssert.verifyThat(next_node, NodeMatchers.isDisabled())
-    }
-
-    void setupSpec() {
-        when:
         def pkgCreated = FS.create.file(pkg)
         def dataCreated = FS.create.directories(datadir)
         def libCreated = FS.create.directories(libdir)

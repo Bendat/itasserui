@@ -93,6 +93,26 @@
             <artifactId>kodein-di-conf-jvm</artifactId>
             <version>6.4.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>${commons-text.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>8.40.15</version>
+        </dependency>
+        <dependency>
+            <groupId>no.tornado</groupId>
+            <artifactId>tornadofx-controlsfx</artifactId>
+            <version>0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -116,15 +136,10 @@
             <!-- Optional plugins for using Spock -->
             <!-- Only required if names of spec classes don't match default Surefire patterns (`*Test` etc.) -->
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.20.1</version>
-                <configuration>
-                    <useFile>false</useFile>
-                    <excludes>
-                        <include>**/*Test.java</include>
-                        <include>**/*Spec.java</include>
-                    </excludes>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

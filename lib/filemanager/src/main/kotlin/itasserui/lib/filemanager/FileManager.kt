@@ -77,7 +77,7 @@ interface FileManager : Logger {
         path: Array<out Path>,
         file: WatchedDirectory
     ): List<Path> = path
-        .map { path -> resolveDomain(file, path) }
+        .map { domainPath -> resolveDomain(file, domainPath) }
         .mapNotNull { FS.create.directories(it).getOrElse { null } }
 
     fun delete(domain: FileDomain): Option<FileSystemError>

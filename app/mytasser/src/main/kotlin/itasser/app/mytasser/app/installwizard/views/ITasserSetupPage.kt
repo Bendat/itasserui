@@ -11,6 +11,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
+
+
 fun ValidationContext.validateDirectory(path: Path): ValidationMessage? {
     return if (!Files.exists(path)) error("Directory does not exist")
     else if (!Files.isDirectory(path)) error("Must be a directory")
@@ -64,12 +66,10 @@ class ITasserSetupPage : View("ITasser setup"), InstallWizardPage {
                     validator { validateDirectory(this@textinput, this) }
                 }
             }
-
             field("Run Style") {
                 val items = FXCollections.observableArrayList(
                     arrayListOf("serial", "parallel", "gnuparallel")
                 )
-                model.runStyle.value = "gnuparallel"
                 combobox<String>(model.runStyle, items) {
                     validator {
                         if (text == null) {

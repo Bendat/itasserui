@@ -8,7 +8,8 @@ import org.slf4j.LoggerFactory
 import java.lang.Thread.currentThread
 
 typealias LogLevel = (String) -> Unit
-object KLog: Logger
+
+object KLog : Logger
 internal interface Logger {
     val klog: org.slf4j.Logger
         get() = LoggerFactory.getLogger(this::class.java)

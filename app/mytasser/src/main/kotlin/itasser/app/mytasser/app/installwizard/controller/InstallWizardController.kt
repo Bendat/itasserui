@@ -21,6 +21,8 @@ import itasserui.lib.filemanager.FS
 import itasserui.lib.store.Database
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.scene.control.ToggleButton
+import javafx.scene.control.ToggleGroup
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance
 import tornadofx.Controller
@@ -61,9 +63,11 @@ class InstallWizardController : Controller(), Logger {
     val dataDirProperty = SimpleStringProperty()
     var dataDir: String by dataDirProperty
 
-    val runStyleProperty = SimpleStringProperty()
+    val runStyleProperty = SimpleStringProperty("gnuparallel")
     var runStyle: String by runStyleProperty
 
+    val newRunStyleProperty = SimpleObjectProperty<ToggleGroup>()
+    val newRunStyle by newRunStyleProperty
     val databasePathProperty = SimpleObjectProperty<Path>()
     var databasePath: Path by databasePathProperty
 
