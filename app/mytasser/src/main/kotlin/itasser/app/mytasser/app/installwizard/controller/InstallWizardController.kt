@@ -68,6 +68,7 @@ class InstallWizardController : Controller(), Logger {
 
     val newRunStyleProperty = SimpleObjectProperty<ToggleGroup>()
     val newRunStyle by newRunStyleProperty
+
     val databasePathProperty = SimpleObjectProperty<Path>()
     var databasePath: Path by databasePathProperty
 

@@ -10,6 +10,7 @@ import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.process.CCRCProcess
 import itasserui.lib.process.process.ITasser
 import itasserui.lib.process.process.ITasserListener
+import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.list.filtering
 import lk.kotlin.observable.list.observableListOf
 import lk.kotlin.observable.property.StandardObservableProperty
@@ -50,7 +51,7 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
             ),
             priority = priority,
             state = state,
-            listener = getListener()
+            listener = getListener(name, processId)
         ).also {
             info { "Created new process ${it.toJson(3)}" }
             process += it
@@ -69,10 +70,10 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
         }
     }
 
-    private fun getListener() =
+    private fun getListener(name: String, id: UUID) =
         ITasserListener().apply {
             afterFinish { _, _ ->
-                trace { "A process has finished" }
+                trace { "A process $name::$id has finished" }
                 if (autoRun) {
                     process.next.map {
                         trace { "Starting process [${it.process.name}]" }
@@ -85,11 +86,11 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
     @Suppress("MemberVisibilityCanBePrivate")
     inner class Processes {
         val processes = observableListOf<ITasser>()
-        val queued: List<ITasser> = processes.filtering { it.state is ExecutionState.Queued }
-        val paused: List<ITasser> = processes.filtering { it.state is ExecutionState.Paused }
-        val completed: List<ITasser> = processes.filtering { it.state is ExecutionState.Completed }
-        val running: List<ITasser> = processes.filtering { it.state is ExecutionState.Running }
-        val failed: List<ITasser> = processes.filtering { it.state is ExecutionState.Failed }
+        val queued: ObservableList<ITasser> = processes.filtering { it.state is ExecutionState.Queued }
+        val paused: ObservableList<ITasser> = processes.filtering { it.state is ExecutionState.Paused }
+        val completed: ObservableList<ITasser> = processes.filtering { it.state is ExecutionState.Completed }
+        val running: ObservableList<ITasser> = processes.filtering { it.state is ExecutionState.Running }
+        val failed: ObservableList<ITasser> = processes.filtering { it.state is ExecutionState.Failed }
 
         val size
             get() = processes.size
