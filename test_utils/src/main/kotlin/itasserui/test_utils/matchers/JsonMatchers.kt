@@ -30,6 +30,13 @@ object Be {
         }
     }
 
+    fun <T> some(item: T) = object : Matcher<Option<T>> {
+        override fun test(value: Option<T>): Result {
+            val result = value.map { it == item }.fold({ false }) { true }
+            return Result(result, "Option [$value] should be Some", "Option [$value] should not be Some[$item]")
+        }
+    }
+
     inline fun <reified T> someOf() = object : Matcher<Option<*>> {
         override fun test(value: Option<*>): Result {
             val result = value.map { it is T }.fold({ false }) { it }

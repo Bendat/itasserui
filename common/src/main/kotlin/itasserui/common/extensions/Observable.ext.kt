@@ -6,6 +6,11 @@ import lk.kotlin.observable.property.plusAssign
 
 fun <T, K> ObservableList<T>.addUpdatable(element: T, updateBy: (T) -> ObservableProperty<K>) {
     add(element).also {
-        updateBy(element) += { update(element) }
+        updateBy(element) += {
+            println("Updating element $element")
+//            remove(element)
+//            add(element)
+            update(element)
+        }
     }
 }

@@ -13,13 +13,15 @@ import itasserui.lib.process.process.ITasserListener
 import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.list.filtering
 import lk.kotlin.observable.list.observableListOf
+import lk.kotlin.observable.property.ObservableProperty
 import lk.kotlin.observable.property.StandardObservableProperty
+import lk.kotlin.observable.property.plusAssign
 import java.nio.file.Path
 import java.util.*
 
 class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logger, AutoCloseable {
 
-    val process = Processes()
+    val processes = Processes()
 
     val autorunProperty = StandardObservableProperty(autoRun)
     var autoRun by autorunProperty
@@ -54,9 +56,9 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
             listener = getListener(name, processId)
         ).also {
             info { "Created new process ${it.toJson(3)}" }
-            process += it
-            if (process.running.size < maxExecuting && autoRun) {
-                process.next.map { proc ->
+            processes += it
+            if (processes.running.size < maxExecuting && autoRun) {
+                processes.next.map { proc ->
                     proc.executor.start()
                     trace { "Starting process [${proc.process.name}]" }
                 }
@@ -65,42 +67,57 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
     }
 
     override fun close() {
-        process.processes.forEach {
+        processes.all.forEach {
             it.executor.kill()
         }
     }
 
     private fun getListener(name: String, id: UUID) =
         ITasserListener().apply {
-            afterFinish { _, _ ->
+            afterFinish { _, res ->
                 trace { "A process $name::$id has finished" }
                 if (autoRun) {
-                    process.next.map {
-                        trace { "Starting process [${it.process.name}]" }
+                    processes.next.map {
+                        debug { "Starting process [${it.process.name}]" }
                         it.executor.start()
                     }
                 }
+                res.exitValue
             }
         }
 
     @Suppress("MemberVisibilityCanBePrivate")
     inner class Processes {
-        val processes = observableListOf<ITasser>()
-        val queued: ObservableList<ITasser> = processes.filtering { it.state is ExecutionState.Queued }
-        val paused: ObservableList<ITasser> = processes.filtering { it.state is ExecutionState.Paused }
-        val completed: ObservableList<ITasser> = processes.filtering { it.state is ExecutionState.Completed }
-        val running: ObservableList<ITasser> = processes.filtering { it.state is ExecutionState.Running }
-        val failed: ObservableList<ITasser> = processes.filtering { it.state is ExecutionState.Failed }
+        val all = observableListOf<ITasser>()
+        val queued: ObservableList<ITasser> = all.filtering { it.state is ExecutionState.Queued }
+        val paused: ObservableList<ITasser> = all.filtering { it.state is ExecutionState.Paused }
+        val completed: ObservableList<ITasser> = all.filtering { it.state is ExecutionState.Completed }
+        val running: ObservableList<ITasser> = all.filtering { it.state is ExecutionState.Running }
+        val failed: ObservableList<ITasser> = all.filtering { it.state is ExecutionState.Failed }
 
+        fun ObservableList<ITasser>.reloadOn(obj: ITasser, binds: ObservableProperty<ExecutionState>){
+            binds += {
+                remove(obj)
+                add(obj)
+            }
+        }
         val size
-            get() = processes.size
+            get() = all.size
 
         val next
             get() = queued
+                .map { info { "Selecting next ${it.process.name} with state ${it.state}" }; it }
                 .minBy { it.priority }
                 .toOption()
 
-        operator fun get(id: UUID) = processes
+        val nextRunning
+            get() = running
+                .filter { it.state is ExecutionState.Running }
+                .map { info { "Selecting next ${it.process.name} with state ${it.state}" }; it }
+                .minBy { it.priority }
+                .toOption()
+
+        operator fun get(id: UUID) = all
             .first { it.process.id == id }
             .toOption()
 
@@ -113,7 +130,7 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
         }
 
         operator fun plusAssign(process: ITasser) {
-            processes.addUpdatable(process) { it.stateProperty }
+            all.addUpdatable(process) { it.stateProperty }
         }
     }
 }

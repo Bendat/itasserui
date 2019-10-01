@@ -54,6 +54,7 @@ class ITasser(
             processExecutor.redirectError(ProcessLogAppender(STDType.Err, std.err))
             with(listener) {
                 afterFinish += { _, result ->
+
                     state = when (result.exitValue) {
                         ExitCode.OK.code -> ExecutionState.Completed
                         ExitCode.SigTerm.code,
@@ -62,10 +63,14 @@ class ITasser(
                     }.also {
                         exitCode = ExitCode.fromInt(result.exitValue)
                     }
+                    info{ "Process stopped with exit code ${result.exitValue} for $state"}
                 }
-
                 afterStart += { _, _ ->
-                    state = ExecutionState.Running
+                    info{ "Process about to start from state $state"}
+
+                        state = ExecutionState.Running
+                    info{ "Process after starting with state $state"}
+
                 }
             }
         }
@@ -94,9 +99,11 @@ class ITasser(
         }
 
         fun kill(): Outcome<ExecutionContext> =
-            sysProcess.toEither { NoProcess(process.name) }.flatMap { process ->
-                Try { ProcessUtil.destroyGracefullyAndWait(process, 10, TimeUnit.SECONDS) }
+            sysProcess.toEither { NoProcess(process.name) }.flatMap { proc ->
+                info { "Killing process ${process.name}" }
+                Try { ProcessUtil.destroyGracefullyAndWait(proc, 10, TimeUnit.SECONDS) }
                     .toEither { e -> Timeout(this@ITasser.process.name, e).also { error -> errors += error } }
+                    .mapLeft { error { "Killing process errored with $it" }; it }
                     .map { this }
             }
 
@@ -118,6 +125,10 @@ class ITasser(
             }
         }
 
+    }
+
+    override fun toString(): String {
+        return "ITasser(process=${process.name}, stateProperty=$state)"
     }
 
 

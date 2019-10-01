@@ -1,6 +1,6 @@
 package itasserui.common.extensions
 
-fun Int.forEach(op: (Int) -> Unit) {
+inline fun Int.forEach(op: (Int) -> Unit) {
     (0..this).forEach {
         op(it)
     }
