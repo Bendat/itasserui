@@ -73,4 +73,21 @@ class WatchedDirectory(
         result = 31 * result + file.category.hashCode()
         return result
     }
+//     TODO: make these return directry watchers
+
+//    override fun normalize(): Path {
+//        return
+//    }
+//
+//    override fun resolve(other: String): Path {
+//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//    }
+//
+//    override fun resolve(other: Path): Path {
+//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//    }
+//
+//    override fun toAbsolutePath(): Path {
+//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//    }
 }

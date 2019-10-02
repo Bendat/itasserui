@@ -28,6 +28,7 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
 
     private val defaultArgs = arrayOf(ArgNames.Perl, ArgNames.AutoFlush).map(Any::toString)
 
+    @JvmOverloads
     fun new(
         processId: UUID,
         priority: Int,

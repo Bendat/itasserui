@@ -5,6 +5,7 @@ import arrow.data.Ior
 import arrow.data.Ior.Both
 import arrow.data.Nel
 import itasserui.app.user.ProfileError.*
+import itasserui.app.user.User.UserCategory
 import itasserui.common.`typealias`.Err
 import itasserui.common.`typealias`.OK
 import itasserui.common.`typealias`.Outcome
@@ -54,7 +55,7 @@ class ProfileManager(
         duration: Duration = Duration.ZERO
     ): Outcome<Session> {
         return when (val users = database.read<User> { User::username eq user.username }) {
-            is Err -> Either.Left(users.a)
+            is Err -> Either.Left(LoginFailedError(user, users.a))
             is OK -> when {
                 users.b.isEmpty() -> Either.Left(NoSuchUser(user))
                 users.b.first().checkPassword(password).isFalse -> Either.Left(WrongPassword(user))
@@ -108,6 +109,9 @@ class ProfileManager(
         database
             .create(user)
             .map { user }
+
+    fun getUserDir(user: User, category: UserCategory) =
+        fileManager[user].map { it.path.resolve(category.directory) }
 
     private fun trySaveToDb(user: User): Outcome<User> = when (val exists = existsInDatabase(user)) {
         is None -> saveToDb(user)

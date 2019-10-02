@@ -54,7 +54,6 @@ class ITasser(
             processExecutor.redirectError(ProcessLogAppender(STDType.Err, std.err))
             with(listener) {
                 afterFinish += { _, result ->
-
                     state = when (result.exitValue) {
                         ExitCode.OK.code -> ExecutionState.Completed
                         ExitCode.SigTerm.code,
@@ -63,13 +62,13 @@ class ITasser(
                     }.also {
                         exitCode = ExitCode.fromInt(result.exitValue)
                     }
-                    info{ "Process stopped with exit code ${result.exitValue} for $state"}
+                    info { "Process stopped with exit code ${result.exitValue} for $state" }
                 }
                 afterStart += { _, _ ->
-                    info{ "Process about to start from state $state"}
+                    info { "Process about to start from state $state" }
 
-                        state = ExecutionState.Running
-                    info{ "Process after starting with state $state"}
+                    state = ExecutionState.Running
+                    info { "Process after starting with state $state" }
 
                 }
             }
@@ -131,5 +130,6 @@ class ITasser(
         return "ITasser(process=${process.name}, stateProperty=$state)"
     }
 
+    data class StartStop(val start: Long, val stop: Long)
 
 }

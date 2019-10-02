@@ -21,14 +21,14 @@ data class User(
 ) : Account, FileDomain, DBObject {
     override val category = FileDomain.FileCategory.Users
     override val relativeRootName get() = username.value
-    override val categories = UserCategories.values().toList()
+    override val categories = UserCategory.values().toList()
 
     fun checkPassword(password: RawPassword) =
         BCrypt.checkpw(password.value, this.password.value)
 
     override fun toUser(id: UUID): User = this
 
-    enum class UserCategories : FileDomain.Subcategory {
+    enum class UserCategory : FileDomain.Subcategory {
         Settings,
         DataDir,
         OutDir,

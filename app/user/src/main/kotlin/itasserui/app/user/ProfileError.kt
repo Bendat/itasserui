@@ -28,6 +28,7 @@ sealed class ProfileError(parentError: RuntimeError? = null) : RuntimeError(pare
     class CannotDeleteUserProfileError(val user: Account, val error: RuntimeError) : ProfileError()
     class FileWriteError(val user: Account, val error: RuntimeError) : ProfileError()
     class WrongPasswordError(val user: Account) : ProfileError()
+    class LoginFailedError(val account: Account, parent: RuntimeError? = null): ProfileError(parent)
     class InvalidUserPasswordError(
         val user: Account,
         val error: PasswordValidationError

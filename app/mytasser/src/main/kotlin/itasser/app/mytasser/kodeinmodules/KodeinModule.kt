@@ -5,6 +5,7 @@ import itasserui.app.user.ProfileManager
 import itasserui.lib.filemanager.FS
 import itasserui.lib.filemanager.FileManager
 import itasserui.lib.filemanager.LocalFileManager
+import itasserui.lib.process.manager.ProcessManager
 import itasserui.lib.store.Database
 import itasserui.lib.store.Database.MemoryDatabase
 import itasserui.lib.store.Database.PersistentDatabase
@@ -24,6 +25,7 @@ fun kodeinModules(
     val fm = LocalFileManager(homeDirectory)
     val pm = ProfileManager(fm, db)
     val sm = SettingsManager().apply(settings)
+    val im = ProcessManager()
     println("Creating File Manager module")
     bind<FileManager>() with singleton { fm }
     println("Creating Database module")
@@ -33,4 +35,7 @@ fun kodeinModules(
     bind<ProfileManager>() with singleton { pm }
     println("Creating Settings Manager module")
     bind<SettingsManager>() with singleton { sm }
+    println("Binding Process manager module")
+    bind<ProcessManager>() with singleton { im }
+
 }
