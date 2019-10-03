@@ -4,6 +4,7 @@ import arrow.core.*
 import io.kotlintest.Matcher
 import io.kotlintest.Result
 import org.skyscreamer.jsonassert.JSONAssert
+import java.lang.Math.abs
 
 val be = Be
 
@@ -65,5 +66,15 @@ object Be {
         }
     }
 
+    fun closeTo(initial: Long, tolerance: Long) = object : Matcher<Long> {
+        override fun test(value: Long): Result {
+            val result = abs(initial - value) < tolerance
+            return Result(
+                result,
+                "Initial $initial should be within $tolerance of $value: ${abs(initial - value)}",
+                "Initial $initial should not be within $tolerance of $value ${abs(initial - value)}"
+            )
+        }
 
+    }
 }

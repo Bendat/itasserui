@@ -5,6 +5,7 @@ import itasser.app.mytasser.app.styles.MainStylee.Companion.paddedImage2
 import itasser.app.mytasser.app.styles.MainStylee.Companion.transparentButton
 import itasser.app.mytasser.lib.DI
 import itasserui.app.user.User
+import itasserui.common.extensions.format
 import itasserui.common.logger.Logger
 import itasserui.lib.process.manager.ProcessManager
 import itasserui.lib.process.process.ITasser
@@ -103,7 +104,6 @@ class ProcessWidget(user: User, process: ITasser, scope: Scope? = null) : Fragme
                 val sicon = imageview(model.stopIcon) {
                     addClass(paddedImage2)
                     this.isSmooth = true
-
                     fitHeight = iconHeight
                     isPreserveRatio = true
                     spacing = 10.0
@@ -115,14 +115,5 @@ class ProcessWidget(user: User, process: ITasser, scope: Scope? = null) : Fragme
     }
 }
 
-fun Duration.format(): String {
-    val absSeconds = abs(seconds)
-    val positive = String.format(
-        "%d:%02d:%02d",
-        absSeconds / 3600,
-        absSeconds % 3600 / 60,
-        absSeconds % 60
-    )
-    return if (seconds < 0) "-$positive" else positive
-}
+
 
