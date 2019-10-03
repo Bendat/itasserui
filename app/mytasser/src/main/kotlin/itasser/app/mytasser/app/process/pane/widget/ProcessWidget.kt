@@ -10,18 +10,31 @@ import itasserui.common.logger.Logger
 import itasserui.lib.process.manager.ProcessManager
 import itasserui.lib.process.process.ITasser
 import javafx.animation.AnimationTimer
+import javafx.util.StringConverter
+import org.joda.time.DateTime
 import org.kodein.di.generic.instance
 import tornadofx.*
-import java.time.Duration
-import kotlin.math.abs
+import java.time.Duration.ofMillis
 
+class ProcessWidget(
+    user: User,
+    itasser: ITasser,
+    scope: Scope? = null
+) : Fragment("Process Widget Fragment"), Logger {
+    val kdi: DI by lazy {
+        val d = find<DI>()
+        d
+    }
 
-class ProcessWidget(user: User, process: ITasser, scope: Scope? = null) : Fragment("My View"), Logger {
     override val scope: Scope = scope ?: super.scope
     private val iconHeight = 16.0
 
+    val processManager: ProcessManager by lazy {
+        val i by kdi.instance<ProcessManager>()
+        i
+    }
 
-    val model: ProcessWidgetViewModel = ProcessWidgetViewModel(user, process)
+    val model: ProcessWidgetViewModel = ProcessWidgetViewModel(user, itasser)
 
     init {
         setInScope(model, this.scope)
@@ -33,7 +46,7 @@ class ProcessWidget(user: User, process: ITasser, scope: Scope? = null) : Fragme
         vbox {
             hbox {
                 label("  ")
-                vbox {
+                borderpane(){
                     hbox {
                         imageview(resources.image("/icons/users.png")) {
                             addClass(paddedImage2)
@@ -54,14 +67,25 @@ class ProcessWidget(user: User, process: ITasser, scope: Scope? = null) : Fragme
                         val timerLabel = label { addClass(text) }
                         object : AnimationTimer() {
                             override fun handle(now: Long) {
-                                val elapsedMillis = System.currentTimeMillis() - model.startedTime.value.toLong()
-                                timerLabel.text = Duration.ofMillis(elapsedMillis).format()
+                                timerLabel.text = ofMillis(model.executionTimeProperty.value).format()
                             }
                         }.start()
 
                     }
                 }
                 spacer()
+                val date = object : StringConverter<Long>() {
+                    override fun fromString(string: String): Long = 0L
+                    override fun toString(value: Long?): String =
+                        DateTime(value).toString("dd / MM / YYYY")
+                }
+                val time = object : StringConverter<Long>() {
+                    override fun fromString(string: String): Long = 0L
+                    override fun toString(value: Long?): String =
+                        DateTime(value).toString("HH:MM")
+                }
+                label("  ")
+
                 vbox {
                     hbox {
                         imageview(resources.image("/icons/stopwatch.png")) {
@@ -71,13 +95,14 @@ class ProcessWidget(user: User, process: ITasser, scope: Scope? = null) : Fragme
                             isPreserveRatio = true
                         }
                         label(" ")
-                        label(model.startedTimeFormatted) { }
+                        label(model.startTime, converter = date)
                     }
+                    label(model.startTime, converter = time)
                 }
             }
             hbox {
                 label("  ")
-                imageview(model.sequenceIcon) {
+                imageview(resources.image("/icons/dna.png")) {
                     this.isSmooth = true
                     addClass(paddedImage2)
                     fitHeight = iconHeight
@@ -85,7 +110,7 @@ class ProcessWidget(user: User, process: ITasser, scope: Scope? = null) : Fragme
                 }
                 spacer()
                 label(" ")
-                label("AMinoOxycillanDehydrateMonoOxide") { addClass(text) }
+                label(itasser.process.name) { addClass(text) }
             }
 
             hbox {
@@ -97,8 +122,10 @@ class ProcessWidget(user: User, process: ITasser, scope: Scope? = null) : Fragme
                 button(graphic = ricon) {
                     addClass(transparentButton)
                     addClass(text)
-                    setOnMouseReleased {
-                        model.togglePlay()
+                    model.executionStateProperty
+                        .addListener { _, _, new -> model.setRunPlayIcon(new) }
+                    setOnMouseClicked {
+                        processManager.run(itasser)
                     }
                 }
                 val sicon = imageview(model.stopIcon) {
@@ -114,6 +141,7 @@ class ProcessWidget(user: User, process: ITasser, scope: Scope? = null) : Fragme
         info { "Model user is ${model.item.user}" }
     }
 }
+
 
 
 

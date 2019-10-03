@@ -13,6 +13,7 @@ import itasserui.lib.process.process.ITasserListener
 import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.list.filtering
 import lk.kotlin.observable.list.observableListOf
+import lk.kotlin.observable.list.sorting
 import lk.kotlin.observable.property.ObservableProperty
 import lk.kotlin.observable.property.StandardObservableProperty
 import lk.kotlin.observable.property.plusAssign
@@ -27,6 +28,11 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
     var autoRun by autorunProperty
 
     private val defaultArgs = arrayOf(ArgNames.Perl, ArgNames.AutoFlush).map(Any::toString)
+    fun run(itasser: ITasser) {
+        if (processes.running.size < maxExecuting && autoRun)
+            itasser.executor.start()
+        else itasser.priority++
+    }
 
     @JvmOverloads
     fun new(
@@ -90,18 +96,20 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
     @Suppress("MemberVisibilityCanBePrivate")
     inner class Processes {
         val all = observableListOf<ITasser>()
-        val queued: ObservableList<ITasser> = all.filtering { it.state is ExecutionState.Queued }
+        val queued: ObservableList<ITasser> =
+            all.filtering { it.state is ExecutionState.Queued }
         val paused: ObservableList<ITasser> = all.filtering { it.state is ExecutionState.Paused }
         val completed: ObservableList<ITasser> = all.filtering { it.state is ExecutionState.Completed }
         val running: ObservableList<ITasser> = all.filtering { it.state is ExecutionState.Running }
         val failed: ObservableList<ITasser> = all.filtering { it.state is ExecutionState.Failed }
 
-        fun ObservableList<ITasser>.reloadOn(obj: ITasser, binds: ObservableProperty<ExecutionState>){
+        fun ObservableList<ITasser>.reloadOn(obj: ITasser, binds: ObservableProperty<ExecutionState>) {
             binds += {
                 remove(obj)
                 add(obj)
             }
         }
+
         val size
             get() = all.size
 
@@ -131,7 +139,9 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
         }
 
         operator fun plusAssign(process: ITasser) {
-            all.addUpdatable(process) { it.stateProperty }
+            all.addUpdatable(process) {
+                listOf(it.stateProperty, it.priorityProperty)
+            }
         }
     }
 }

@@ -5,7 +5,6 @@ package itasserui.lib.process.process
 import arrow.core.*
 import com.fasterxml.jackson.annotation.JsonIgnore
 import itasserui.common.`typealias`.Outcome
-import itasserui.common.extensions.format
 import itasserui.common.logger.Logger
 import itasserui.common.serialization.JsonObject
 import itasserui.lib.process.*
@@ -22,7 +21,6 @@ import org.zeroturnaround.process.ProcessUtil
 import org.zeroturnaround.process.Processes.newStandardProcess
 import org.zeroturnaround.process.SystemProcess
 import java.lang.System.currentTimeMillis
-import java.time.Duration
 import java.util.*
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
@@ -47,8 +45,9 @@ class ITasser(
     var priority: Int by priorityProperty
     val std = STD()
     @JsonIgnore
-    val executor = ExecutionContext()
-
+    internal val executor = ExecutionContext()
+    val startedTimeProperty = StandardObservableProperty(0L)
+    var startedTime by startedTimeProperty
 
     private var timer: Option<Timer> = None
     private val startTimesPrivate = arrayListOf<Long>()
@@ -74,6 +73,7 @@ class ITasser(
             processExecutor.redirectError(ProcessLogAppender(STDType.Err, std.err))
             with(listener) {
                 afterFinish += { _, result ->
+                    info { "Process stopped with exit code ${result.exitValue} for $state" }
                     state = when (result.exitValue) {
                         ExitCode.OK.code -> ExecutionState.Completed
                         ExitCode.SigTerm.code,
@@ -87,15 +87,14 @@ class ITasser(
                     info { "Process stopped with exit code ${result.exitValue} for $state" }
                 }
                 afterStart += { _, _ ->
-                    info { "Process about to start from state $state" }
+                    info { "Process ${process.name} about to start from state $state" }
                     startTimes as MutableList += currentTimeMillis()
                     timer = timer("ITasser counter timer", period = 1000, initialDelay = 0) {
-                        warn { "Executing timer whose old value is $executionTimePrivate" }
                         executionTimePrivate = durationFromExecutionTimes()
-                        warn { "Exec time ${Duration.ofMillis(executionTime).format()}" }
                     }.some()
+                    startedTime = startTimes[0]
                     state = ExecutionState.Running
-                    info { "Process after starting with state $state" }
+                    info { "Process ${process.name} after starting with state $state" }
 
                 }
             }
@@ -105,37 +104,30 @@ class ITasser(
             return startTimes
                 .subList(0, max(0, startTimes.size - 1))
                 .mapIndexed { index, start ->
-                    abs(endTimes[index] - start)
-                }.sum() + abs(currentTimeMillis() - startTimes.last())
+                    if (index <= endTimes.size - 1) abs(endTimes[index] - start) else null
+                }.filterNotNull()
+                .sum() + abs(currentTimeMillis() - startTimes.last())
         }
 
-        fun start(): Outcome<StartedProcess> {
-            return Try {
-                processExecutor.start()
-            }.toEither { e ->
-                FailedStart(process.name, e).also { errors += it }
-            }.map { process ->
-                process.also { realProcess = Some(process) }
-            }.map { process ->
-                sysProcess = Some(newStandardProcess(process.process))
-                future = Some(process.future)
-                process
-            }.also {
-                info { "Start result is $it" }
+        internal fun start(): Outcome<StartedProcess> {
+            return Try { processExecutor.start() }
+                .toEither { e -> FailedStart(process.name, e).also { errors += it } }
+                .map { process -> process.also { realProcess = Some(process) } }
+                .map { process ->
+                    sysProcess = Some(newStandardProcess(process.process))
+                    future = Some(process.future)
+                    process
+                }
+        }
+
+        fun await(): Outcome<ProcessResult> = realProcess
+            .toEither { ProcessError.NoProcessError("realProcess") }
+            .flatMap { p ->
+                Try { p.future.get() }
+                    .toEither { Timeout("[${process.name}] timed out", it) }
             }
-        }
 
-        fun await(): Outcome<ProcessResult> = realProcess.toEither {
-            ProcessError.NoProcessError("realProcess")
-        }.flatMap { p ->
-            Try {
-                p.future.get()
-            }.toEither {
-                Timeout("[${process.name}] timed out", it)
-            }
-        }
-
-        fun kill(): Outcome<ExecutionContext> =
+        internal fun kill(): Outcome<ExecutionContext> =
             sysProcess.toEither { NoProcess(process.name) }.flatMap { proc ->
                 info { "Killing process ${process.name}" }
                 Try { ProcessUtil.destroyGracefullyAndWait(proc, 10, TimeUnit.SECONDS) }

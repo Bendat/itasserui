@@ -16,6 +16,7 @@ import itasserui.common.interfaces.inline.EmailAddress
 import itasserui.common.interfaces.inline.RawPassword
 import itasserui.common.interfaces.inline.Username
 import itasserui.common.utils.SafeWaitKt
+import itasserui.lib.filemanager.FS
 import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.manager.ProcessManager
 import itasserui.lib.process.process.ITasser
@@ -57,12 +58,15 @@ abstract class ProcessPaneWidgetSpec extends AppSpec<ProcessWidget> {
         user = res.value
         extractor.pm.getUserDir(user, User.UserCategory.DataDir)
                 .map { dataDir = it.toAbsolutePath() }
+        Path file = FS.INSTANCE.get(this.class.getResource("/Infinity.pl").file)
+        def ls = new ArrayList<String>()
+        ls.add(file.toAbsolutePath().toString())
         itasser = extractor.proc.new(
                 UUID.randomUUID(),
                 0,
                 Paths.get(""),
                 "Automationyl Aminodril",
-                new ArrayList<String>(),
+                ls,
                 user.id,
                 dataDir
         )
@@ -90,10 +94,11 @@ abstract class ProcessPaneWidgetSpec extends AppSpec<ProcessWidget> {
 class ProcSpec extends ProcessPaneWidgetSpec {
     void "Yo"(){
         given:
-        SafeWaitKt.safeWait(5000)
+        SafeWaitKt.safeWait(35000)
         when:
         def a = 2
         then:
         1 == 1
+        println("Value is ${view.model.startTime}")
     }
 }
