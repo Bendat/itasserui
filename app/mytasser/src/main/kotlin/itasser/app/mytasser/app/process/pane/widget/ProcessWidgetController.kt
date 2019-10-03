@@ -1,6 +1,5 @@
 package itasser.app.mytasser.app.process.pane.widget
 
-import itasser.app.mytasser.lib.DI
 import itasser.app.mytasser.lib.extensions.bind
 import itasserui.app.user.User
 import itasserui.common.logger.Logger
@@ -35,7 +34,7 @@ class ProcessWidgetController(
 
     init {
         startedTimeProperty.addListener { it1, it2, it3 ->
-            info{"Started time changed from $it3 to $it2"}
+            info { "Started time changed from $it3 to $it2" }
         }
     }
 

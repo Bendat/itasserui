@@ -12,7 +12,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 
-
 fun ValidationContext.validateDirectory(path: Path): ValidationMessage? {
     return if (!Files.exists(path)) error("Directory does not exist")
     else if (!Files.isDirectory(path)) error("Must be a directory")

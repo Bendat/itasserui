@@ -1,6 +1,6 @@
 package itasserui.app.mytasser.process.pane.widget
 
-import arrow.core.Either
+
 import arrow.data.Ior
 import arrow.data.NonEmptyList
 import itasser.app.mytasser.app.process.pane.widget.ProcessWidget
@@ -17,7 +17,6 @@ import itasserui.common.interfaces.inline.RawPassword
 import itasserui.common.interfaces.inline.Username
 import itasserui.common.utils.SafeWaitKt
 import itasserui.lib.filemanager.FS
-import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.manager.ProcessManager
 import itasserui.lib.process.process.ITasser
 import javafx.scene.Scene
@@ -61,6 +60,7 @@ abstract class ProcessPaneWidgetSpec extends AppSpec<ProcessWidget> {
         Path file = FS.INSTANCE.get(this.class.getResource("/Infinity.pl").file)
         def ls = new ArrayList<String>()
         ls.add(file.toAbsolutePath().toString())
+        extractor.proc.autoRun = false
         itasser = extractor.proc.new(
                 UUID.randomUUID(),
                 0,
@@ -92,7 +92,7 @@ abstract class ProcessPaneWidgetSpec extends AppSpec<ProcessWidget> {
 }
 
 class ProcSpec extends ProcessPaneWidgetSpec {
-    void "Yo"(){
+    void "Yo"() {
         given:
         SafeWaitKt.safeWait(35000)
         when:

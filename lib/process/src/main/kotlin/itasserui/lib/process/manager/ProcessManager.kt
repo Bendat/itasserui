@@ -7,6 +7,7 @@ import itasserui.common.extensions.addUpdatable
 import itasserui.common.logger.Logger
 import itasserui.lib.process.ArgNames
 import itasserui.lib.process.details.ExecutionState
+import itasserui.lib.process.details.ExecutionState.Running
 import itasserui.lib.process.process.CCRCProcess
 import itasserui.lib.process.process.ITasser
 import itasserui.lib.process.process.ITasserListener
@@ -29,9 +30,12 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
 
     private val defaultArgs = arrayOf(ArgNames.Perl, ArgNames.AutoFlush).map(Any::toString)
     fun run(itasser: ITasser) {
-        if (processes.running.size < maxExecuting && autoRun)
-            itasser.executor.start()
-        else itasser.priority++
+        info { "Run executed for $itasser" }
+        when {
+            itasser.state == Running -> itasser.executor.kill()
+            processes.running.size < maxExecuting -> itasser.executor.start()
+            else -> itasser.priority++
+        }
     }
 
     @JvmOverloads
@@ -83,12 +87,8 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
         ITasserListener().apply {
             afterFinish { _, res ->
                 trace { "A process $name::$id has finished" }
-                if (autoRun) {
-                    processes.next.map {
-                        debug { "Starting process [${it.process.name}]" }
-                        it.executor.start()
-                    }
-                }
+                if (autoRun)
+                    processes.next.map { run(it) }
                 res.exitValue
             }
         }
@@ -96,11 +96,12 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
     @Suppress("MemberVisibilityCanBePrivate")
     inner class Processes {
         val all = observableListOf<ITasser>()
-        val queued: ObservableList<ITasser> =
-            all.filtering { it.state is ExecutionState.Queued }
+        val queued: ObservableList<ITasser> = all
+            .filtering { it.state is ExecutionState.Queued }
+            .sorting { first, second -> first.priority > second.priority }
         val paused: ObservableList<ITasser> = all.filtering { it.state is ExecutionState.Paused }
         val completed: ObservableList<ITasser> = all.filtering { it.state is ExecutionState.Completed }
-        val running: ObservableList<ITasser> = all.filtering { it.state is ExecutionState.Running }
+        val running: ObservableList<ITasser> = all.filtering { it.state is Running }
         val failed: ObservableList<ITasser> = all.filtering { it.state is ExecutionState.Failed }
 
         fun ObservableList<ITasser>.reloadOn(obj: ITasser, binds: ObservableProperty<ExecutionState>) {
@@ -121,7 +122,7 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
 
         val nextRunning
             get() = running
-                .filter { it.state is ExecutionState.Running }
+                .filter { it.state is Running }
                 .map { info { "Selecting next ${it.process.name} with state ${it.state}" }; it }
                 .minBy { it.priority }
                 .toOption()
@@ -135,7 +136,7 @@ class ProcessManager(var maxExecuting: Int = 3, autoRun: Boolean = true) : Logge
             is ExecutionState.Paused -> paused
             is ExecutionState.Completed -> completed
             is ExecutionState.Failed -> failed
-            is ExecutionState.Running -> running
+            is Running -> running
         }
 
         operator fun plusAssign(process: ITasser) {

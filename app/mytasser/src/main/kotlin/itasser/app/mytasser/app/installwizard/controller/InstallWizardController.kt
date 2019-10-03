@@ -21,7 +21,6 @@ import itasserui.lib.filemanager.FS
 import itasserui.lib.store.Database
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
-import javafx.scene.control.ToggleButton
 import javafx.scene.control.ToggleGroup
 import org.kodein.di.Kodein
 import org.kodein.di.generic.instance

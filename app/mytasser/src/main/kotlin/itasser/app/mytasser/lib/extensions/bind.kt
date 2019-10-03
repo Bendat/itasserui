@@ -9,10 +9,7 @@ import lk.kotlin.observable.property.plusAssign
 fun <T : Any> ObjectProperty<T>.bind(to: MutableObservableProperty<T>): ObjectProperty<T> {
     to += {
         Platform.runLater {
-            println("Updating property from fx with value $it")
-            println(this.bean)
             this.value = it
-            println("Which makes this ${this.value}")
         }
     }
     return this

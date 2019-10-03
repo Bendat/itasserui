@@ -46,59 +46,73 @@ class ProcessWidget(
         vbox {
             hbox {
                 label("  ")
-                borderpane(){
-                    hbox {
-                        imageview(resources.image("/icons/users.png")) {
-                            addClass(paddedImage2)
-                            fitHeight = iconHeight
-                            isPreserveRatio = true
-                        }
-                        label(" ")
-                        label(model.username) { }
-                    }
-                    hbox {
-                        imageview(resources.image("/icons/clock.png")) {
-                            this.isSmooth = true
-                            addClass(paddedImage2)
-                            fitHeight = iconHeight
-                            isPreserveRatio = true
-                        }
-                        label(" ")
-                        val timerLabel = label { addClass(text) }
-                        object : AnimationTimer() {
-                            override fun handle(now: Long) {
-                                timerLabel.text = ofMillis(model.executionTimeProperty.value).format()
+                borderpane() {
+                    left {
+                        vbox {
+                            hbox {
+                                imageview(resources.image("/icons/users.png")) {
+                                    addClass(paddedImage2)
+                                    fitHeight = iconHeight
+                                    isPreserveRatio = true
+                                }
+                                label(" ")
+                                label(model.username) { }
                             }
-                        }.start()
+                            hbox {
+                                imageview(resources.image("/icons/clock.png")) {
+                                    this.isSmooth = true
+                                    addClass(paddedImage2)
+                                    fitHeight = iconHeight
+                                    isPreserveRatio = true
+                                }
+                                label(" ")
+                                val timerLabel = label { addClass(text) }
+                                object : AnimationTimer() {
+                                    override fun handle(now: Long) {
+                                        timerLabel.text = ofMillis(model.executionTimeProperty.value).format()
+                                    }
+                                }.start()
 
-                    }
-                }
-                spacer()
-                val date = object : StringConverter<Long>() {
-                    override fun fromString(string: String): Long = 0L
-                    override fun toString(value: Long?): String =
-                        DateTime(value).toString("dd / MM / YYYY")
-                }
-                val time = object : StringConverter<Long>() {
-                    override fun fromString(string: String): Long = 0L
-                    override fun toString(value: Long?): String =
-                        DateTime(value).toString("HH:MM")
-                }
-                label("  ")
-
-                vbox {
-                    hbox {
-                        imageview(resources.image("/icons/stopwatch.png")) {
-                            this.isSmooth = true
-                            addClass(paddedImage2)
-                            fitHeight = iconHeight
-                            isPreserveRatio = true
+                            }
                         }
-                        label(" ")
-                        label(model.startTime, converter = date)
                     }
-                    label(model.startTime, converter = time)
+
+                    center {
+                        label("        ")
+                        spacer { }
+                        label("     ")
+
+                    }
+                    right {
+                        val date = object : StringConverter<Long>() {
+                            override fun fromString(string: String): Long = 0L
+                            override fun toString(value: Long?): String =
+                                DateTime(value).toString("dd / MM / YYYY")
+                        }
+                        val time = object : StringConverter<Long>() {
+                            override fun fromString(string: String): Long = 0L
+                            override fun toString(value: Long?): String =
+                                DateTime(value).toString("HH:MM")
+                        }
+                        label("  ")
+
+                        vbox {
+                            hbox {
+                                imageview(resources.image("/icons/stopwatch.png")) {
+                                    this.isSmooth = true
+                                    addClass(paddedImage2)
+                                    fitHeight = iconHeight
+                                    isPreserveRatio = true
+                                }
+                                label(" ")
+                                label(model.startTime, converter = date)
+                            }
+                            label(model.startTime, converter = time)
+                        }
+                    }
                 }
+
+
             }
             hbox {
                 label("  ")
@@ -108,9 +122,8 @@ class ProcessWidget(
                     fitHeight = iconHeight
                     isPreserveRatio = true
                 }
-                spacer()
                 label(" ")
-                label(itasser.process.name) { addClass(text) }
+                label(itasser.process.name)
             }
 
             hbox {

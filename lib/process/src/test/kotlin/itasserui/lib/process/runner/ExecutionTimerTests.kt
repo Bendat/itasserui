@@ -5,12 +5,10 @@ import io.kotlintest.should
 import io.kotlintest.shouldNot
 import io.kotlintest.specs.DescribeSpec
 import itasserui.common.`typealias`.Err
-import itasserui.common.extensions.format
 import itasserui.common.utils.safeWait
 import itasserui.lib.filemanager.FS
 import itasserui.lib.process.process.ITasser
 import itasserui.test_utils.matchers.Be
-import java.time.Duration
 
 class ExecutionTimerTests : DescribeSpec({
     val file = FS[javaClass.getResource("/Infinity.pl").file]

@@ -7,10 +7,8 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.conf.global
 import org.kodein.di.generic
 import tornadofx.Component
-import tornadofx.DIContainer
 import tornadofx.Scope
 import tornadofx.ScopedInstance
-import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
 class DI(
