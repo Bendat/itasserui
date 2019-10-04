@@ -91,14 +91,3 @@ abstract class ProcessPaneWidgetSpec extends AppSpec<ProcessWidget> {
     }
 }
 
-class ProcSpec extends ProcessPaneWidgetSpec {
-    void "Yo"() {
-        given:
-        SafeWaitKt.safeWait(35000)
-        when:
-        def a = 2
-        then:
-        1 == 1
-        println("Value is ${view.model.startTime}")
-    }
-}

@@ -89,7 +89,7 @@ class ITasser(
                 afterStart += { _, _ ->
                     info { "Process ${process.name} about to start from state $state" }
                     startTimes as MutableList += currentTimeMillis()
-                    timer = timer("ITasser counter timer", period = 1000, initialDelay = 0) {
+                    timer = timer("ITasser counter timer", period = 500, initialDelay = 0) {
                         executionTimePrivate = durationFromExecutionTimes()
                     }.some()
                     startedTime = startTimes[0]

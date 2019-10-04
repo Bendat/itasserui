@@ -32,14 +32,9 @@ class ProcessWidgetController(
 
     var startedTime: Long by startedTimeProperty
 
-    init {
-        startedTimeProperty.addListener { it1, it2, it3 ->
-            info { "Started time changed from $it3 to $it2" }
-        }
-    }
-
     val executionTimeProperty = SimpleObjectProperty(0L)
         .bind(itasser.executionTimeProperty)
+
     val sequenceNameProperty = SimpleStringProperty(itasser.process.name)
     var sequenceName: String by sequenceNameProperty
 

@@ -28,15 +28,14 @@ object SeqParser : Logger {
 
     fun parse(
         input: List<String>?,
-        file: Path? = FS["-- Input was a List object --"]
+        file: Path = FS["-- Input was a List object --"]
     ): Either<SequenceError, SeqFile> = when {
         input == null || input.isEmpty() -> when {
             !Files.exists(file) -> Left(NoSuchFile(file))
             Files.size(file) == 0L -> Left(InvalidFile(file))
             else -> Left(EmptyFile(file))
         }
-        else -> when (val verify =
-            verifyFirstLine(input.getOrNull(0), file)) {
+        else -> when (val verify = verifyFirstLine(input.getOrNull(0), file)) {
             is Some -> Left(verify.t)
             else -> Right(mapDescriptionToBodies(input.joinToString("\n"), file))
         }
