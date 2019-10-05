@@ -9,6 +9,8 @@ import itasserui.common.interfaces.inline.Username
 import itasserui.common.serialization.DBObject
 import itasserui.lib.filemanager.FileDomain
 import org.mindrot.jbcrypt.BCrypt
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.*
 
 
@@ -31,7 +33,10 @@ data class User(
     enum class UserCategory : FileDomain.Subcategory {
         Settings,
         DataDir,
-        OutDir,
+        OutDir;
+
+        override val directory: Path
+            get() = Paths.get(name.toLowerCase())
     }
 
 }

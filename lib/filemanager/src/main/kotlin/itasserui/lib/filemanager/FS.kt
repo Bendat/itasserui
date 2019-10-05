@@ -33,7 +33,7 @@ object FS {
             this[root, path.toList()]
 
         operator fun get(root: Path, paths: List<Subcategory>): List<Path> =
-            paths.map { root.resolve(it.toString().toLowerCase()) }
+            paths.map { root.resolve(it.directory.also { info { "Resolving ${it}" } }) }
                 .map { directory(it); it }
 
         operator fun get(root: WatchedDirectory, vararg path: Subcategory): List<Path> =
@@ -48,7 +48,7 @@ object FS {
             directories(FS[path])
 
         fun directory(path: Path): Outcome<Path> =
-            Try { Files.createDirectory(path) }
+            Try { Files.createDirectory(path).also { info { "Creating dir $path" } } }
                 .toEither { CannotCreateFile(path, it) }
 
         fun directory(path: String): Outcome<Path> =

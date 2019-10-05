@@ -135,4 +135,8 @@ class ProfileManager(
             .toOption()
             .flatMap { it.firstOrNone() }
 
+    data class Profile(
+        val user: User
+    )
+
 }

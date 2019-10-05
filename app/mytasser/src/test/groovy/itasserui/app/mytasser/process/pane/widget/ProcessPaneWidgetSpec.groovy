@@ -39,7 +39,6 @@ abstract class ProcessPaneWidgetSpec extends AppSpec<ProcessWidget> {
             false
     )
     User user = null
-    Path dataDir = null
     ITasser itasser = null
     Kodein kodein = null
 
