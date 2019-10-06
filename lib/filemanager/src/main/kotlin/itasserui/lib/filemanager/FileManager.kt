@@ -20,11 +20,11 @@ interface FileManager : Logger {
     fun watchDirectory(
         path: Path,
         domain: FileDomain,
-        op: (DirectoryChangeEvent) -> Unit
+        op: (DirectoryChangeEvent) -> Unit = {}
     ): WatchedDirectory
 
     fun wait(path: Path): Try<None>
-
+    fun getDirectories(domain: FileDomain): Map<Subcategory, WatchedDirectory>
     operator fun get(category: FileCategory) =
         inner.filtering { it.file.category == category }
 

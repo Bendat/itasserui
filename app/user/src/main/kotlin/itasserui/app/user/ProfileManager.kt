@@ -18,6 +18,8 @@ import itasserui.common.logger.Logger
 import itasserui.lib.filemanager.FileManager
 import itasserui.lib.filemanager.WatchedDirectory
 import itasserui.lib.store.Database
+import lk.kotlin.observable.list.ObservableList
+import lk.kotlin.observable.list.ObservableListWrapper
 import org.dizitart.kno2.filters.eq
 import org.dizitart.no2.objects.ObjectFilter
 import java.lang.System.currentTimeMillis
@@ -27,6 +29,7 @@ class ProfileManager(
     val fileManager: FileManager,
     val database: Database
 ) : Logger {
+    val profiles: ObservableList<Profile> = ObservableListWrapper()
 
     data class TimeLock(val start: Long, val duration: Duration) {
         val timeRemaining get() = start + duration.toMillis() - currentTimeMillis()
@@ -62,6 +65,26 @@ class ProfileManager(
                 else -> Either.Right(Session(users.b.first(), TimeLock(currentTimeMillis(), duration)))
             }
         }
+    }
+
+    private fun getOrAddProfile(user: User, session: Option<Session>): Outcome<Profile> {
+        if (profiles.any { it.user == user })
+            return profiles
+                .first { it.user == user }
+                .also { it.session = session }
+                .let { Either.Right(it) }
+        val directories = fileManager.getDirectories(user)
+        val profile = profiles.find { it.user == user } ?: Profile(
+            user = user,
+            session = session,
+            directories = directories.toList().map { it.second },
+            dataDir = directories.getValue(UserCategory.DataDir),
+            outDir = directories.getValue(UserCategory.OutDir),
+            settings = directories.getValue(UserCategory.Settings),
+            manager = this
+        )
+
+        return Either.Right(profile)
     }
 
     fun login(
@@ -136,7 +159,17 @@ class ProfileManager(
             .flatMap { it.firstOrNone() }
 
     data class Profile(
-        val user: User
-    )
+        val user: User,
+        var session: Option<Session>,
+        val directories: List<WatchedDirectory>,
+        val dataDir: WatchedDirectory,
+        val outDir: WatchedDirectory,
+        val settings: WatchedDirectory,
+        private val manager: ProfileManager
+    ) {
+        fun login(user: User, password: RawPassword, duration: Duration) =
+            manager.login(user, password, duration)
+                .map { session = Some(it); it }
+    }
 
 }

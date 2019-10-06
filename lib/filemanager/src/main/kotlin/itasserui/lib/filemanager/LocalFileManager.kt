@@ -8,15 +8,24 @@ import io.methvin.watcher.DirectoryWatcher
 import itasserui.common.`typealias`.Outcome
 import itasserui.common.datastructures.observable.ObservableSet
 import itasserui.common.datastructures.observable.observableSetOf
+import itasserui.lib.filemanager.FileDomain.Subcategory
 import java.nio.file.Files
 import java.nio.file.Path
 
 
 class LocalFileManager(
     override val basedir: Path,
-    inner: ObservableSet<WatchedDirectory> = observableSetOf()
+    override val inner: ObservableSet<WatchedDirectory> = observableSetOf()
 ) : FileManager {
-    override val inner: ObservableSet<WatchedDirectory> = inner
+    override fun getDirectories(domain: FileDomain): Map<Subcategory, WatchedDirectory> {
+        val dir = fullPath(domain)
+        return domain
+            .categories
+            .map { it to dir.resolve(it.directory) }
+            .filter { Files.exists(it.second) }
+            .map { it.first to watchDirectory(it.second, domain) }
+            .toMap()
+    }
 
     override fun new(
         domain: FileDomain,
