@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNotNull
 
 @Stepwise
 abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {
-    Path tmpdirPath = generateTestDir()
+    Path tmpdirPath = Files.createTempDirectory("e2e").toAbsolutePath()
     Stage stage = null
     Faker fake = FakeKt.getFake()
     T view = null
@@ -33,9 +33,6 @@ abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {
     Path libdir = tmpdirPath.resolve("lib").toAbsolutePath()
     Path javaHome = tmpdirPath.resolve("jdk").toAbsolutePath()
 
-    Path generateTestDir() {
-        return Files.createTempDirectory("e2e").toAbsolutePath()
-    }
 
     void setup() {
         System.setProperty("itasserui.testmode", true.toString())

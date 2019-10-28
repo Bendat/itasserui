@@ -5,7 +5,7 @@ import itasser.app.mytasser.app.login.LoginModal.LoginDuration
 import itasser.app.mytasser.app.login.LoginModal.LoginDuration.*
 import itasser.app.mytasser.lib.kInject
 import itasserui.app.user.ProfileManager
-import itasserui.app.user.ProfileManager.Session
+import itasserui.app.user.ProfileManager.Profile
 import itasserui.common.`typealias`.Outcome
 import itasserui.common.errors.ExceptionError
 import itasserui.common.errors.RuntimeError
@@ -18,7 +18,7 @@ import tornadofx.getValue
 import tornadofx.setValue
 import java.time.Duration
 
-@Suppress("MemberVisibilityCanBePrivate")
+@Suppress("MemberVisibilityCanBePrivate", "unused")
 class LoginModalController : Controller(), Logger {
 
     val profileManager: ProfileManager by kInject<ProfileManager>()
@@ -35,20 +35,20 @@ class LoginModalController : Controller(), Logger {
     val durationProperty = SimpleObjectProperty<Int>()
     val duration: Int by durationProperty
 
-    val sessionProperty = SimpleObjectProperty<Option<Session>>(None)
-    var session: Option<Session> by sessionProperty
+    val sessionProperty = SimpleObjectProperty<Option<Profile>>(None)
+    var profile: Option<Profile> by sessionProperty
 
     val loginErrorProperty = SimpleObjectProperty<Option<RuntimeError>>(None)
     var loginError: Option<RuntimeError> by loginErrorProperty
 
 
-    fun onLogin(): Outcome<Session> =
+    fun onLogin(): Outcome<Profile> =
         Try {
             profileManager.login(
                 username = Username(username),
                 password = RawPassword(password),
                 duration = durationStringConverter(duration)
-            ).also { it.map { ses -> session = Some(ses) } }
+            )
         }.toEither {
             ExceptionError(it)
         }.flatMap {
@@ -57,6 +57,8 @@ class LoginModalController : Controller(), Logger {
             it.also { err ->
                 loginError = Some(err)
             }
+        }.map {
+            profile = Some(it)
             it
         }
 

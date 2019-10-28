@@ -29,10 +29,12 @@ class ProfileManager(
     val fileManager: FileManager,
     val database: Database
 ) : Logger {
+    @Suppress("MemberVisibilityCanBePrivate")
     val profiles: ObservableList<Profile> = ObservableListWrapper()
-    
+
     data class Session(val start: Long, val duration: Duration) {
         val sessionTimeRemaining: Long get() = start + duration.toMillis() - currentTimeMillis()
+        @Suppress("MemberVisibilityCanBePrivate")
         val isLocked get() = sessionTimeRemaining < 0
         val isActive get() = !isLocked
     }
@@ -69,6 +71,10 @@ class ProfileManager(
                 .also { it.session = session.toOption() }
                 .let { Either.Right(it) }
         val directories = fileManager.getDirectories(user)
+        println("User directories are $directories")
+        directories.map {
+            println("Dirs made are ${fileManager.mkdirs(user, it.value)}")
+        }
         val profile = profiles.find { it.user == user } ?: Profile(
             user = user,
             session = session.toOption(),

@@ -11,16 +11,10 @@ import static org.testfx.matcher.base.NodeMatchers.isDisabled
 
 abstract class InstallWizardSetupSpec extends InstallWizardSpec {
 
-    @Shared
     Path uncreated = tmpdirPath.resolve("uncreated")
-
-    @Shared
     NodeQuery pkgdirNode = null
-    @Shared
     NodeQuery dataDirNode = null
-    @Shared
     NodeQuery libDirNode = null
-    @Shared
     NodeQuery javaHomeNode = null
     void setup() {
         given:

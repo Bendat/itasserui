@@ -28,7 +28,7 @@ abstract class LoginSpec extends AppSpec<LoginModal> {
 
     void setup() {
         setup:
-        def user = new UnregisteredUser(new Username(username), new RawPassword(password), new EmailAddress(email)).toUser(UUID.randomUUID())
+        def user = new UnregisteredUser(new Username(username), new RawPassword(password), new EmailAddress(email), false).toUser(UUID.randomUUID())
         timeUnit = lookup("#timeout_unit")
 
         expect:
@@ -39,7 +39,7 @@ abstract class LoginSpec extends AppSpec<LoginModal> {
         and:
         "A new user $username to exist in the database"
         view.model.item.profileManager.database.launch()
-        view.model.item.profileManager.saveToDb(user)
+        view.model.item.profileManager.createUserProfile(user)
     }
 
     @Override

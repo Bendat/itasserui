@@ -37,10 +37,9 @@ class BasicLoginSpec extends LoginSpec {
 
         when: "Clicking login"
         clickOn("#login_login")
-
         then: "The user is logged in"
-        def session = view.model.userLogin.value as Some<ProfileManager.Session>
-        session.t.active
+        def profile = view.model.userLogin.value as Some<ProfileManager.Profile>
+        def session = profile.t.session as Some<ProfileManager.Session>
 
         when: "Waiting 1/2 seconds"
         safeWait(500)

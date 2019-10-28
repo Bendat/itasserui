@@ -15,7 +15,6 @@ import itasserui.common.errors.RuntimeError
 import itasserui.common.interfaces.inline.EmailAddress
 import itasserui.common.interfaces.inline.RawPassword
 import itasserui.common.interfaces.inline.Username
-import itasserui.common.utils.SafeWaitKt
 import itasserui.lib.filemanager.FS
 import itasserui.lib.process.manager.ProcessManager
 import itasserui.lib.process.process.ITasser
@@ -23,7 +22,7 @@ import javafx.scene.Scene
 import javafx.stage.Stage
 import org.kodein.di.Kodein
 import tornadofx.Scope
-
+import itasserui.app.mytasser.process.pane.widget.KodeinExtractor
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -32,6 +31,7 @@ import static itasserui.common.utils.FakeKt.Fake
 abstract class ProcessPaneWidgetSpec extends AppSpec<ProcessWidget> {
     private ITasserSettings settins = new ITasserSettings(tmpdirPath, libdir, javaHome, datadir, "gnuparallel", UUID.randomUUID())
     ProcessManager pm = new ProcessManager()
+    Path dataDir = null
     Account account = new UnregisteredUser(
             new Username(Fake.name().username()),
             new RawPassword(Fake.internet().password()),
@@ -53,6 +53,7 @@ abstract class ProcessPaneWidgetSpec extends AppSpec<ProcessWidget> {
         extractor.db.launch()
 
         def res = extractor.pm.createUserProfile(account) as Ior.Right<NonEmptyList<RuntimeError>, User>
+
         user = res.value
         extractor.pm.getUserDir(user, User.UserCategory.DataDir)
                 .map { dataDir = it.toAbsolutePath() }
@@ -69,6 +70,9 @@ abstract class ProcessPaneWidgetSpec extends AppSpec<ProcessWidget> {
                 user.id,
                 dataDir
         )
+
+        expect:
+        res.isRight()
     }
 
     @Override

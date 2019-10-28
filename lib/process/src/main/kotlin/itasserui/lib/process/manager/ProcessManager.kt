@@ -32,7 +32,6 @@ class ProcessManager(
     private val defaultArgs = arrayOf(ArgNames.Perl, ArgNames.AutoFlush).map(Any::toString)
     fun run(itasser: ITasser) {
         info {
-            safeWait(1000)
             "Starting run on ${itasser.process.name}:" +
                     " IsRunning: ${itasser.state == Running}: ${itasser.state}\n" +
                     "can execute: ${processes.running.size < maxExecuting}: ${processes.running.map { it }}:$maxExecuting"
