@@ -8,11 +8,13 @@ import itasserui.common.utils.safeWait
 import itasserui.common.utils.uuid
 import itasserui.lib.process.process.ITasser
 import itasserui.test_utils.matchers.Be
+import org.joda.time.DateTime
 import java.nio.file.Paths
 
 class ProcessManagerTests : DescribeSpec({
     val waitTime = 500L
     val manager = ProcessManager()
+
     describe("Executing processes sequentially upon completion") {
         val file = Paths.get(javaClass.getResource("/Infinity.pl").file)
         context("Creating the processes") {
@@ -32,53 +34,60 @@ class ProcessManagerTests : DescribeSpec({
         }
 
         it("Verifies there are 3 processes running") {
+
             manager.processes.running.size should be(3)
         }
 
         context("Killing processes manually") {
 
             it("Kills the first process") {
-                manager.processes.running[0].executor.kill()
-                safeWait(100)
-            }
+                println("Running was ${manager.processes.running.toList()}")
+                val proc = manager.processes.running[0]
+                println("Old running at  [${DateTime()}] is ${manager.processes.running.map { it }} ")
+                proc.executor.kill()
+                println("All is ${manager.processes.running.toList()}")
 
-            it("Verifies there are still 3 running processes") {
-                manager.processes.running.size should be(3)
+            }
+            context("Not sure") {
+                it("Verifies there are still 3 running processes") {
+                    safeWait(1000)
+                    manager.processes.running.size should be(3)
+                }
             }
 
             it("Kills the second process") {
-                manager.processes.running[0].executor.kill()
-                safeWait(100)
+                manager.processes.running[0].executor.kill() should Be.ok()
             }
 
             it("Verifies again there are still 3 running processes") {
+                safeWait(1000)
                 manager.processes.running.size should be(3)
             }
 
             it("Kills the 3rd process") {
                 manager.processes.running[0].executor.kill()
-                safeWait(100)
             }
 
             it("Verifies there are 2 running processes") {
+                safeWait(1000)
                 manager.processes.running.size should be(2)
             }
 
             it("Kills the 4th process") {
                 manager.processes.running[0].executor.kill()
-                safeWait(100)
             }
 
             it("Verifies there is 1 running processes") {
+                safeWait(1000)
                 manager.processes.running.size should be(1)
             }
 
             it("Kills the 5th process") {
                 manager.processes.running[0].executor.kill()
-                safeWait(100)
             }
 
             it("Verifies there is 0 running processes") {
+                safeWait(1000)
                 manager.processes.running.size should be(0)
             }
         }
@@ -112,4 +121,7 @@ class ProcessManagerTests : DescribeSpec({
             }
         }
     }
-})
+}) {
+    init {
+    }
+}

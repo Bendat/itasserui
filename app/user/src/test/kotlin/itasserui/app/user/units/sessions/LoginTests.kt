@@ -6,10 +6,11 @@ import io.kotlintest.matchers.beInstanceOf
 import io.kotlintest.should
 import io.kotlintest.specs.DescribeSpec
 import itasserui.app.user.Account
-import itasserui.app.user.ProfileManager.Session
+import itasserui.app.user.ProfileManager.Profile
 import itasserui.app.user.units.utils.SetupObject
 import itasserui.common.errors.RuntimeError
 import itasserui.common.utils.safeWait
+import itasserui.test_utils.matchers.Be
 import java.time.Duration
 
 class LoginTests : DescribeSpec({
@@ -22,34 +23,35 @@ class LoginTests : DescribeSpec({
         }
 
         context("Logging in with no session time") {
-            lateinit var session: Session
+            lateinit var profile: Profile
             it("Attempts to login") {
                 data.pm
                     .login(user, data.user.password)
-                    .map { session = it }
+                    .map { profile = it }
                     .mapLeft { print("Error: $it") }
             }
 
             it("Verifies the user matches the session user") {
-                session.user should be(user)
+                profile.user should be(user)
             }
 
             it("Verifies the session is inactive") {
-                session.isActive should be(false)
+                profile.session.map { it.isActive should be(false) } should Be.some()
             }
         }
 
         context("Logging in with an active session") {
-            lateinit var session: Session
+            lateinit var profile: Profile
+
             it("Attempts to login") {
                 data.pm
                     .login(user, data.user.password, Duration.ofMillis(500))
-                    .map { session = it }
+                    .map { profile = it }
                     .mapLeft { print("Error: $it") }
             }
 
             it("Verifies the session is active") {
-                session.isActive should be(true)
+                profile.session.map { it.isActive should be(true) } should Be.some()
             }
 
             it("Waits 200 milliseconds") {
@@ -57,8 +59,7 @@ class LoginTests : DescribeSpec({
             }
 
             it("Verifies the session is still active") {
-                session.isActive should be(true)
-
+                profile.session.map { it.isActive should be(true) } should Be.some()
             }
 
             context("Session should become inactive after its duration has passed") {
@@ -67,7 +68,7 @@ class LoginTests : DescribeSpec({
                 }
 
                 it("Verifies the session is no longer active") {
-                    session.isActive should be(false)
+                    profile.session.map { it.isActive should be(false)} should Be.some()
                 }
             }
         }

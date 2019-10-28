@@ -22,9 +22,9 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 
-data class TestDBObject(override val id: UUID, val foo: String = "Bar") : DBObject
 
 class DatabaseTest : DescribeSpec({
+
     val testObject = TestDBObject(uuid)
 
     describe("Standard tests using in memory Database instance.") {

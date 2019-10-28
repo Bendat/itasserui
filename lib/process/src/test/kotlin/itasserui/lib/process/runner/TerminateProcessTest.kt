@@ -12,6 +12,7 @@ import io.kotlintest.shouldNot
 import io.kotlintest.specs.DescribeSpec
 import itasserui.common.`typealias`.Err
 import itasserui.common.`typealias`.OK
+import itasserui.common.utils.safeWait
 import itasserui.common.utils.until
 import itasserui.lib.filemanager.FS
 import itasserui.lib.process.details.ExecutionState
@@ -34,10 +35,12 @@ class TerminateProcessTest : DescribeSpec({
 
         it("Will wait for the process to be in it's $Running state") {
             until { runner.state == Running }
+            safeWait(1000)
             runner.state should be<ExecutionState>(Running)
         }
 
         it("Should destroy the process") {
+            safeWait(1000) 
             runner.executor.kill() shouldNot beInstanceOf<Err>()
         }
 

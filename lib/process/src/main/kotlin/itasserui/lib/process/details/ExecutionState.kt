@@ -7,6 +7,8 @@ sealed class ExecutionState : AbstractSealedObject() {
     object Completed : ExecutionState()
     object Paused : ExecutionState()
     object Running : ExecutionState()
+    object Starting : ExecutionState()
+    object Stopping : ExecutionState()
     object Queued : ExecutionState()
     object Failed : ExecutionState()
 

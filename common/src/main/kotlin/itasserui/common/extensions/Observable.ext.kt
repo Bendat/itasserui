@@ -8,7 +8,6 @@ fun <T, K> ObservableList<T>.addUpdatableProperty(element: T, updateBy: (T) -> O
     add(element).also {
         updateBy(element) += {
             println("Updating element $element")
-
             update(element)
         }
     }

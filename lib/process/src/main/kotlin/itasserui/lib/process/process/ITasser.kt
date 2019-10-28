@@ -10,6 +10,7 @@ import itasserui.common.serialization.JsonObject
 import itasserui.lib.process.*
 import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.details.ExecutionState.Queued
+import itasserui.lib.process.details.ExecutionState.Stopping
 import itasserui.lib.process.details.ExitCode
 import itasserui.lib.process.details.TrackingList
 import lk.kotlin.observable.property.StandardObservableProperty
@@ -72,14 +73,18 @@ class ITasser(
             processExecutor.redirectOutput(ProcessLogAppender(STDType.Out, std.output))
             processExecutor.redirectError(ProcessLogAppender(STDType.Err, std.err))
             with(listener) {
+                beforeStart += {
+                    state = ExecutionState.Starting
+                }
                 afterFinish += { _, result ->
-                    info { "Process stopped with exit code ${result.exitValue} for $state" }
+                    info { "Process [${process.name}]stopped with exit code ${result.exitValue} for $state" }
                     state = when (result.exitValue) {
                         ExitCode.OK.code -> ExecutionState.Completed
                         ExitCode.SigTerm.code,
                         ExitCode.SigKill.code -> ExecutionState.Paused
                         else -> ExecutionState.Failed
                     }.also {
+                        info { "${process.name} changed state to $it" }
                         exitCode = ExitCode.fromInt(result.exitValue)
                         endTimes as MutableList += currentTimeMillis()
                         timer.map { timer -> timer.cancel() }
@@ -129,8 +134,10 @@ class ITasser(
 
         internal fun kill(): Outcome<ExecutionContext> =
             sysProcess.toEither { NoProcess(process.name) }.flatMap { proc ->
+                val cached = state
                 info { "Killing process ${process.name}" }
                 Try { ProcessUtil.destroyGracefullyAndWait(proc, 10, TimeUnit.SECONDS) }
+                    .map { state = Stopping }
                     .toEither { e -> Timeout(this@ITasser.process.name, e).also { error -> errors += error } }
                     .mapLeft { error { "Killing process errored with $it" }; it }
                     .map { this }

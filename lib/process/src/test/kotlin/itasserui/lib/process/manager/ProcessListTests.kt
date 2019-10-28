@@ -33,17 +33,16 @@ class ProcessListTests : DescribeSpec({
             it("Should verify the $Queued is in the queued queue") {
                 manager.processes[Queued].size should be(1)
             }
-
-            it("Should verify the $Completed is in the queued queue") {
+            it("Should verify the $Completed is in the completed queue") {
                 manager.processes[Completed].size should be(1)
             }
 
-            it("Should verify the $Paused is in the queued queue") {
+            it("Should verify the $Paused is in the paused queue") {
                 manager.processes[Paused].size should be(1)
             }
 
-            it("Should verify the $Running is in the queued queue") {
-                manager.processes[Running].size should be(1)
+            it("Should verify the $Running is in the running queue") {
+                manager.processes[Running].size should be(2)
             }
         }
 

@@ -3,8 +3,9 @@
 package itasserui.lib.process.manager
 
 import arrow.core.toOption
-import itasserui.common.extensions.addUpdatable
+import itasserui.common.extensions.addUpdatableProperty
 import itasserui.common.logger.Logger
+import itasserui.common.utils.safeWait
 import itasserui.lib.process.ArgNames
 import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.details.ExecutionState.*
@@ -14,7 +15,6 @@ import itasserui.lib.process.process.ITasserListener
 import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.list.filtering
 import lk.kotlin.observable.list.observableListOf
-import lk.kotlin.observable.list.sorting
 import lk.kotlin.observable.property.ObservableProperty
 import lk.kotlin.observable.property.StandardObservableProperty
 import lk.kotlin.observable.property.plusAssign
@@ -29,9 +29,14 @@ class ProcessManager(
 
     val autorunProperty = StandardObservableProperty(autoRun)
     var autoRun by autorunProperty
-
     private val defaultArgs = arrayOf(ArgNames.Perl, ArgNames.AutoFlush).map(Any::toString)
     fun run(itasser: ITasser) {
+        info {
+            safeWait(1000)
+            "Starting run on ${itasser.process.name}:" +
+                    " IsRunning: ${itasser.state == Running}: ${itasser.state}\n" +
+                    "can execute: ${processes.running.size < maxExecuting}: ${processes.running.map { it }}:$maxExecuting"
+        }
         when {
             itasser.state == Running -> itasser.executor.kill()
             processes.running.size < maxExecuting -> itasser.executor.start()
@@ -69,12 +74,8 @@ class ProcessManager(
         ).also {
             info { "Created new process ${it.toJson(3)}" }
             processes += it
-            if (processes.running.size < maxExecuting && autoRun) {
-                processes.next.map { proc ->
-                    proc.executor.start()
-                    trace { "Starting process [${proc.process.name}]" }
-                }
-            }
+            if(autoRun)
+                run(it)
         }
     }
 
@@ -88,8 +89,10 @@ class ProcessManager(
         ITasserListener().apply {
             afterFinish { _, res ->
                 trace { "A process $name::$id has finished" }
-                if (autoRun)
+                if (autoRun) {
+                    info { "Running next process ${processes.next}" }
                     processes.next.map { run(it) }
+                }
                 res.exitValue
             }
         }
@@ -99,10 +102,10 @@ class ProcessManager(
         val all = observableListOf<ITasser>()
         val queued: ObservableList<ITasser> = all
             .filtering { it.state is Queued }
-            .sorting { first, second -> first.priority > second.priority }
         val paused: ObservableList<ITasser> = all.filtering { it.state is Paused }
         val completed: ObservableList<ITasser> = all.filtering { it.state is Completed }
-        val running: ObservableList<ITasser> = all.filtering { it.state is Running }
+        val running: ObservableList<ITasser> = all.filtering { it.state is Running || it.state == Starting }
+        val stopping: ObservableList<ITasser> = all.filtering { it.state is Stopping }
         val failed: ObservableList<ITasser> = all.filtering { it.state is Failed }
 
         fun ObservableList<ITasser>.reloadOn(obj: ITasser, binds: ObservableProperty<ExecutionState>) {
@@ -137,13 +140,13 @@ class ProcessManager(
             is Paused -> paused
             is Failed -> failed
             is Running -> running
+            is Stopping -> stopping
             is Completed -> completed
+            is Starting -> running.filtering { it.state is Starting }
         }
 
         operator fun plusAssign(process: ITasser) {
-            all.addUpdatable(process) {
-                listOf(it.stateProperty, it.priorityProperty)
-            }
+            all.addUpdatableProperty(process) { it.stateProperty }
         }
     }
 }

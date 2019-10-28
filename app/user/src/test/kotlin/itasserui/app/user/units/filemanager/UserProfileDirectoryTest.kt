@@ -8,7 +8,7 @@ import itasserui.app.user.units.utils.SetupObject
 import itasserui.common.`typealias`.OK
 import itasserui.lib.filemanager.WatchedDirectory
 
-class CreateUserProfileDirectoryTest : DescribeSpec({
+class UserProfileDirectoryTest : DescribeSpec({
     describe("Setting up subcategory directories") {
         val data = SetupObject()
         val user = UserMocks.user

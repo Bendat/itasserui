@@ -30,16 +30,11 @@ class ProfileManager(
     val database: Database
 ) : Logger {
     val profiles: ObservableList<Profile> = ObservableListWrapper()
-
-    data class TimeLock(val start: Long, val duration: Duration) {
-        val timeRemaining get() = start + duration.toMillis() - currentTimeMillis()
-        val isLocked get() = timeRemaining < 0
-        val isUnlocked get() = !isLocked
-    }
-
-    data class Session(val user: User, val timeLock: TimeLock) {
-        val isActive get() = timeLock.isUnlocked
-        val sessionTimeRemaining: Long get() = timeLock.timeRemaining
+    
+    data class Session(val start: Long, val duration: Duration) {
+        val sessionTimeRemaining: Long get() = start + duration.toMillis() - currentTimeMillis()
+        val isLocked get() = sessionTimeRemaining < 0
+        val isActive get() = !isLocked
     }
 
     fun getAdmin(password: RawPassword): Outcome<User> {
@@ -56,27 +51,27 @@ class ProfileManager(
         user: Account,
         password: RawPassword,
         duration: Duration = Duration.ZERO
-    ): Outcome<Session> {
+    ): Outcome<Profile> {
         return when (val users = database.read<User> { User::username eq user.username }) {
             is Err -> Either.Left(LoginFailedError(user, users.a))
             is OK -> when {
                 users.b.isEmpty() -> Either.Left(NoSuchUser(user))
                 users.b.first().checkPassword(password).isFalse -> Either.Left(WrongPassword(user))
-                else -> Either.Right(Session(users.b.first(), TimeLock(currentTimeMillis(), duration)))
+                else -> getOrAddProfile(user.toUser(), Session(currentTimeMillis(), duration))
             }
         }
     }
 
-    private fun getOrAddProfile(user: User, session: Option<Session>): Outcome<Profile> {
+    private fun getOrAddProfile(user: User, session: Session? = null): Outcome<Profile> {
         if (profiles.any { it.user == user })
             return profiles
                 .first { it.user == user }
-                .also { it.session = session }
+                .also { it.session = session.toOption() }
                 .let { Either.Right(it) }
         val directories = fileManager.getDirectories(user)
         val profile = profiles.find { it.user == user } ?: Profile(
             user = user,
-            session = session,
+            session = session.toOption(),
             directories = directories.toList().map { it.second },
             dataDir = directories.getValue(UserCategory.DataDir),
             outDir = directories.getValue(UserCategory.OutDir),
@@ -91,7 +86,7 @@ class ProfileManager(
         username: Username,
         password: RawPassword,
         duration: Duration
-    ): Outcome<Session> =
+    ): Outcome<Profile> =
         login(UnregisteredUser(username, password, EmailAddress("")), password, duration)
 
     fun createUserProfile(user: Account): Ior<Nel<RuntimeError>, User> {
@@ -169,7 +164,6 @@ class ProfileManager(
     ) {
         fun login(user: User, password: RawPassword, duration: Duration) =
             manager.login(user, password, duration)
-                .map { session = Some(it); it }
     }
 
 }
