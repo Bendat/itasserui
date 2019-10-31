@@ -33,8 +33,8 @@ abstract class LoginSpec extends AppSpec<LoginModal> {
 
         expect:
         "The combobox to have ${LoginModal.LoginDuration.values().size()}"
-        FxAssert.verifyThat(timeUnit, ComboBoxMatchers.hasItems(4))
-        FxAssert.verifyThat(timeUnit, ComboBoxMatchers.hasSelectedItem(LoginModal.LoginDuration.Actions))
+        FxAssert.verifyThat(timeUnit, ComboBoxMatchers.hasItems(3))
+        FxAssert.verifyThat(timeUnit, ComboBoxMatchers.hasSelectedItem(LoginModal.LoginDuration.Seconds))
 
         and:
         "A new user $username to exist in the database"

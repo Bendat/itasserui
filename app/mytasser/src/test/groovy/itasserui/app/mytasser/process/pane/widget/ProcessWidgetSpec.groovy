@@ -1,5 +1,6 @@
 package itasserui.app.mytasser.process.pane.widget
 
+import com.anotherchrisberry.spock.extensions.retry.RetryOnFailure
 import itasser.app.mytasser.app.process.pane.widget.WidgetCss
 import org.joda.time.DateTime
 import org.testfx.matcher.base.NodeMatchers
@@ -39,6 +40,18 @@ class ProcessWidgetSpec extends ProcessPaneWidgetSpec {
         verifyThat(startTime, NodeMatchers.isInvisible())
     }
 
+    void login(Boolean succeed = true) {
+        clickOn("#username_field").write(account.username.value)
+        if (succeed)
+            clickOn("#password_field").write(account.password.value)
+        else clickOn("#password_field").write("horp")
+
+        for (int i = 0; i < 4; i++) {
+            clickOn(".increment-arrow-button")
+        }
+        clickOn("#login_login")
+    }
+
     void "Executing a process should change the state of the widget"() {
         given: "The time strings to verify"
         def date = dateTime.toString("dd / MM / YYYY")
@@ -46,6 +59,7 @@ class ProcessWidgetSpec extends ProcessPaneWidgetSpec {
 
         when: "The run button is clicked"
         clickOn(controlButton.queryButton())
+        login()
         safeWait(1000)
 
         then:
@@ -60,6 +74,7 @@ class ProcessWidgetSpec extends ProcessPaneWidgetSpec {
     void "Pausing an executing process"() {
         when: "The process for this widget is executed and paused"
         clickOn(controlButton.queryButton())
+        login()
         safeWait(1000)
         clickOn(controlButton.queryButton())
         clickOn(controlButton.queryButton())
@@ -70,4 +85,20 @@ class ProcessWidgetSpec extends ProcessPaneWidgetSpec {
         view.model.runPauseIcon.value == view.model.item.runStopIcons.play
         verifyThat(timerLabel, LabeledMatchers.hasText("0:00:02"))
     }
+
+    @RetryOnFailure(times = 3)
+    void "Attempting to use the widget while logged out"() {
+        when: "The process for this widget is executed and paused"
+        clickOn(controlButton.queryButton())
+        login(false)
+        safeWait(1000)
+        clickOn("OK")
+
+        then:
+        view.model.runPauseIcon.value == view.model.item.runStopIcons.play
+        verifyThat(timerLabel, LabeledMatchers.hasText(""))
+
+    }
+
+
 }

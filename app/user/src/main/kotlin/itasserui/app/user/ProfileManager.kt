@@ -24,6 +24,7 @@ import org.dizitart.kno2.filters.eq
 import org.dizitart.no2.objects.ObjectFilter
 import java.lang.System.currentTimeMillis
 import java.time.Duration
+import java.util.*
 
 class ProfileManager(
     val fileManager: FileManager,
@@ -31,14 +32,17 @@ class ProfileManager(
 ) : Logger {
     @Suppress("MemberVisibilityCanBePrivate")
     val profiles: ObservableList<Profile> = ObservableListWrapper()
+    val sessions: Map<UUID, Session?> = mutableMapOf()
 
     data class Session(val start: Long, val duration: Duration) {
         val sessionTimeRemaining: Long get() = start + duration.toMillis() - currentTimeMillis()
         @Suppress("MemberVisibilityCanBePrivate")
-        val isLocked get() = sessionTimeRemaining < 0
+        val isLocked
+            get() = sessionTimeRemaining < 0
         val isActive get() = !isLocked
     }
 
+    fun isLoggedIn(profile: Profile) = (sessions[profile.user.id]?.isActive == true)
     fun getAdmin(password: RawPassword): Outcome<User> {
         val results = database.read<User> { Account::isAdmin eq true }
         lateinit var user: User
@@ -49,11 +53,26 @@ class ProfileManager(
             .map { user }
     }
 
+    fun perform(profile: Profile, onNotLoggedIn: () -> Unit, op: () -> Unit) {
+        info {
+            "Perform logged in is ${sessions.toList()}${sessions.map { it.value?.duration?.toMillis() }}"
+        }
+        info{"Is logged in is ${isLoggedIn(profile)}"}
+        if (!isLoggedIn(profile))
+            onNotLoggedIn()
+        info{"Is logged in is ${isLoggedIn(profile)}"}
+
+        if (isLoggedIn(profile))
+            op()
+    }
+
     fun login(
         user: Account,
         password: RawPassword,
         duration: Duration = Duration.ZERO
     ): Outcome<Profile> {
+        info { "Continuing login for ${duration.toMillis()}" }
+        info { "Profiles are for ${profiles.toList()}" }
         return when (val users = database.read<User> { User::username eq user.username }) {
             is Err -> Either.Left(LoginFailedError(user, users.a))
             is OK -> when {
@@ -65,27 +84,33 @@ class ProfileManager(
     }
 
     private fun getOrAddProfile(user: User, session: Session? = null): Outcome<Profile> {
-        if (profiles.any { it.user == user })
-            return profiles
-                .first { it.user == user }
-                .also { it.session = session.toOption() }
-                .let { Either.Right(it) }
-        val directories = fileManager.getDirectories(user)
-        println("User directories are $directories")
-        directories.map {
-            println("Dirs made are ${fileManager.mkdirs(user, it.value)}")
+        fun addSession(user: User) {
+            sessions as MutableMap
+            sessions[user.id] = session
         }
-        val profile = profiles.find { it.user == user } ?: Profile(
-            user = user,
-            session = session.toOption(),
-            directories = directories.toList().map { it.second },
-            dataDir = directories.getValue(UserCategory.DataDir),
-            outDir = directories.getValue(UserCategory.OutDir),
-            settings = directories.getValue(UserCategory.Settings),
-            manager = this
-        )
-
-        return Either.Right(profile)
+        return when (profiles.any { it.user.username == user.username }) {
+            true -> profiles.first { it.user.username == user.username }
+                .also { addSession(it.user) }
+                .right()
+            false -> database.find<User> { User::username eq user.username }
+                .flatMap { it.firstOrNone().toEither { NoSuchUser(user) } }
+                .map {
+                    val directories = fileManager.getDirectories(user)
+                    val profile = profiles.find { p -> p.user.username == user.username  } ?: Profile(
+                        user = it,
+                        session = session.toOption(),
+                        directories = directories.toList().map { it.second },
+                        dataDir = directories.getValue(UserCategory.DataDir),
+                        outDir = directories.getValue(UserCategory.OutDir),
+                        settings = directories.getValue(UserCategory.Settings),
+                        manager = this
+                    )
+                    info { "Profiles are ${profiles.find { it.user.id == user.id }} " }
+                    profiles += profile
+                    addSession(profile.user)
+                    profile
+                }
+        }
     }
 
     fun login(

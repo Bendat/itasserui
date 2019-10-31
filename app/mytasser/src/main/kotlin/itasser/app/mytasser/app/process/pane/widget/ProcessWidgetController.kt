@@ -1,7 +1,7 @@
 package itasser.app.mytasser.app.process.pane.widget
 
 import itasser.app.mytasser.lib.extensions.bind
-import itasserui.app.user.User
+import itasserui.app.user.ProfileManager.Profile
 import itasserui.common.logger.Logger
 import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.details.ExecutionState.Queued
@@ -15,13 +15,13 @@ import tornadofx.getValue
 import tornadofx.setValue
 
 class ProcessWidgetController(
-    val user: User,
+    val user: Profile,
     val itasser: ITasser
 ) : Controller(), Logger {
 
     val runStopIcons = PlayPauseIcons(resources.image("/icons/play.png"), resources.image("/icons/pause.png"))
 
-    val usernameProperty = SimpleStringProperty(user.username.value)
+    val usernameProperty = SimpleStringProperty(user.user.username.value)
     var username: String by usernameProperty
 
     val executionStateProperty = SimpleObjectProperty<ExecutionState>(Queued)

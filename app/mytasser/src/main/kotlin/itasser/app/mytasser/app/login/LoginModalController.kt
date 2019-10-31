@@ -1,13 +1,15 @@
 package itasser.app.mytasser.app.login
 
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.flatMap
 import itasser.app.mytasser.app.login.LoginModal.LoginDuration
 import itasser.app.mytasser.app.login.LoginModal.LoginDuration.*
 import itasser.app.mytasser.lib.kInject
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.ProfileManager.Profile
 import itasserui.common.`typealias`.Outcome
-import itasserui.common.errors.ExceptionError
 import itasserui.common.errors.RuntimeError
 import itasserui.common.interfaces.inline.RawPassword
 import itasserui.common.interfaces.inline.Username
@@ -29,7 +31,7 @@ class LoginModalController : Controller(), Logger {
     val passwordProperty = SimpleObjectProperty("")
     val password: String by passwordProperty
 
-    val timeUnitProperty = SimpleObjectProperty(Actions)
+    val timeUnitProperty = SimpleObjectProperty(Seconds)
     val timeUnit: LoginDuration by timeUnitProperty
 
     val durationProperty = SimpleObjectProperty<Int>()
@@ -43,17 +45,11 @@ class LoginModalController : Controller(), Logger {
 
 
     fun onLogin(): Outcome<Profile> =
-        Try {
-            profileManager.login(
-                username = Username(username),
-                password = RawPassword(password),
-                duration = durationStringConverter(duration)
-            )
-        }.toEither {
-            ExceptionError(it)
-        }.flatMap {
-            it
-        }.mapLeft {
+        profileManager.login(
+            username = Username(username),
+            password = RawPassword(password),
+            duration = durationStringConverter(duration)
+        ).mapLeft {
             it.also { err ->
                 loginError = Some(err)
             }

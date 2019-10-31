@@ -25,6 +25,14 @@ class BasicLoginSpec extends LoginSpec {
         type(KeyCode.DOWN)
         type(KeyCode.ENTER)
 
+        then:
+        FxAssert.verifyThat(timeUnit, ComboBoxMatchers.hasSelectedItem(LoginModal.LoginDuration.Minutes))
+
+        and:
+        clickOn("#timeout_unit")
+        type(KeyCode.UP)
+        type(KeyCode.ENTER)
+
         then: "The Timeout box to have a value of 1 second"
         timeoutTime.query().getValue() == 1
         FxAssert.verifyThat(timeUnit, ComboBoxMatchers.hasSelectedItem(LoginModal.LoginDuration.Seconds))
@@ -37,6 +45,7 @@ class BasicLoginSpec extends LoginSpec {
 
         when: "Clicking login"
         clickOn("#login_login")
+
         then: "The user is logged in"
         def profile = view.model.userLogin.value as Some<ProfileManager.Profile>
         def session = profile.t.session as Some<ProfileManager.Session>

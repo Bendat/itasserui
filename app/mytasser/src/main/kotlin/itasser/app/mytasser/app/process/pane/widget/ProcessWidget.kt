@@ -1,23 +1,34 @@
 package itasser.app.mytasser.app.process.pane.widget
 
+import itasser.app.mytasser.app.login.LoginModal
 import itasser.app.mytasser.app.styles.MainStylee
 import itasser.app.mytasser.app.styles.MainStylee.Companion.paddedImage2
 import itasser.app.mytasser.app.styles.MainStylee.Companion.transparentButton
 import itasser.app.mytasser.lib.DI
-import itasserui.app.user.User
+import itasserui.app.user.ProfileManager
+import itasserui.app.user.ProfileManager.Profile
 import itasserui.common.extensions.format
 import itasserui.common.logger.Logger
 import itasserui.lib.process.manager.ProcessManager
 import itasserui.lib.process.process.ITasser
 import javafx.animation.AnimationTimer
+import javafx.scene.control.Dialog
 import javafx.util.StringConverter
 import org.joda.time.DateTime
 import org.kodein.di.generic.instance
 import tornadofx.*
 import java.time.Duration.ofMillis
 
+val <T : UIComponent> T.loginModal
+    get() = fun() {
+        val vm = find<LoginModal>()
+        val d = Dialog<LoginModal>()
+        d.dialogPane.content = vm.root
+        d.showAndWait()
+    }
+
 class ProcessWidget(
-    user: User,
+    user: Profile,
     itasser: ITasser,
     scope: Scope? = null
 ) : Fragment("Process Widget Fragment"), Logger {
@@ -27,6 +38,7 @@ class ProcessWidget(
     val model: ProcessWidgetViewModel = ProcessWidgetViewModel(user, itasser)
 
     private val processManager: ProcessManager by lazy { val i by kdi.instance<ProcessManager>(); i }
+    private val profileManager: ProfileManager by lazy { val i by kdi.instance<ProfileManager>(); i }
     private val iconHeight: Double = 16.0
 
     init {
@@ -140,7 +152,11 @@ class ProcessWidget(
                     addClass(WidgetCss.controlButton)
                     model.executionStateProperty
                         .addListener { _, _, new -> model.setRunPlayIcon(new) }
-                    setOnMouseClicked { processManager.run(itasser) }
+                    setOnMouseClicked {
+                        profileManager.perform(user, loginModal) {
+                            processManager.run(itasser)
+                        }
+                    }
                 }
                 val sicon = imageview(model.stopIcon) {
                     addClass(paddedImage2)
@@ -152,20 +168,21 @@ class ProcessWidget(
                 button(graphic = sicon) { addClass(transparentButton); }
             }
         }
-        info { "Model user is ${model.item.user}" }
+
+
     }
+    val date
+        get() = object : StringConverter<Long>() {
+            override fun fromString(string: String): Long = 0L
+            override fun toString(value: Long?): String =
+                DateTime(value).toString("dd / MM / YYYY")
+        }
+
+    val time
+        get() = object : StringConverter<Long>() {
+            override fun fromString(string: String): Long = 0L
+            override fun toString(value: Long?): String =
+                DateTime(value).toString("hh:mm")
+
+        }
 }
-
-val date
-    get() = object : StringConverter<Long>() {
-        override fun fromString(string: String): Long = 0L
-        override fun toString(value: Long?): String =
-            DateTime(value).toString("dd / MM / YYYY")
-    }
-
-val time
-    get() = object : StringConverter<Long>() {
-        override fun fromString(string: String): Long = 0L
-        override fun toString(value: Long?): String =
-            DateTime(value).toString("hh:mm")
-    }

@@ -89,6 +89,7 @@ class ITasser(
                         endTimes as MutableList += currentTimeMillis()
                         timer.map { timer -> timer.cancel() }
                     }
+
                     info { "Process stopped with exit code ${result.exitValue} for $state" }
                 }
                 afterStart += { _, _ ->
@@ -134,7 +135,6 @@ class ITasser(
 
         internal fun kill(): Outcome<ExecutionContext> =
             sysProcess.toEither { NoProcess(process.name) }.flatMap { proc ->
-                val cached = state
                 info { "Killing process ${process.name}" }
                 Try { ProcessUtil.destroyGracefullyAndWait(proc, 10, TimeUnit.SECONDS) }
                     .map { state = Stopping }

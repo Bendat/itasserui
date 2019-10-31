@@ -1,6 +1,7 @@
 package itasserui.app.mytasser
 
 import com.github.javafaker.Faker
+import itasser.app.mytasser.TestApp
 import itasserui.common.utils.FakeKt
 import javafx.scene.Scene
 import javafx.scene.control.DialogPane

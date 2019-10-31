@@ -1,12 +1,13 @@
 package itasser.app.mytasser.app.login
 
 import arrow.core.Either
-import itasser.app.mytasser.app.login.LoginModal.LoginDuration.Actions
+import itasser.app.mytasser.app.login.LoginModal.LoginDuration.Seconds
 import itasser.app.mytasser.app.login.LoginModal.LoginDuration.values
 import itasserui.common.logger.Logger
 import javafx.scene.Node
 import javafx.scene.Parent
 import javafx.scene.control.Alert.AlertType.ERROR
+import javafx.scene.control.ButtonType
 import tornadofx.*
 
 class LoginModal(
@@ -23,7 +24,6 @@ class LoginModal(
 
     @Suppress("unused")
     enum class LoginDuration {
-        Actions,
         Seconds,
         Minutes,
         Hours
@@ -41,9 +41,8 @@ class LoginModal(
                     hbox {
                         val values = values().toList()
                         spinner(-1, 100000, 0, 1, false, model.duration, true) { maxWidth = 80.0 }.id("user_timeout")
-                        combobox(model.timeUnit, values) { value = Actions }.id("timeout_unit")
+                        combobox(model.timeUnit, values) { value = Seconds }.id("timeout_unit")
                     }
-
                 }
             }
             hbox {
@@ -58,12 +57,10 @@ class LoginModal(
                                 ERROR,
                                 login.a::class.simpleName?.removeSuffix("Error") ?: "Unknown error",
                                 login.a.toString(),
+                                ButtonType.OK,
                                 owner = currentStage,
                                 title = "Couldn't log in"
-                            ).also {
-                                info { "Created alert $it" }
-                            }
-
+                            )
                         }
                     }
                 }.id("login_login")
@@ -72,7 +69,6 @@ class LoginModal(
         spacer()
 
     }
-
 }
 
 

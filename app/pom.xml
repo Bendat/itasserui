@@ -23,6 +23,12 @@
     </properties>
 
     <dependencies>
+        <!-- Spock -->
+        <dependency>
+            <groupId>com.anotherchrisberry</groupId>
+            <artifactId>spock-retry</artifactId>
+            <version>0.6.4</version>
+        </dependency>
         <!-- Kotlin -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
