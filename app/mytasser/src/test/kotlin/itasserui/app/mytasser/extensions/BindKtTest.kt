@@ -10,26 +10,6 @@ import lk.kotlin.observable.list.ObservableListWrapper
 import lk.kotlin.observable.list.sorting
 import lk.kotlin.observable.property.StandardObservableProperty
 
-private val sorter = fun(
-    first: Foo,
-    second: Foo
-): Boolean {
-    return if (first.priority == second.priority) {
-        val comp1 = first.value
-        val comp2 = second.value
-        when {
-            comp1 == comp2 -> true
-            comp1 < comp2 -> true
-            else -> false
-        }
-    } else {
-        when {
-            first.priority > second.priority -> true
-            else -> false
-        }
-    }
-}
-
 class Foo(val name: String, initial: Int, priority: Int) {
     val prop = StandardObservableProperty<Int>(initial)
     var value by prop
@@ -40,7 +20,27 @@ class Foo(val name: String, initial: Int, priority: Int) {
         return "Foo(name='$name', value=$value, priority=$priority"
     }
 
-
+    companion object {
+        val sorter = fun(
+            first: Foo,
+            second: Foo
+        ): Boolean {
+            return if (first.priority == second.priority) {
+                val comp1 = first.value
+                val comp2 = second.value
+                when {
+                    comp1 == comp2 -> true
+                    comp1 < comp2 -> true
+                    else -> false
+                }
+            } else {
+                when {
+                    first.priority > second.priority -> true
+                    else -> false
+                }
+            }
+        }
+    }
 }
 
 class BindKtTest : DescribeSpec() {
@@ -53,7 +53,7 @@ class BindKtTest : DescribeSpec() {
                     Foo("Third", 3, 0),
                     Foo("Fourth", 4, 0)
                 )
-            ).sorting(sorter).bindProperty { it.priorityProperty }
+            ).sorting(Foo.sorter).bindProperty { it.priorityProperty }
 
             val fxobservable = FXCollections.observableArrayList(lkobservable)
                 .bind(lkobservable)
