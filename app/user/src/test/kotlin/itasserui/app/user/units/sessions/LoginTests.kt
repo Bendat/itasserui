@@ -25,7 +25,7 @@ class LoginTests : DescribeSpec({
             lateinit var profile: Profile
             it("Attempts to login") {
                 data.pm
-                    .login(user, data.user.password)
+                    .login(user, data.user.password, Duration.ofSeconds(1))
                     .map { profile = it }
                     .mapLeft { print("Error: $it") }
             }
@@ -67,7 +67,7 @@ class LoginTests : DescribeSpec({
                 }
 
                 it("Verifies the session is no longer active") {
-                    data.pm.isLoggedIn(profile) should be(true)
+                    data.pm.isLoggedIn(profile) should be(false)
                 }
             }
         }

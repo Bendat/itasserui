@@ -1,8 +1,10 @@
-package itasserui.app.mytasser.lib.extensions
+package itasserui.app.mytasser.extensions
 
 import io.kotlintest.be
 import io.kotlintest.should
 import io.kotlintest.specs.DescribeSpec
+import itasserui.app.mytasser.lib.extensions.bind
+import itasserui.app.mytasser.lib.extensions.bindProperty
 import javafx.collections.FXCollections
 import lk.kotlin.observable.list.ObservableListWrapper
 import lk.kotlin.observable.list.sorting

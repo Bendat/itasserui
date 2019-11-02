@@ -5,7 +5,7 @@
         <module>fasta</module>
         <module>filemanager</module>
         <module>store</module>
-        <module>Process</module>
+        <module>process</module>
     </modules>
 
     <parent>
