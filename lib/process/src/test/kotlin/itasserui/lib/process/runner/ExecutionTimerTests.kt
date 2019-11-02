@@ -22,16 +22,13 @@ class ExecutionTimerTests : DescribeSpec({
         it("Starts the process") {
             runner.executor.start() shouldNot beInstanceOf<Err>()
         }
-
-        it("Waits for 1 second") {
-            safeWait(1000)
-        }
-
         it("Stops the process") {
+            safeWait(1000)
             runner.executor.kill()
         }
 
         it("Verifies the process has run for 1 second") {
+            safeWait(1000)
             runner.executionTime should Be.closeTo(1000L, 200)
         }
 
