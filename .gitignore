@@ -52,3 +52,5 @@ fabric.properties
 **/.idea
 **/target
 **/.kotlintest
+
+..bfg-report
