@@ -51,7 +51,5 @@ class ExecutionTimerTests : DescribeSpec({
         it("Stops the process a final time") {
             runner.executor.kill()
         }
-
     }
-
 })
