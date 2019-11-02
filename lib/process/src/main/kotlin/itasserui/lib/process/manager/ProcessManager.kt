@@ -3,7 +3,6 @@
 package itasserui.lib.process.manager
 
 import arrow.core.toOption
-import itasserui.common.extensions.addUpdatable
 import itasserui.common.extensions.addUpdatableProperty
 import itasserui.common.logger.Logger
 import itasserui.lib.process.ArgNames
@@ -128,14 +127,19 @@ class ProcessManager(
     @Suppress("MemberVisibilityCanBePrivate")
     inner class Processes {
         val all = observableListOf<ITasser>()
-        val queued: ObservableList<ITasser> = all
-            .filtering { it.state is Queued }
+        val queued: ObservableList<ITasser> = all.filtering { it.state is Queued }
+            .sorting(sorter)
         val paused: ObservableList<ITasser> = all.filtering { it.state is Paused }
             .sorting(sorter)
         val completed: ObservableList<ITasser> = all.filtering { it.state is Completed }
+            .sorting(sorter)
         val running: ObservableList<ITasser> = all.filtering { it.state is Running || it.state == Starting }
+            .sorting(sorter)
         val stopping: ObservableList<ITasser> = all.filtering { it.state is Stopping }
+            .sorting(sorter)
         val failed: ObservableList<ITasser> = all.filtering { it.state is Failed }
+            .sorting(sorter)
+
 
         fun ObservableList<ITasser>.reloadOn(obj: ITasser, binds: ObservableProperty<ExecutionState>) {
             binds += {

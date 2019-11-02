@@ -42,14 +42,7 @@ class Foo(val name: String, initial: Int, priority: Int) {
 }
 
 class BindKtTest : DescribeSpec() {
-
     init {
-//        describe("bind") {
-//
-//        }
-//
-//        describe("bind") { }
-
         describe("bindPriority") {
             val lkobservable = ObservableListWrapper(
                 mutableListOf(
@@ -76,8 +69,5 @@ class BindKtTest : DescribeSpec() {
                 lkobservable[0] should be(fxobservable[0])
             }
         }
-
-//        describe("bind") { }
     }
-
 }
