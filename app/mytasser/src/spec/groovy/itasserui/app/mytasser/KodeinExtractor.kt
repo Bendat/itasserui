@@ -1,4 +1,4 @@
-package itasserui.app.mytasser.process.pane.widget
+package itasserui.app.mytasser
 
 import itasserui.app.user.ProfileManager
 import itasserui.lib.process.manager.ProcessManager

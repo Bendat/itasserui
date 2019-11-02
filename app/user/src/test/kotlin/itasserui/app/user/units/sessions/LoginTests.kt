@@ -10,7 +10,6 @@ import itasserui.app.user.ProfileManager.Profile
 import itasserui.app.user.units.utils.SetupObject
 import itasserui.common.errors.RuntimeError
 import itasserui.common.utils.safeWait
-import itasserui.test_utils.matchers.Be
 import java.time.Duration
 
 class LoginTests : DescribeSpec({
@@ -36,7 +35,7 @@ class LoginTests : DescribeSpec({
             }
 
             it("Verifies the session is inactive") {
-                profile.session.map { it.isActive should be(false) } should Be.some()
+                data.pm.isLoggedIn(profile) should be(true)
             }
         }
 
@@ -51,7 +50,7 @@ class LoginTests : DescribeSpec({
             }
 
             it("Verifies the session is active") {
-                profile.session.map { it.isActive should be(true) } should Be.some()
+                data.pm.isLoggedIn(profile) should be(true)
             }
 
             it("Waits 200 milliseconds") {
@@ -59,7 +58,7 @@ class LoginTests : DescribeSpec({
             }
 
             it("Verifies the session is still active") {
-                profile.session.map { it.isActive should be(true) } should Be.some()
+                data.pm.isLoggedIn(profile) should be(true)
             }
 
             context("Session should become inactive after its duration has passed") {
@@ -68,7 +67,7 @@ class LoginTests : DescribeSpec({
                 }
 
                 it("Verifies the session is no longer active") {
-                    profile.session.map { it.isActive should be(false)} should Be.some()
+                    data.pm.isLoggedIn(profile) should be(true)
                 }
             }
         }

@@ -2,9 +2,9 @@ package itasserui.app.mytasser.login
 
 import itasser.app.mytasser.app.login.LoginModal
 import itasser.app.mytasser.kodeinmodules.DependencyInjector
-import itasser.app.mytasser.lib.DI
-import itasser.app.mytasser.lib.ITasserSettings
 import itasserui.app.mytasser.AppSpec
+import itasserui.app.mytasser.lib.DI
+import itasserui.app.mytasser.lib.ITasserSettings
 import itasserui.app.user.UnregisteredUser
 import itasserui.common.interfaces.inline.EmailAddress
 import itasserui.common.interfaces.inline.RawPassword

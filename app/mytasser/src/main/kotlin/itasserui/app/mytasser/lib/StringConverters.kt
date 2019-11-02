@@ -1,4 +1,4 @@
-package itasser.app.mytasser.lib
+package itasserui.app.mytasser.lib
 
 import itasserui.common.interfaces.inline.RawPassword
 import itasserui.common.interfaces.inline.Username

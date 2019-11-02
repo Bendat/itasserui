@@ -36,13 +36,16 @@ class ProfileManager(
 
     data class Session(val start: Long, val duration: Duration) {
         val sessionTimeRemaining: Long get() = start + duration.toMillis() - currentTimeMillis()
-        @Suppress("MemberVisibilityCanBePrivate")
+        @Suppress("MemberVisibilityCanBePrivate", "unused")
         val isLocked
             get() = sessionTimeRemaining < 0
         val isActive get() = !isLocked
     }
 
+    fun isLoggedIn(user: User) = (sessions[user.id]?.isActive == true)
     fun isLoggedIn(profile: Profile) = (sessions[profile.user.id]?.isActive == true)
+    fun find(id: UUID) = profiles.first { it.user.id == id }
+    @Suppress("unused")
     fun getAdmin(password: RawPassword): Outcome<User> {
         val results = database.read<User> { Account::isAdmin eq true }
         lateinit var user: User
@@ -53,16 +56,12 @@ class ProfileManager(
             .map { user }
     }
 
-    fun perform(profile: Profile, onNotLoggedIn: () -> Unit, op: () -> Unit) {
-        info {
-            "Perform logged in is ${sessions.toList()}${sessions.map { it.value?.duration?.toMillis() }}"
-        }
-        info{"Is logged in is ${isLoggedIn(profile)}"}
-        if (!isLoggedIn(profile))
+    fun perform(user: User, onNotLoggedIn: () -> Unit, op: () -> Unit) {
+        if (!isLoggedIn(user))
             onNotLoggedIn()
-        info{"Is logged in is ${isLoggedIn(profile)}"}
+        info { "Is logged in is ${isLoggedIn(user)}" }
 
-        if (isLoggedIn(profile))
+        if (isLoggedIn(user))
             op()
     }
 
@@ -96,9 +95,8 @@ class ProfileManager(
                 .flatMap { it.firstOrNone().toEither { NoSuchUser(user) } }
                 .map {
                     val directories = fileManager.getDirectories(user)
-                    val profile = profiles.find { p -> p.user.username == user.username  } ?: Profile(
+                    val profile = profiles.find { p -> p.user.username == user.username } ?: Profile(
                         user = it,
-                        session = session.toOption(),
                         directories = directories.toList().map { it.second },
                         dataDir = directories.getValue(UserCategory.DataDir),
                         outDir = directories.getValue(UserCategory.OutDir),
@@ -184,9 +182,21 @@ class ProfileManager(
             .toOption()
             .flatMap { it.firstOrNone() }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ProfileManager
+
+        if (database != other.database) return false
+
+        return true
+    }
+
+
+
     data class Profile(
         val user: User,
-        var session: Option<Session>,
         val directories: List<WatchedDirectory>,
         val dataDir: WatchedDirectory,
         val outDir: WatchedDirectory,
@@ -195,6 +205,22 @@ class ProfileManager(
     ) {
         fun login(user: User, password: RawPassword, duration: Duration) =
             manager.login(user, password, duration)
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Profile
+
+            if (user.id != other.user.id) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return user.id.hashCode()
+        }
+
     }
 
 }

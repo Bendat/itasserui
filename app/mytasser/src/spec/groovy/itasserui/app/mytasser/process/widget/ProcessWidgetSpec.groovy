@@ -1,7 +1,8 @@
-package itasserui.app.mytasser.process.pane.widget
+package itasserui.app.mytasser.process.widget
 
 import com.anotherchrisberry.spock.extensions.retry.RetryOnFailure
 import itasser.app.mytasser.app.process.pane.widget.WidgetCss
+import itasserui.common.annotations.RetryReason
 import org.joda.time.DateTime
 import org.testfx.matcher.base.NodeMatchers
 import org.testfx.matcher.control.LabeledMatchers
@@ -44,19 +45,20 @@ class ProcessWidgetSpec extends ProcessPaneWidgetSpec {
         clickOn("#username_field").write(account.username.value)
         if (succeed)
             clickOn("#password_field").write(account.password.value)
-        else clickOn("#password_field").write("horp")
+        else
+            clickOn("#password_field").write("horp")
 
         for (int i = 0; i < 4; i++) {
             clickOn(".increment-arrow-button")
         }
         clickOn("#login_login")
     }
-
+    @RetryOnFailure(times = 2)
+    @RetryReason("The time may rollover by a minute if run near the end of a minute i.e 10:30:59 and 10:31:XX")
     void "Executing a process should change the state of the widget"() {
         given: "The time strings to verify"
         def date = dateTime.toString("dd / MM / YYYY")
         def time = dateTime.toString("hh:mm")
-
         when: "The run button is clicked"
         clickOn(controlButton.queryButton())
         login()
@@ -86,7 +88,6 @@ class ProcessWidgetSpec extends ProcessPaneWidgetSpec {
         verifyThat(timerLabel, LabeledMatchers.hasText("0:00:02"))
     }
 
-    @RetryOnFailure(times = 3)
     void "Attempting to use the widget while logged out"() {
         when: "The process for this widget is executed and paused"
         clickOn(controlButton.queryButton())

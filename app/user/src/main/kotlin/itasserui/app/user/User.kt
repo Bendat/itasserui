@@ -29,6 +29,20 @@ data class User(
         BCrypt.checkpw(password.value, this.password.value)
 
     override fun toUser(id: UUID): User = this
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as User
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
 
     enum class UserCategory : FileDomain.Subcategory {
         Settings,
@@ -38,5 +52,7 @@ data class User(
         override val directory: Path
             get() = Paths.get(name.toLowerCase())
     }
+
+
 
 }

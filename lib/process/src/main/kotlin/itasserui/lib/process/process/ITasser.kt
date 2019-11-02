@@ -37,6 +37,7 @@ class ITasser(
     state: ExecutionState = Queued,
     priority: Int = 0
 ) : JsonObject, Logger {
+    @JsonIgnore
     val errors = TrackingList<ProcessError>()
     @JsonIgnore
     val stateProperty = StandardObservableProperty(state)
@@ -47,6 +48,7 @@ class ITasser(
     val std = STD()
     @JsonIgnore
     internal val executor = ExecutionContext()
+    @JsonIgnore
     val startedTimeProperty = StandardObservableProperty(0L)
     var startedTime by startedTimeProperty
 
@@ -56,7 +58,7 @@ class ITasser(
     private val endTimesPrivate = arrayListOf<Long>()
     val endTimes: List<Long> get() = endTimesPrivate
 
-
+    @JsonIgnore
     val executionTimeProperty = StandardObservableProperty(0L)
     private var executionTimePrivate by executionTimeProperty
     val executionTime get() = executionTimePrivate
@@ -165,6 +167,21 @@ class ITasser(
 
     override fun toString(): String {
         return "ITasser(process=${process.name}, stateProperty=$state)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as ITasser
+
+        if (process.id != other.process.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return process.id.hashCode()
     }
 
     data class StartStop(val start: Long, val stop: Long? = null)

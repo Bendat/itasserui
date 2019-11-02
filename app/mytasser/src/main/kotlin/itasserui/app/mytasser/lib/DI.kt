@@ -1,4 +1,4 @@
-package itasser.app.mytasser.lib
+package itasserui.app.mytasser.lib
 
 import itasserui.common.logger.Logger
 import org.kodein.di.Instance
@@ -7,12 +7,10 @@ import org.kodein.di.KodeinAware
 import org.kodein.di.conf.global
 import org.kodein.di.generic
 import tornadofx.Component
-import tornadofx.Scope
 import tornadofx.ScopedInstance
 import kotlin.reflect.KProperty
 
 class DI(
-    override val scope: Scope,
     override val kodein: Kodein = Kodein.global
 ) : Component(), KodeinAware, ScopedInstance
 

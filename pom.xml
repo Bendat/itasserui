@@ -30,7 +30,7 @@
         <kotlin.code.style>official</kotlin.code.style>
 
         <!-- Dependency versions -->
-        <kotlin.version>1.3.41</kotlin.version>
+        <kotlin.version>1.3.50</kotlin.version>
         <tornadofx.version>1.7.19</tornadofx.version>
         <nitrite.version>3.2.0</nitrite.version>
         <lk-observable.version>0.2.2</lk-observable.version>

@@ -1,4 +1,4 @@
-package itasser.app.mytasser.lib
+package itasserui.app.mytasser.lib
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import itasserui.common.serialization.DBObject

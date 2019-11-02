@@ -3,9 +3,9 @@
 package itasserui.lib.process.manager
 
 import arrow.core.toOption
+import itasserui.common.extensions.addUpdatable
 import itasserui.common.extensions.addUpdatableProperty
 import itasserui.common.logger.Logger
-import itasserui.common.utils.safeWait
 import itasserui.lib.process.ArgNames
 import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.details.ExecutionState.*
@@ -15,6 +15,7 @@ import itasserui.lib.process.process.ITasserListener
 import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.list.filtering
 import lk.kotlin.observable.list.observableListOf
+import lk.kotlin.observable.list.sorting
 import lk.kotlin.observable.property.ObservableProperty
 import lk.kotlin.observable.property.StandardObservableProperty
 import lk.kotlin.observable.property.plusAssign
@@ -41,6 +42,14 @@ class ProcessManager(
             processes.running.size < maxExecuting -> itasser.executor.start()
             else -> itasser.priority++
         }
+    }
+
+    init {
+        Runtime.getRuntime().addShutdownHook(Thread {
+            processes.all.forEach {
+                it.executor.destroy()
+            }
+        })
     }
 
     @JvmOverloads
@@ -73,7 +82,7 @@ class ProcessManager(
         ).also {
             info { "Created new process ${it.toJson(3)}" }
             processes += it
-            if(autoRun)
+            if (autoRun)
                 run(it)
         }
     }
@@ -96,12 +105,33 @@ class ProcessManager(
             }
         }
 
+    private val sorter = fun(
+        first: ITasser,
+        second: ITasser
+    ): Boolean {
+        return if (first.priority == second.priority) {
+            val comp1 = first.process.createdAt
+            val comp2 = second.process.createdAt
+            when {
+                comp1 == comp2 -> true
+                comp1 < comp2 -> true
+                else -> false
+            }
+        } else {
+            when {
+                first.priority > second.priority -> true
+                else -> false
+            }
+        }
+    }
+
     @Suppress("MemberVisibilityCanBePrivate")
     inner class Processes {
         val all = observableListOf<ITasser>()
         val queued: ObservableList<ITasser> = all
             .filtering { it.state is Queued }
         val paused: ObservableList<ITasser> = all.filtering { it.state is Paused }
+            .sorting(sorter)
         val completed: ObservableList<ITasser> = all.filtering { it.state is Completed }
         val running: ObservableList<ITasser> = all.filtering { it.state is Running || it.state == Starting }
         val stopping: ObservableList<ITasser> = all.filtering { it.state is Stopping }

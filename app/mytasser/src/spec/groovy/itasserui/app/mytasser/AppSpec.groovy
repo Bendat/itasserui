@@ -18,7 +18,6 @@ import java.nio.file.Path
 
 import static org.junit.Assert.assertNotNull
 
-@Stepwise
 abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {
     Path tmpdirPath = Files.createTempDirectory("e2e").toAbsolutePath()
     Stage stage = null

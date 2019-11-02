@@ -1,11 +1,11 @@
 package itasser.app.mytasser.app.process.pane.widget
 
-import itasserui.app.user.ProfileManager.Profile
+import itasserui.app.user.User
 import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.process.ITasser
 import tornadofx.ItemViewModel
 
-class ProcessWidgetViewModel(user: Profile, process: ITasser) :
+class ProcessWidgetViewModel(user: User, process: ITasser) :
     ItemViewModel<ProcessWidgetController>(ProcessWidgetController(user, process)) {
     val username = bind(ProcessWidgetController::usernameProperty)
     val runPauseIcon = bind(ProcessWidgetController::runPauseIconProperty)

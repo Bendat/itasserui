@@ -3,10 +3,9 @@ package itasser.app.mytasser.app.login
 import arrow.core.None
 import arrow.core.Option
 import arrow.core.Some
-import arrow.core.flatMap
 import itasser.app.mytasser.app.login.LoginModal.LoginDuration
 import itasser.app.mytasser.app.login.LoginModal.LoginDuration.*
-import itasser.app.mytasser.lib.kInject
+import itasserui.app.mytasser.lib.kInject
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.ProfileManager.Profile
 import itasserui.common.`typealias`.Outcome
@@ -64,8 +63,5 @@ class LoginModalController : Controller(), Logger {
             Minutes -> Duration.ofMinutes(string.toLong())
             Hours -> Duration.ofHours(string.toLong())
             Seconds -> Duration.ofSeconds(string.toLong())
-            else -> Duration.ofMillis(string.toLong())
         }
-
-
 }

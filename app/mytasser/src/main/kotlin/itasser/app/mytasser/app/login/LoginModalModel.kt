@@ -12,13 +12,12 @@ class LoginModalModel : ItemViewModel<LoginModalController>(LoginModalController
     val userLogin = bind(LoginModalController::sessionProperty)
     val loginError = bind(LoginModalController::loginErrorProperty)
 
-    val isLoggedIn get() = when(val login = userLogin.value){
-        is None -> false
-        is Some -> when(val ses = login.t.session){
+    val isLoggedIn
+        get() = when (val login = userLogin.value) {
             is None -> false
-            is Some -> ses.t.isActive
+            is Some -> item.profileManager.isLoggedIn(login.t)
         }
-    }
+
     fun login() = commit()
         .let { item.onLogin() }
 }

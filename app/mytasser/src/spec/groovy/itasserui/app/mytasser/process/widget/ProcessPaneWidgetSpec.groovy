@@ -1,13 +1,14 @@
-package itasserui.app.mytasser.process.pane.widget
+package itasserui.app.mytasser.process.widget
 
 import arrow.core.Either
 import arrow.data.Ior
 import arrow.data.NonEmptyList
 import itasser.app.mytasser.app.process.pane.widget.ProcessWidget
 import itasser.app.mytasser.kodeinmodules.DependencyInjector
-import itasser.app.mytasser.lib.DI
-import itasser.app.mytasser.lib.ITasserSettings
 import itasserui.app.mytasser.AppSpec
+import itasserui.app.mytasser.KodeinExtractor
+import itasserui.app.mytasser.lib.DI
+import itasserui.app.mytasser.lib.ITasserSettings
 import itasserui.app.user.Account
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.UnregisteredUser
@@ -93,8 +94,8 @@ abstract class ProcessPaneWidgetSpec extends AppSpec<ProcessWidget> {
         def login = extractor.pm.login(user, account.password as RawPassword, Duration.ofSeconds(0)) as Either.Right<ProfileManager.Profile>
         def prof = login.b
         println("Prof is $prof")
-        def view = new ProcessWidget(prof, itasser, new Scope())
-        view.setInScope(new DI(view.scope, kodein), view.scope)
+        def view = new ProcessWidget(prof.user, itasser, new Scope())
+        view.setInScope(new DI(kodein), view.scope)
         return view
     }
 }

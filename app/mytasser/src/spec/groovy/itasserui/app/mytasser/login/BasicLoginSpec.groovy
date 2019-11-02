@@ -11,7 +11,6 @@ import org.testfx.matcher.control.ComboBoxMatchers
 import static itasserui.common.utils.SafeWaitKt.safeWait
 
 class BasicLoginSpec extends LoginSpec {
-
     void "Create the admin user and log in"() {
         given:
         def timeoutTime = lookup("#user_timeout")
