@@ -24,26 +24,18 @@ class ExecutionTimerTests : DescribeSpec({
             runner.executor.start() shouldNot beInstanceOf<Err>()
         }
         it("Stops the process") {
-            runner.executor.waitForFinish(1000.ms)
-            runner.executor.kill()
+            runner.executor.kill(1000)
         }
 
         it("Verifies the process has run for 1 second") {
-            runner.executor.waitForFinish(1000.ms)
             runner.executionTime should Be.closeTo(1000L, 200)
         }
 
         it("Starts the process again") {
             runner.executor.start()
         }
-
-        it("Waits for 1 more second") {
-            safeWait(1000)
-        }
-
         it("Stops the process again") {
-            runner.executor.kill()
-            runner.executor.waitForFinish()
+            runner.executor.kill(1000)
         }
 
         it("Verifies the process has run for 2 seconds") {

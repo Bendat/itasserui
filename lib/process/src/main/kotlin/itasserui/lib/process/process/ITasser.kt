@@ -153,11 +153,13 @@ class ITasser(
                     .toEither { Timeout("[${process.name}] timed out", it) }
             }
 
-        internal fun kill(): Outcome<ExecutionContext> =
+        internal fun kill(timeoutMillis: Long = 0): Outcome<ExecutionContext> =
             sysProcess.toEither { NoProcess(process.name) }.flatMap { proc ->
                 info { "Killing process ${process.name}" }
-                Try { ProcessUtil.destroyGracefullyAndWait(proc, 10, TimeUnit.SECONDS) }
-                    .map { state = Stopping }
+                Try {
+                    Thread.sleep(timeoutMillis)
+                    ProcessUtil.destroyGracefullyAndWait(proc, 10, TimeUnit.SECONDS)
+                }.map { state = Stopping }
                     .toEither { e -> Timeout(this@ITasser.process.name, e).also { error -> errors += error } }
                     .mapLeft { error { "Killing process errored with $it" }; it }
                     .map { this }
