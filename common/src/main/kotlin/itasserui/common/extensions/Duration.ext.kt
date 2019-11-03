@@ -12,3 +12,6 @@ fun Duration.format(): String {
     )
     return if (seconds < 0) "-$positive" else positive
 }
+
+val Int.ms get() = Duration.ofMillis(this.toLong())
+val Long.ms get() = Duration.ofMillis(this)

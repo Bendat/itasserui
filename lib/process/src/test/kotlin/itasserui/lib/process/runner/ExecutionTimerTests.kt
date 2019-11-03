@@ -5,6 +5,7 @@ import io.kotlintest.should
 import io.kotlintest.shouldNot
 import io.kotlintest.specs.DescribeSpec
 import itasserui.common.`typealias`.Err
+import itasserui.common.extensions.ms
 import itasserui.common.utils.safeWait
 import itasserui.lib.filemanager.FS
 import itasserui.lib.process.process.ITasser
@@ -23,13 +24,12 @@ class ExecutionTimerTests : DescribeSpec({
             runner.executor.start() shouldNot beInstanceOf<Err>()
         }
         it("Stops the process") {
-            safeWait(1000)
+            runner.executor.waitForFinish(1000.ms)
             runner.executor.kill()
-            runner.executor.waitForFinish()
         }
 
         it("Verifies the process has run for 1 second") {
-            safeWait(1000)
+            runner.executor.waitForFinish(1000.ms)
             runner.executionTime should Be.closeTo(1000L, 200)
         }
 

@@ -73,10 +73,18 @@ class ITasser(
         var exitCode: Option<ExitCode> = None
         fun waitForFinish(): Option<ProcessResult> {
             return future.map {
-                while(!it.isCancelled and !it.isDone){
+                while (!it.isCancelled and !it.isDone) {
                     Thread.sleep(100)
                 }
                 it.get()
+            }
+        }
+
+        fun waitForFinish(timeout: Duration): Option<ProcessResult> {
+            return when (val f = future) {
+                is None -> None
+                is Some -> Try { f.t.get(timeout.toMillis(), TimeUnit.MILLISECONDS) }
+                    .toOption()
             }
         }
 
