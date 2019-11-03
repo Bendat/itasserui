@@ -89,6 +89,7 @@ class TerminateProcessTest : DescribeSpec({
         }
 
         it("Should verify the process did not execute to once") {
+            println("STD ${runner.std.output}")
             runner.std.output.size should beLessThan(1)
         }
 

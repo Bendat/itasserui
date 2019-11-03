@@ -104,28 +104,29 @@ class ProcessManager(
             }
         }
 
-    private val sorter = fun(
-        first: ITasser,
-        second: ITasser
-    ): Boolean {
-        return if (first.priority == second.priority) {
-            val comp1 = first.process.createdAt
-            val comp2 = second.process.createdAt
-            when {
-                comp1 == comp2 -> true
-                comp1 < comp2 -> true
-                else -> false
-            }
-        } else {
-            when {
-                first.priority > second.priority -> true
-                else -> false
-            }
-        }
-    }
+
 
     @Suppress("MemberVisibilityCanBePrivate")
     inner class Processes {
+        private val sorter = fun(
+            first: ITasser,
+            second: ITasser
+        ): Boolean {
+            return if (first.priority == second.priority) {
+                val comp1 = first.process.createdAt
+                val comp2 = second.process.createdAt
+                when {
+                    comp1 == comp2 -> true
+                    comp1 < comp2 -> true
+                    else -> false
+                }
+            } else {
+                when {
+                    first.priority > second.priority -> true
+                    else -> false
+                }
+            }
+        }
         val all = observableListOf<ITasser>()
         val queued: ObservableList<ITasser> = all.filtering { it.state is Queued }
             .sorting(sorter)
