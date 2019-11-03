@@ -28,6 +28,7 @@ class ExecutionTimerTests : DescribeSpec({
         }
 
         it("Verifies the process has run for 1 second") {
+            runner.executor.future.map { it.get() }
             runner.executionTime should Be.closeTo(1000L, 200)
         }
 
@@ -39,6 +40,7 @@ class ExecutionTimerTests : DescribeSpec({
         }
 
         it("Verifies the process has run for 2 seconds") {
+            runner.executor.future.map { it.get() }
             runner.executionTime should Be.closeTo(2000L, 500)
         }
 
