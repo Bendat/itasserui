@@ -21,24 +21,28 @@ class ProcessPane(di: DI, scope: Scope? = null) : View("My View") {
         hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
         squeezebox {
             fold("Completed") {
+                addClass("completed-fold")
                 listview(model.completed) {
                     widget()
                 }
             }
 
             fold("Failed") {
+                addClass("failed-fold")
                 listview(model.failed) {
                     widget()
                 }
             }
 
             fold("Runnning") {
+                addClass("running-fold")
                 listview(model.running) {
                     widget()
                 }
             }
 
             fold("Queued") {
+                addClass("queued-fold")
                 listview(model.queued) {
                     widget()
                 }

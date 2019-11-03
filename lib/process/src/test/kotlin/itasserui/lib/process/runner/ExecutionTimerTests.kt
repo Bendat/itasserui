@@ -25,6 +25,7 @@ class ExecutionTimerTests : DescribeSpec({
         it("Stops the process") {
             safeWait(1000)
             runner.executor.kill()
+            runner.executor.waitForFinish()
         }
 
         it("Verifies the process has run for 1 second") {
@@ -42,10 +43,11 @@ class ExecutionTimerTests : DescribeSpec({
 
         it("Stops the process again") {
             runner.executor.kill()
+            runner.executor.waitForFinish()
         }
 
         it("Verifies the process has run for 2 seconds") {
-            runner.executionTime should Be.closeTo(2000L, 100)
+            runner.executionTime should Be.closeTo(2000L, 500)
         }
 
         it("Stops the process a final time") {

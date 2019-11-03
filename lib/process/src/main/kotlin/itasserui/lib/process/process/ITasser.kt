@@ -22,6 +22,7 @@ import org.zeroturnaround.process.ProcessUtil
 import org.zeroturnaround.process.Processes.newStandardProcess
 import org.zeroturnaround.process.SystemProcess
 import java.lang.System.currentTimeMillis
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
@@ -70,6 +71,15 @@ class ITasser(
         private var sysProcess: Option<SystemProcess> = None
         private val processExecutor: ProcessExecutor = ExecutorFactory.executor(process.args, listener)
         var exitCode: Option<ExitCode> = None
+        fun waitForFinish(): Option<ProcessResult> {
+            return future.map {
+                while(!it.isCancelled and !it.isDone){
+                    Thread.sleep(100)
+                }
+                it.get()
+            }
+        }
+
 
         init {
             processExecutor.redirectOutput(ProcessLogAppender(STDType.Out, std.output))
