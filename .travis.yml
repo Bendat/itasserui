@@ -20,7 +20,7 @@ matrix:
       before_script:
         - curl -L https://cpanmin.us | sudo perl - --sudo App::cpanminus
         - sudo cpan App::cpanminus
-        - sudo cpanm MDevel::Autoflush
+        - sudo cpanm MDevel::Autoflush < yes
 # configure xvfb screen.
 services:
   - xvfb
