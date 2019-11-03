@@ -34,7 +34,6 @@ class ProcessManagerTests : DescribeSpec({
         }
 
         it("Verifies there are 3 processes running") {
-
             manager.processes.running.size should be(3)
         }
 

@@ -14,7 +14,12 @@ matrix:
       if: branch = master OR tag =~ ^v1\.[0-9]+\.[0-9]+ # match v1.x.x
     - jdk: openjdk11
       if: branch = jdk10 OR tag =~ ^v2\.[0-9]+\.[0-9]+ # match v2.x.x
-
+    - language: perl
+      perl:
+        - "5.30"
+      before_script:
+        - curl -L https://cpanmin.us | sudo perl - --sudo App::cpanminus
+        - sudo cpanm MDevel::Autoflush
 # configure xvfb screen.
 services:
   - xvfb
