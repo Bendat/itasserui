@@ -38,55 +38,59 @@ class ProcessManagerTests : DescribeSpec({
         }
 
         context("Killing processes manually") {
+            lateinit var proc: ITasser
 
             it("Kills the first process") {
                 println("Running was ${manager.processes.running.toList()}")
-                val proc = manager.processes.running[0]
+                proc = manager.processes.running[0]
                 println("Old running at  [${DateTime()}] is ${manager.processes.running.map { it }} ")
                 proc.executor.kill()
                 println("All is ${manager.processes.running.toList()}")
 
             }
-            context("Not sure") {
-                it("Verifies there are still 3 running processes") {
-                    safeWait(1000)
-                    manager.processes.running.size should be(3)
-                }
+            it("Verifies there are still 3 running processes") {
+                proc.executor.await()
+                manager.processes.running.size should be(3)
             }
 
+
             it("Kills the second process") {
-                manager.processes.running[0].executor.kill() should Be.ok()
+                proc = manager.processes.running[0]
+                proc.executor.kill() should Be.ok()
             }
 
             it("Verifies again there are still 3 running processes") {
-                safeWait(1000)
+                proc.executor.await()
                 manager.processes.running.size should be(3)
             }
 
             it("Kills the 3rd process") {
-                manager.processes.running[0].executor.kill()
+                proc = manager.processes.running[0]
+                proc.executor.kill()
             }
 
             it("Verifies there are 2 running processes") {
-                safeWait(1000)
+                proc.executor.await()
                 manager.processes.running.size should be(2)
             }
 
             it("Kills the 4th process") {
-                manager.processes.running[0].executor.kill()
+                proc = manager.processes.running[0]
+                proc.executor.kill()
             }
 
             it("Verifies there is 1 running processes") {
-                safeWait(1000)
+                proc.executor.await()
                 manager.processes.running.size should be(1)
             }
 
             it("Kills the 5th process") {
-                manager.processes.running[0].executor.kill()
+                proc = manager.processes.running[0]
+                proc.executor.kill()
             }
 
             it("Verifies there is 0 running processes") {
-                safeWait(1000)
+                proc.executor.await()
                 manager.processes.running.size should be(0)
             }
         }
@@ -120,7 +124,4 @@ class ProcessManagerTests : DescribeSpec({
             }
         }
     }
-}) {
-    init {
-    }
-}
+})

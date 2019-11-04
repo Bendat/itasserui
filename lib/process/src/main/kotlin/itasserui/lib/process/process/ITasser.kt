@@ -7,10 +7,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import itasserui.common.`typealias`.Outcome
 import itasserui.common.logger.Logger
 import itasserui.common.serialization.JsonObject
+import itasserui.common.utils.safeWait
 import itasserui.lib.process.*
 import itasserui.lib.process.details.ExecutionState
-import itasserui.lib.process.details.ExecutionState.Queued
-import itasserui.lib.process.details.ExecutionState.Stopping
+import itasserui.lib.process.details.ExecutionState.*
 import itasserui.lib.process.details.ExitCode
 import itasserui.lib.process.details.TrackingList
 import lk.kotlin.observable.property.StandardObservableProperty
@@ -152,6 +152,16 @@ class ITasser(
                 Try { p.future.get() }
                     .toEither { Timeout("[${process.name}] timed out", it) }
             }
+
+        @Synchronized
+        fun awaitStart() {
+            safeWait(1000) {
+                safeWait(100)
+                state is Running ||
+                        state is Completed ||
+                        state is Failed
+            }
+        }
 
         internal fun kill(timeoutMillis: Long = 0): Outcome<ExecutionContext> =
             sysProcess.toEither { NoProcess(process.name) }.flatMap { proc ->
