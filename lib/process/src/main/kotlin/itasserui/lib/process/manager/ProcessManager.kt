@@ -2,6 +2,7 @@
 
 package itasserui.lib.process.manager
 
+import arrow.core.firstOrNone
 import arrow.core.toOption
 import itasserui.common.extensions.addUpdatableProperty
 import itasserui.common.logger.Logger
@@ -153,10 +154,7 @@ class ProcessManager(
             get() = all.size
 
         val next
-            get() = queued
-                .map { info { "Selecting next ${it.process.name} with state ${it.state}" }; it }
-                .minBy { it.priority }
-                .toOption()
+            get() = queued.firstOrNone()
 
         val nextRunning
             get() = running
