@@ -94,15 +94,15 @@ class ITasser(
             processExecutor.redirectError(ProcessLogAppender(STDType.Err, std.err))
             with(listener) {
                 beforeStart += {
-                    state = ExecutionState.Starting
+                    state = Starting
                 }
                 afterFinish += { _, result ->
                     info { "Process [${process.name}]stopped with exit code ${result.exitValue} for $state" }
                     state = when (result.exitValue) {
-                        ExitCode.OK.code -> ExecutionState.Completed
+                        ExitCode.OK.code -> Completed
                         ExitCode.SigTerm.code,
-                        ExitCode.SigKill.code -> ExecutionState.Paused
-                        else -> ExecutionState.Failed
+                        ExitCode.SigKill.code -> Paused
+                        else -> Failed
                     }.also {
                         info { "${process.name} changed state to $it" }
                         exitCode = ExitCode.fromInt(result.exitValue)
@@ -119,7 +119,7 @@ class ITasser(
                         executionTimePrivate = durationFromExecutionTimes()
                     }.some()
                     startedTime = startTimes[0]
-                    state = ExecutionState.Running
+                    state = Running
                     info { "Process ${process.name} after starting with state $state" }
 
                 }

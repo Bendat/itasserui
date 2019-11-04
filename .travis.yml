@@ -25,9 +25,9 @@ before_install:
 # skip install stage.
 install: true
 
-# run maven build.
-script:
-  - mvn test
+## run maven build.
+#script:
+#  - mvn test
 
 cache:
   directories:
@@ -36,7 +36,7 @@ cache:
 deploy:
   # Deploy snapshots & releases on every commit made to master
   - provider: script
-    script: "cp .travis.settings.xml $HOME/.m2/settings.xml && mvn clean test -fn"
+    script: "mvn clean test"
     skip_cleanup: true
     on:
       all_branches: true

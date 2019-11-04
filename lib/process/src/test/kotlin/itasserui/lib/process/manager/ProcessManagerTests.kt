@@ -14,7 +14,6 @@ import org.joda.time.DateTime
 import java.nio.file.Paths
 
 class ProcessManagerTests : DescribeSpec({
-    val waitTime = 500L
     val manager = ProcessManager()
     if (!SystemUtils.IS_OS_LINUX) {
         """
