@@ -18,7 +18,7 @@ matrix:
       perl:
         - "5.30"
       before_script:
-        - curl -L https://cpanmin.us | sudo perl - --sudo App::cpanminus < yes
+        - curl -L https://cpanmin.us | sudo perl - --sudo App::cpanminus
         - sudo cpanm App::cpanminus
         - sudo cpanm MDevel::Autoflush
 # configure xvfb screen.
