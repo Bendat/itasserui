@@ -29,7 +29,6 @@ class ProcessPaneSpec extends AbstractProcessPaneSpec {
 
         then:
         lookup(".paused-list").queryListView().items.size() == 1
-
-
     }
+
 }
