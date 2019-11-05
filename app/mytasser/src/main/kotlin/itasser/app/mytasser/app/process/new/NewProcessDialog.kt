@@ -1,6 +1,5 @@
 package itasser.app.mytasser.app.process.new
 
-import itasser.app.mytasser.app.login.LoginModal.LoginDuration.Seconds
 import itasserui.lib.process.ArgParam.*
 import itasserui.lib.process.ArgParam.Range.*
 import itasserui.lib.process.ArgParam.SimpleText.Text
@@ -58,8 +57,7 @@ class NewProcessDialog : View("New Process Dialog") {
                                         false,
                                         null,
                                         true
-                                    )
-                                    { maxWidth = 80.0 }
+                                    ) { maxWidth = 80.0 }
                                 }
                                 is IntegerRange -> field(it.simpleName) {
                                     spinner(
@@ -70,10 +68,9 @@ class NewProcessDialog : View("New Process Dialog") {
                                         false,
                                         null,
                                         true
-                                    )
-                                    { maxWidth = 80.0 }
+                                    ) { maxWidth = 80.0 }
                                 }
-                                is TextSelection -> field(it.simpleName){
+                                is TextSelection -> field(it.simpleName) {
                                     combobox(null, type.range) { value = type.default }
 
                                 }
