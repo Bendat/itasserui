@@ -41,18 +41,7 @@ class ProcessWidgetSpec extends ProcessPaneWidgetSpec {
         verifyThat(startTime, NodeMatchers.isInvisible())
     }
 
-    void login(Boolean succeed = true) {
-        clickOn("#username_field").write(account.username.value)
-        if (succeed)
-            clickOn("#password_field").write(account.password.value)
-        else
-            clickOn("#password_field").write("horp")
 
-        for (int i = 0; i < 4; i++) {
-            clickOn(".increment-arrow-button")
-        }
-        clickOn("#login_login")
-    }
     @RetryOnFailure(times = 2)
     @RetryReason("The time may rollover by a minute if run near the end of a minute i.e 10:30:59 and 10:31:XX")
     void "Executing a process should change the state of the widget"() {

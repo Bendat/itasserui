@@ -47,10 +47,10 @@ class ProcessWidget(
 
     override val root = anchorpane {
         prefWidth = 250.0
+        addClass(itasser.process.id.toString())
         addStylesheet(MainStylee::class)
         vbox {
             hbox(10) {
-
                 borderpane {
                     left {
                         vbox {

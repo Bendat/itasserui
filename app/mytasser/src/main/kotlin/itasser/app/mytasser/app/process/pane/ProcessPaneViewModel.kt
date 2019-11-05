@@ -6,6 +6,8 @@ import tornadofx.ItemViewModel
 
 class ProcessPaneViewModel : ItemViewModel<ProcessPaneController>(ProcessPaneController()) {
     val profileManager: ProfileManager by kInject<ProfileManager>()
+    val autoRun = bind(ProcessPaneController::autoRun)
+    val maxExecuting = bind(ProcessPaneController::maxExecuting)
     val processes = bind(ProcessPaneController::processes)
     val running = bind(ProcessPaneController::running)
     val queued = bind(ProcessPaneController::queued)

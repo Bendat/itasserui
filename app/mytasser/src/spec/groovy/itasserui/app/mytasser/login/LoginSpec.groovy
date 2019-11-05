@@ -52,7 +52,7 @@ abstract class LoginSpec extends AppSpec<LoginModal> {
                 settins,
                 path)
         def view = new LoginModal("User Login", new Scope())
-        view.setInScope(new DI(view.scope, kodein), view.scope)
+        view.setInScope(new DI(kodein), view.scope)
         return view
     }
 }

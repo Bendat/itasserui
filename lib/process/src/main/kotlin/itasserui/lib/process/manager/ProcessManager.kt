@@ -23,11 +23,12 @@ import java.nio.file.Path
 import java.util.*
 
 class ProcessManager(
-    var maxExecuting: Int = 3,
+    maxExecuting: Int = 3,
     autoRun: Boolean = true
 ) : Logger, AutoCloseable {
     val processes = Processes()
-
+    val maxExecutingProperty = StandardObservableProperty(maxExecuting)
+    val maxExecuting by maxExecutingProperty
     val autorunProperty = StandardObservableProperty(autoRun)
     var autoRun by autorunProperty
     private val defaultArgs = arrayOf(ArgNames.Perl, ArgNames.AutoFlush).map(Any::toString)

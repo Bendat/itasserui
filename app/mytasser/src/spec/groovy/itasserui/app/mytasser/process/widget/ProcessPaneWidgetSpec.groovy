@@ -44,6 +44,19 @@ abstract class ProcessPaneWidgetSpec extends AppSpec<ProcessWidget> {
     Kodein kodein = null
     KodeinExtractor extractor = null
 
+    void login(Boolean succeed = true) {
+        clickOn("#username_field").write(account.username.value)
+        if (succeed)
+            clickOn("#password_field").write(account.password.value)
+        else
+            clickOn("#password_field").write("horp")
+
+        for (int i = 0; i < 4; i++) {
+            clickOn(".increment-arrow-button")
+        }
+        clickOn("#login_login")
+    }
+
     void setupStuff() {
         println("profile is hi")
 

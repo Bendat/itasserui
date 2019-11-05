@@ -19,6 +19,7 @@ import itasserui.common.interfaces.inline.Username
 import itasserui.lib.filemanager.FS
 import itasserui.lib.process.process.ITasser
 import javafx.scene.Scene
+import javafx.scene.input.KeyCode
 import javafx.stage.Stage
 import org.kodein.di.Kodein
 import tornadofx.Scope
@@ -41,6 +42,22 @@ class AbstractProcessPaneSpec extends AppSpec<ProcessPane> {
     ITasser itasser = null
     Kodein kodein = null
     KodeinExtractor extractor = null
+    def file = Paths.get(this.class.getResource("/Infinity.pl").file)
+    void login(Boolean succeed = true) {
+        clickOn("#username_field").write(account.username.value)
+        if (succeed)
+            clickOn("#password_field").write(account.password.value)
+        else
+            clickOn("#password_field").write("horp")
+
+        for (int i = 0; i < 4; i++) {
+            clickOn(".increment-arrow-button")
+        }
+        clickOn("#timeout_unit")
+        type(KeyCode.DOWN)
+        type(KeyCode.ENTER)
+        clickOn("#login_login")
+    }
 
     void setupStuff() {
         println("profile is hi")
@@ -67,8 +84,8 @@ class AbstractProcessPaneSpec extends AppSpec<ProcessPane> {
         itasser = extractor.proc.new(
                 UUID.randomUUID(),
                 0,
-                Paths.get(""),
-                "Automationyl Aminodril",
+                file,
+                file.fileName.toString(),
                 ls,
                 user.id,
                 dataDir
