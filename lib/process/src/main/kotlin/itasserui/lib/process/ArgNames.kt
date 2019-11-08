@@ -2,6 +2,7 @@
 
 package itasserui.lib.process;
 
+import itasserui.common.utils.AbstractSealedObject
 import itasserui.lib.process.ArgParam.*
 import itasserui.lib.process.ArgParam.BooleanParam.BooleanRange
 import itasserui.lib.process.ArgParam.BooleanParam.Flag
@@ -9,10 +10,14 @@ import itasserui.lib.process.ArgParam.Range.*
 import itasserui.lib.process.ArgParam.SimpleText.IntParam
 import itasserui.lib.process.ArgParam.SimpleText.Text
 
-sealed class ArgParam {
-    sealed class Range<T>(val default: T) : ArgParam() {
+interface DefaultParamType<T> {
+    val default: T
+}
+
+sealed class ArgParam : AbstractSealedObject() {
+    sealed class Range<T>(override val default: T) : ArgParam(), DefaultParamType<T> {
         class IntegerRange(val range: IntRange, default: Int) : Range<Int>(default)
-        class FloatRange(val range: ClosedFloatingPointRange<Double>, default: Double) : Range<Double>(default)
+        class DecimalRange(val range: ClosedFloatingPointRange<Double>, default: Double) : Range<Double>(default)
 
         class TextSelection(val range: List<String>, default: String) : Range<String>(default)
     }
@@ -24,7 +29,7 @@ sealed class ArgParam {
     }
 
     sealed class BooleanParam : ArgParam() {
-        class BooleanRange(val default: Boolean) : ArgParam() {
+        class BooleanRange(override val default: Boolean) : ArgParam(), DefaultParamType<Boolean> {
             val range = arrayOf(true, false)
         }
 
@@ -36,42 +41,44 @@ sealed class ArgParam {
     object None : ArgParam()
 }
 
-sealed class Args(
+sealed class Arg<out T : ArgParam>(
     val prefix: String,
     val name: String,
     val useOnNew: Boolean,
     val required: Boolean,
-    val argType: ArgParam
-) {
-    object Perl : Args("", "perl", false, true, None)
-    object AutoFlush : Args("", "MDevel::Autoflush", false, true, Flag)
-    object PkgDir : Args("-", "pkgdir", false, true, Directory)
-    object LibDir : Args("-", "lbdir", false, true, Directory)
-    object SeqName : Args("-", "seqname", true, true, Text)
-    object DataDir : Args("-", "datadir", true, true, Directory)
-    object RunStyle : Args("-", "runstyle", false, false, TextSelection(arrayListOf(), "gnuparallel"))
-    object OutDir : Args("-", "outdir", true, false, Directory)
-    object HomoFlag : Args("-", "homoflag", true, false, TextSelection(listOf("real", "benchmark"), "real"))
-    object IdCut : Args("-", "idcut", true, false, FloatRange(0.0..1.0, 0.3))
-    object NTemp : Args("-", "ntemp", true, false, IntegerRange(1..50, 20))
-    object NModel : Args("-", "nmodel", true, false, IntegerRange(1..10, 5))
-    object EC : Args("-", "EC", true, false, BooleanRange(false))
-    object LBS : Args("-", "LBS", true, false, BooleanRange(false))
-    object GO : Args("-", "GO", true, false, BooleanRange(false))
-    object TempExcl : Args("-", "temp_excl", true, false, File)
-    object Restraint1 : Args("-", "restraint1", true, false, File)
-    object Restraint2 : Args("-", "restraint2", true, false, File)
-    object Restraint3 : Args("-", "restraint3", true, false, File)
-    object Restraint4 : Args("-", "restraint4", true, false, File)
-    object Traj : Args("-", "traj", true, false, Flag)
-    object Light : Args("-", "light", true, false, Flag)
-    object Hours : Args("-", "hours", true, false, IntParam)
+    val argType: T
+) : AbstractSealedObject() {
+    object Perl : Arg<None>("", "perl", false, true, None)
+    object AutoFlush : Arg<Flag>("", "MDevel::Autoflush", false, true, Flag)
+    object PkgDir : Arg<Directory>("-", "pkgdir", false, true, Directory)
+    object LibDir : Arg<Directory>("-", "lbdir", false, true, Directory)
+    object SeqName : Arg<Text>("-", "seqname", true, true, Text)
+    object DataDir : Arg<Directory>("-", "datadir", true, true, Directory)
+    object RunStyle : Arg<TextSelection>("-", "runstyle", false, false, TextSelection(arrayListOf(), "gnuparallel"))
+    object OutDir : Arg<Directory>("-", "outdir", true, false, Directory)
+    object HomoFlag : Arg<TextSelection>(
+        "-", "homoflag", true, false,
+        TextSelection(listOf("", "real", "benchmark"), "")
+    )
 
-    open val simpleName get() = javaClass.simpleName
+    object IdCut : Arg<DecimalRange>("-", "idcut", true, false, DecimalRange(0.0..1.0, 0.3))
+    object NTemp : Arg<IntegerRange>("-", "ntemp", true, false, IntegerRange(1..50, 20))
+    object NModel : Arg<IntegerRange>("-", "nmodel", true, false, IntegerRange(1..10, 5))
+    object EC : Arg<BooleanRange>("-", "EC", true, false, BooleanRange(false))
+    object LBS : Arg<BooleanRange>("-", "LBS", true, false, BooleanRange(false))
+    object GO : Arg<BooleanRange>("-", "GO", true, false, BooleanRange(false))
+    object TempExcl : Arg<File>("-", "temp_excl", true, false, File)
+    object Restraint1 : Arg<File>("-", "restraint1", true, false, File)
+    object Restraint2 : Arg<File>("-", "restraint2", true, false, File)
+    object Restraint3 : Arg<File>("-", "restraint3", true, false, File)
+    object Restraint4 : Arg<File>("-", "restraint4", true, false, File)
+    object Traj : Arg<Flag>("-", "traj", true, false, Flag)
+    object Light : Arg<Flag>("-", "light", true, false, Flag)
+    object Hours : Arg<IntParam>("-", "hours", true, false, IntParam)
 
     companion object {
         val values
-            get() = Args::class
+            get() = Arg::class
                 .sealedSubclasses
                 .mapNotNull { it.objectInstance }
     }

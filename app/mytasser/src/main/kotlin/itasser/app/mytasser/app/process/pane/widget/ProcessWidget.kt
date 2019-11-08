@@ -12,8 +12,13 @@ import itasserui.common.logger.Logger
 import itasserui.lib.process.manager.ProcessManager
 import itasserui.lib.process.process.ITasser
 import javafx.animation.AnimationTimer
+import javafx.beans.property.DoubleProperty
+import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.value.ObservableValue
+import javafx.scene.Parent
 import javafx.scene.control.Dialog
 import javafx.util.StringConverter
+import lk.kotlin.observable.property.StandardObservableProperty
 import org.joda.time.DateTime
 import org.kodein.di.generic.instance
 import tornadofx.*
@@ -26,6 +31,25 @@ val <T : UIComponent> T.loginModal
         d.dialogPane.content = vm.root
         d.showAndWait()
     }
+
+class X : View("X") {
+    val model: XModel by inject()
+    override val root = spinner<Int>(
+        initialValue = 1,
+        max = 3,
+        min = 0,
+        amountToStepBy = 1,
+        editable = true
+    ){
+        bind(model.dub as ObservableValue<Int>)
+    }
+}
+class XController: Controller() {
+    val dub = StandardObservableProperty<Int>(1)
+}
+class XModel: ItemViewModel<XController>(XController()){
+    val dub = bind(XController::dub)
+}
 
 class ProcessWidget(
     user: User,
