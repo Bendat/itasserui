@@ -24,7 +24,7 @@ class CreateUserTest : DescribeSpec({
         val data = SetupObject()
         lateinit var user: Account
         it("Creates the user") {
-            data.pm.createUserProfile(data.user)
+            data.pm.new(data.user)
                 .map { user = it } should beInstanceOf<Ior.Right<RuntimeError, Account>>()
         }
 
@@ -41,7 +41,7 @@ class CreateUserTest : DescribeSpec({
         context("Creating a duplicate user") {
             lateinit var retry: ErrorsList
             it("Attempts to add the same user to the database") {
-                data.pm.createUserProfile(data.user)
+                data.pm.new(data.user)
                     .mapLeft { retry = it } should beInstanceOf<Errors>()
             }
 
@@ -62,7 +62,7 @@ class CreateUserTest : DescribeSpec({
             val userSameName = data.user.copy(emailAddress = EmailAddress(Fake.internet().emailAddress()))
             lateinit var errors: ErrorsList
             it("Tries to create the user") {
-                data.pm.createUserProfile(userSameName)
+                data.pm.new(userSameName)
                     .mapLeft { errors = it } should beInstanceOf<Errors>()
             }
 
@@ -87,7 +87,7 @@ class CreateUserTest : DescribeSpec({
             val userSameName = data.user.copy(username = Username(Fake.name().username()))
             lateinit var errors: ErrorsList
             it("Tries to create the user") {
-                data.pm.createUserProfile(userSameName)
+                data.pm.new(userSameName)
                     .mapLeft { errors = it; it } should beInstanceOf<SoftErrors>()
             }
 

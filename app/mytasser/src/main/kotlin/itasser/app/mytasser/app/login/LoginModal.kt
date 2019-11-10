@@ -16,7 +16,6 @@ class LoginModal(
 ) : View(), Logger {
     override val scope: Scope = scope ?: super.scope
     val model: LoginModalModel by inject()
-
     fun <T : Node> T.id(fxId: String): T {
         id = fxId
         return this
@@ -30,12 +29,18 @@ class LoginModal(
     }
 
     override val root: Parent = hbox {
+        addClass("login-modal")
         spacer()
         form {
             maxWidth = 520.0
             maxHeight = 250.0
             fieldset(titleText) {
-                field("Username") { textfield(model.username).id("username_field") }
+                field("Username") {
+                    combobox(model.username) {
+                        isEditable = true
+                        itemsProperty().bind(model.users)
+                    }.id("username_field")
+                }
                 field("Password") { passwordfield(model.password) { }.id("password_field") }
                 field("Log in for:") {
                     hbox {
@@ -67,7 +72,6 @@ class LoginModal(
             }
         }
         spacer()
-
     }
 }
 

@@ -70,10 +70,10 @@ abstract class ProcessPaneWidgetSpec extends AppSpec<ProcessWidget> {
         extractor = new KodeinExtractor(kodein)
         extractor.db.launch()
 
-        def res = extractor.pm.createUserProfile(account) as Ior.Right<NonEmptyList<RuntimeError>, User>
+        def res = extractor.profile.new(account) as Ior.Right<NonEmptyList<RuntimeError>, User>
         println("profile is $res")
         user = res.value
-        extractor.pm.getUserDir(user, User.UserCategory.DataDir)
+        extractor.profile.getUserDir(user, User.UserCategory.DataDir)
                 .map { dataDir = it.toAbsolutePath() }
         Path file = FS.INSTANCE.get(this.class.getResource("/Infinity.pl").file)
         def ls = new ArrayList<String>()
@@ -104,7 +104,7 @@ abstract class ProcessPaneWidgetSpec extends AppSpec<ProcessWidget> {
     @Override
     ProcessWidget create() {
         println("Dir is ${tmpdirPath.toAbsolutePath()}")
-        def login = extractor.pm.login(user, account.password as RawPassword, Duration.ofSeconds(0)) as Either.Right<ProfileManager.Profile>
+        def login = extractor.profile.login(user, account.password as RawPassword, Duration.ofSeconds(0)) as Either.Right<ProfileManager.Profile>
         def prof = login.b
         println("Prof is $prof")
         def view = new ProcessWidget(prof.user, itasser, new Scope())

@@ -2,9 +2,12 @@ package itasser.app.mytasser.app.login
 
 import arrow.core.None
 import arrow.core.Some
+import itasser.app.mytasser.app.process.newDialog.NewProcessController
 import tornadofx.ItemViewModel
 
 class LoginModalModel : ItemViewModel<LoginModalController>(LoginModalController()) {
+    val users = bind(LoginModalController::usersProperty)
+
     val username = bind(LoginModalController::usernameProperty)
     val password = bind(LoginModalController::passwordProperty)
     val duration = bind(LoginModalController::durationProperty)

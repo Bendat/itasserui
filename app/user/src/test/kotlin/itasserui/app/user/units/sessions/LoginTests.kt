@@ -17,7 +17,7 @@ class LoginTests : DescribeSpec({
         val data = SetupObject()
         lateinit var user: Account
         it("Creates the user") {
-            data.pm.createUserProfile(data.user)
+            data.pm.new(data.user)
                 .map { user = it } should beInstanceOf<Right<RuntimeError, Account>>()
         }
 

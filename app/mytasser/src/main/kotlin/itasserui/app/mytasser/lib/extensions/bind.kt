@@ -65,3 +65,20 @@ fun <T> ObservableProperty<T>.toFx(): StandardObservableProperty<T> {
 
     return prop
 }
+
+fun <T, K> FXList<T>.bind(to: LKList<K>, mapping: (K) -> T): FXList<T> {
+    addAll(to.map { mapping(it) })
+    to.onAdd += { item, idx ->
+        println("List update even $idx")
+        add(idx, mapping(item))
+    }
+
+    to.onMove += { item, _, newIdx ->
+        move(mapping(item), newIdx)
+    }
+
+    to.onRemove += { item, idx ->
+        remove(mapping(item))
+    }
+    return this
+}

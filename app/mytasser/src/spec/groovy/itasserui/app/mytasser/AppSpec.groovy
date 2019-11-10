@@ -1,21 +1,35 @@
 package itasserui.app.mytasser
 
+import arrow.data.Ior
+import arrow.data.NonEmptyList
 import com.github.javafaker.Faker
-import itasser.app.mytasser.TestApp
+import itasser.app.mytasser.kodeinmodules.DependencyInjector
+import itasserui.app.mytasser.lib.ITasserSettings
+import itasserui.app.user.UnregisteredUser
+import itasserui.app.user.User
+import itasserui.common.errors.RuntimeError
+import itasserui.common.interfaces.inline.EmailAddress
+import itasserui.common.interfaces.inline.RawPassword
+import itasserui.common.interfaces.inline.Username
 import itasserui.common.utils.FakeKt
+import itasserui.lib.filemanager.FS
+import itasserui.lib.process.process.ITasser
 import javafx.scene.Scene
 import javafx.scene.control.DialogPane
+import javafx.scene.input.KeyCode
 import javafx.stage.Stage
 import javafx.stage.Window
+import org.kodein.di.Kodein
 import org.testfx.api.FxRobot
 import org.testfx.framework.spock.ApplicationSpec
 import org.testfx.service.query.NodeQuery
-import spock.lang.Stepwise
 import tornadofx.UIComponent
 
 import java.nio.file.Files
 import java.nio.file.Path
 
+import static itasserui.common.utils.FakeKt.Fake
+import static java.util.UUID.randomUUID
 import static org.junit.Assert.assertNotNull
 
 abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {

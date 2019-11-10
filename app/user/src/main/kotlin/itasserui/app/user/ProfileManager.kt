@@ -6,6 +6,7 @@ import arrow.data.Ior.Both
 import arrow.data.Nel
 import itasserui.app.user.ProfileError.*
 import itasserui.app.user.User.UserCategory
+import itasserui.app.user.User.UserCategory.*
 import itasserui.common.`typealias`.Err
 import itasserui.common.`typealias`.OK
 import itasserui.common.`typealias`.Outcome
@@ -15,6 +16,7 @@ import itasserui.common.interfaces.inline.EmailAddress
 import itasserui.common.interfaces.inline.RawPassword
 import itasserui.common.interfaces.inline.Username
 import itasserui.common.logger.Logger
+import itasserui.common.utils.uuid
 import itasserui.lib.filemanager.FileManager
 import itasserui.lib.filemanager.WatchedDirectory
 import itasserui.lib.store.Database
@@ -42,9 +44,18 @@ class ProfileManager(
         val isActive get() = !isLocked
     }
 
-    fun isLoggedIn(user: User) = (sessions[user.id]?.isActive == true)
-    fun isLoggedIn(profile: Profile) = (sessions[profile.user.id]?.isActive == true)
-    fun find(id: UUID) = profiles.first { it.user.id == id }
+    fun isLoggedIn(profile: Profile) = isLoggedIn(profile.user)
+    fun isLoggedIn(user: User) = isLoggedIn(user.id)
+    fun isLoggedIn(user: UUID) = (sessions[user]?.isActive == true)
+    fun isLoggedIn(user: Username): Boolean {
+        return when (val profile = profiles.firstOrNull { it.user.username == user }) {
+            null -> false
+            else -> isLoggedIn(profile.user.id)
+        }
+    }
+
+    fun find(id: UUID) = profiles.firstOrNull() { it.user.id == id }
+    fun find(name: Username) = profiles.firstOrNull() { it.user.username == name }
     @Suppress("unused")
     fun getAdmin(password: RawPassword): Outcome<User> {
         val results = database.read<User> { Account::isAdmin eq true }
@@ -59,8 +70,13 @@ class ProfileManager(
     fun perform(user: User, onNotLoggedIn: () -> Unit, op: () -> Unit) {
         if (!isLoggedIn(user))
             onNotLoggedIn()
-        info { "Is logged in is ${isLoggedIn(user)}" }
+        if (isLoggedIn(user))
+            op()
+    }
 
+    fun perform(user: Username, onNotLoggedIn: () -> Unit, op: () -> Unit) {
+        if (!isLoggedIn(user))
+            onNotLoggedIn()
         if (isLoggedIn(user))
             op()
     }
@@ -82,33 +98,38 @@ class ProfileManager(
         }
     }
 
+    fun addSession(user: User, session: Session?) {
+        sessions as MutableMap
+        sessions[user.id] = session
+    }
+
     private fun getOrAddProfile(user: User, session: Session? = null): Outcome<Profile> {
-        fun addSession(user: User) {
-            sessions as MutableMap
-            sessions[user.id] = session
-        }
         return when (profiles.any { it.user.username == user.username }) {
             true -> profiles.first { it.user.username == user.username }
-                .also { addSession(it.user) }
+                .also { addSession(it.user, session) }
                 .right()
-            false -> database.find<User> { User::username eq user.username }
-                .flatMap { it.firstOrNone().toEither { NoSuchUser(user) } }
-                .map {
-                    val directories = fileManager.getDirectories(user)
-                    val profile = profiles.find { p -> p.user.username == user.username } ?: Profile(
-                        user = it,
-                        directories = directories.toList().map { it.second },
-                        dataDir = directories.getValue(UserCategory.DataDir),
-                        outDir = directories.getValue(UserCategory.OutDir),
-                        settings = directories.getValue(UserCategory.Settings),
-                        manager = this
-                    )
-                    info { "Profiles are ${profiles.find { it.user.id == user.id }} " }
-                    profiles += profile
-                    addSession(profile.user)
-                    profile
-                }
+            false -> getProfile(user, session)
         }
+    }
+
+    private fun getProfile(user: User, session: Session?): Either<RuntimeError, Profile> {
+        return database.find<User> { User::username eq user.username }
+            .flatMap { it.firstOrNone().toEither { NoSuchUser(user) } }
+            .map {
+                val directories = fileManager.getDirectories(user)
+                val profile = profiles.find { p -> p.user.username == user.username } ?: Profile(
+                    user = it,
+                    directories = directories.toList().map { it.second },
+                    dataDir = directories.getValue(DataDir),
+                    outDir = directories.getValue(OutDir),
+                    settings = directories.getValue(Settings),
+                    manager = this
+                )
+                info { "Profiles are ${profiles.find { it.user.id == user.id }} " }
+                profiles += profile
+                addSession(profile.user, session)
+                profile
+            }
     }
 
     fun login(
@@ -118,7 +139,7 @@ class ProfileManager(
     ): Outcome<Profile> =
         login(UnregisteredUser(username, password, EmailAddress("")), password, duration)
 
-    fun createUserProfile(user: Account): Ior<Nel<RuntimeError>, User> {
+    fun new(user: Account): Ior<Nel<RuntimeError>, User> {
         val realUser = user.toUser()
         val mkdir = createProfileDir(realUser)
         val saveDb = trySaveToDb(realUser)
@@ -127,6 +148,19 @@ class ProfileManager(
             mkdir is Err && saveDb is OK -> Both(Nel(mkdir.a), realUser)
             mkdir is OK && saveDb is Err -> Both(Nel(saveDb.a), realUser)
             else -> Ior.Right(realUser)
+        }
+    }
+
+    fun findUSer(name: Username): Either<RuntimeError, Profile> {
+        val user = User(uuid, name, RawPassword("").hashed, EmailAddress(""), false)
+        return getProfile(user, null)
+    }
+
+    fun removeProfile(user: User): Option<User> {
+        val result = profiles.removeIf { it.user.id == user.id }
+        return when (result) {
+            true -> Some(user)
+            false -> None
         }
     }
 
@@ -192,7 +226,6 @@ class ProfileManager(
 
         return true
     }
-
 
 
     data class Profile(

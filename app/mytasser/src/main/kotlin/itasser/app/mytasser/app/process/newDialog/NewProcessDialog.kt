@@ -1,17 +1,19 @@
 package itasser.app.mytasser.app.process.newDialog
 
 import itasser.app.mytasser.app.components.tornadofx.FileChooserType
+import itasser.app.mytasser.app.components.tornadofx.intConverter
 import itasser.app.mytasser.app.components.tornadofx.itFileChooser
-import itasser.app.mytasser.app.components.tornadofx.pathConverter
+import itasser.app.mytasser.app.process.pane.widget.loginModal
+import itasserui.common.interfaces.inline.Username
 import itasserui.lib.process.Arg
 import javafx.beans.binding.BooleanExpression
-import javafx.beans.property.Property
-import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.control.TextField
+import org.controlsfx.control.textfield.TextFields.bindAutoCompletion
 import tornadofx.*
-import java.nio.file.Path
+import itasser.app.mytasser.app.process.newDialog.NewSequenceCss as css
 
-class NewProcessDialog : View("New Process Dialog") {
+class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process") {
+    override val scope: Scope = scope ?: super.scope
     val model: NewProcessDialogModel by inject()
     override val complete: BooleanExpression = model.valid(
         model.dataDir, model.outDir, model.seqName,
@@ -21,14 +23,17 @@ class NewProcessDialog : View("New Process Dialog") {
     @Suppress("UNCHECKED_CAST")
     override val root = vbox {
         print("Hello world")
-        prefWidth = 400.0
+        prefWidth = 410.0
         prefHeight = 690.0
         lateinit var user: Field
         form {
-            fieldset() {
+            fieldset {
                 user = field("User") {
-                    combobox(null, listOf("Earl.gray", "Steve,Man")) {
+                    combobox<String>(model.user) {
+                        addClass(css.userField)
+                        itemsProperty().bind(model.users)
                         isEditable = true
+                        bindAutoCompletion(editor, model.users.value)
                     }
                 }
             }
@@ -38,18 +43,19 @@ class NewProcessDialog : View("New Process Dialog") {
             lateinit var nameField: TextField
             form {
                 fieldset("Sequence details") {
-
-                    spacer { }
-
+                    separator { }
                     field("Name") {
-                        nameField = textfield {
+                        nameField = textfield(model.seqName) {
+                            addClass(css.name)
                             user.prefWidthProperty().bind(user.widthProperty())
                         }
+                        spacer { }
                     }
                     spacer { }
                     vbox {
                         label("Description")
                         textarea {
+                            addClass(css.description)
                             prefColumnCount = 20
                             prefRowCount = 5
                             isWrapText = true
@@ -57,11 +63,12 @@ class NewProcessDialog : View("New Process Dialog") {
                     }
 
                 }
-                separator { }
 
                 fieldset("ITasser Required Parameters") {
+                    separator { }
                     field("Sequence Name") {
-                        textfield(model.seqName, pathConverter) {
+                        textfield(model.seqName) {
+                            addClass(css.sequenceName)
                             nameField.textProperty()
                                 .addListener { _, old, new ->
                                     if (old == text)
@@ -75,16 +82,14 @@ class NewProcessDialog : View("New Process Dialog") {
                     }
 
                     field("Data Directory") {
-                        itFileChooser(model.dataDir, FileChooserType.Directory) {
-                            validator {
-                                if (text.isNullOrBlank()) error("Sequence name must not be empty")
-                                else null
-                            }
+                        itFileChooser(model.dataDir, FileChooserType.Directory, disableManual = true) {
+                            addClass(css.dataDir)
                         }
                     }
 
                     field("Out Directory") {
-                        itFileChooser(model.outDir, FileChooserType.Directory) {
+                        itFileChooser(model.outDir, FileChooserType.Directory, disableManual = true) {
+                            addClass(css.outDir)
                             validator(ValidationTrigger.OnBlur) {
                                 if (text.isNullOrBlank()) error("Sequence name must not be empty")
                                 else null
@@ -94,10 +99,9 @@ class NewProcessDialog : View("New Process Dialog") {
 
 
                 }
-                separator { }
 
                 fieldset("Default parameters") {
-
+                    separator { }
                     field("ID Cut") {
                         val type = Arg.IdCut.argType
                         spinner(
@@ -107,8 +111,9 @@ class NewProcessDialog : View("New Process Dialog") {
                             0.1,
                             true,
                             model.idCut,
-                            true
+                            false
                         ) {
+                            addClass(css.idCut)
                             maxWidth = 80.0
                         }
                     }
@@ -122,8 +127,9 @@ class NewProcessDialog : View("New Process Dialog") {
                             1,
                             true,
                             model.nTemp,
-                            true
+                            false
                         ) {
+                            addClass(css.nTemp)
                             maxWidth = 80.0
                         }
                     }
@@ -136,83 +142,126 @@ class NewProcessDialog : View("New Process Dialog") {
                             type.default,
                             1,
                             true,
-                            model.nTemp,
-                            true
+                            model.nModel,
+                            false
                         ) {
+                            addClass(css.nModel)
                             maxWidth = 80.0
                         }
                     }
 
                     field("EC") {
-                        checkbox(null, model.ec) { }
+                        checkbox(null, model.ec) {
+                            addClass(css.ec)
+                        }
                     }
 
-                    field("EBS") {
-                        checkbox(null, model.lbs) { }
+                    field("LBS") {
+                        checkbox(null, model.lbs) {
+                            addClass(css.lbs)
+
+                        }
                     }
 
                     field("GO") {
-                        checkbox(null, model.go) { }
+                        checkbox(null, model.go) {
+                            addClass(css.go)
+                        }
                     }
 
                     field("Light") {
-                        checkbox { }
+                        checkbox(null, model.light) {
+                            addClass(css.light)
+                        }
                     }
 
+                    field("Traj") {
+                        checkbox(null, model.traj) {
+                            addClass(css.traj)
+
+                        }
+                    }
                 }
-                separator { }
 
                 fieldset("Optional Parameters") {
+                    separator { }
                     field("Homoflag") {
                         val items = Arg
                             .HomoFlag
                             .argType
                             .range
-                        combobox(model.homoFlag, items) { }
+                        combobox(model.homoFlag, items) {
+                            addClass(css.homoflag)
+                        }
                     }
 
-                    field("Temp Exclude") {
-                        itFileChooser(model.tempExcl) {}
+                    field("Temp Excl") {
+                        itFileChooser(model.tempExcl, acceptEmpty = true) {
+                            addClass(css.tempexcl)
+                        }
                     }
 
                     field("Restraint 1") {
-                        itFileChooser(model.restraint1) {}
+                        itFileChooser(model.restraint1, acceptEmpty = true) {
+                            addClass(css.restraint1)
+                        }
                     }
 
                     field("Restraint  2") {
-                        itFileChooser(model.restraint2) {}
+                        itFileChooser(model.restraint2, acceptEmpty = true) {
+                            addClass(css.restraint2)
+                        }
                     }
 
                     field("Restraint 3") {
-                        itFileChooser(model.restraint3) {}
+                        itFileChooser(model.restraint3, acceptEmpty = true) {
+                            addClass(css.restraint3)
+                        }
                     }
 
                     field("Restraint 4") {
-                        itFileChooser(model.restraint4) {}
-                    }
-
-                    field("Traj") {
-                        checkbox(null, model.traj) { }
+                        itFileChooser(model.restraint4, acceptEmpty = true) {
+                            addClass(css.restraint4)
+                        }
                     }
 
                     field("Hours") {
-                        textfield(model.hours) { }
+                        textfield(model.hours, intConverter) {
+                            filterInput {
+                                addClass(css.hours)
+                                it.controlNewText.isInt()
+                            }
+                        }
                     }
                 }
             }
         }
-
         form {
             fieldset {
                 hbox(10) {
                     spacer()
-                    field { button("Cancel") { } }
+                    val invalidLabel = label("Please complete all necessary fields") {
+                        addClass(css.errorLabel)
+                        isVisible = false
+                    }
+                    field {
+                        button("Cancel") {
+                            addClass(css.cancelButton)
+                            setOnMouseClicked { currentStage?.close() }
+                        }
+                    }
                     field {
                         button("Create") {
+                            addClass(css.createButton)
                             setOnMouseClicked {
-                                model.commit()
-                                if(model.isValid)
-                                    print("foo")
+                                val username = Username(model.user.value)
+                                model.profileManager
+                                    .value
+                                    .perform(username, { loginModal(username.value) }) {
+                                        model.commit()
+                                        invalidLabel.isVisible = !model.isValid
+                                    }
+
                             }
                         }
                     }
@@ -220,50 +269,5 @@ class NewProcessDialog : View("New Process Dialog") {
             }
         }
     }
-}
-
-class NewProcessController : Controller() {
-    val seqDirProperty = SimpleObjectProperty<Path?>(null)
-    val seqNameProperty = SimpleObjectProperty<Path?>(null)
-    val dataDirProperty = SimpleObjectProperty<Path?>(null)
-    val outDirProperty = SimpleObjectProperty<Path?>(null)
-    val homoFlagProperty = SimpleObjectProperty(Arg.HomoFlag.argType.default)
-    val idCutProperty: Property<Double> = SimpleObjectProperty(Arg.IdCut.argType.default)
-    val nTempProperty = SimpleObjectProperty(Arg.NTemp.argType.default)
-    val nModelProperty = SimpleObjectProperty(Arg.NModel.argType.default)
-    val ecProperty = SimpleObjectProperty(Arg.EC.argType.default)
-    val lbsProperty = SimpleObjectProperty(Arg.LBS.argType.default)
-    val goProperty = SimpleObjectProperty(Arg.GO.argType.default)
-    val tempExclProperty = SimpleObjectProperty<Path?>(null)
-    val restraint1Property = SimpleObjectProperty<Path?>(null)
-    val restraint2Property = SimpleObjectProperty<Path?>(null)
-    val restraint3Property = SimpleObjectProperty<Path?>(null)
-    val restraint4Property = SimpleObjectProperty<Path?>(null)
-    val trajProperty = SimpleObjectProperty<Boolean>(null)
-    val lightProperty = SimpleObjectProperty(false)
-    val hoursProperty = SimpleObjectProperty<String>("")
-
-}
-
-class NewProcessDialogModel : ItemViewModel<NewProcessController>(NewProcessController()) {
-    val seqName = bind(NewProcessController::seqNameProperty)
-    val seqFile = bind(NewProcessController::seqDirProperty)
-    val dataDir = bind(NewProcessController::dataDirProperty)
-    val outDir = bind(NewProcessController::outDirProperty)
-    val homoFlag = bind(NewProcessController::homoFlagProperty)
-    val idCut = bind(NewProcessController::idCutProperty)
-    val nTemp = bind(NewProcessController::nTempProperty)
-    val nModel = bind(NewProcessController::nModelProperty)
-    val ec = bind(NewProcessController::ecProperty)
-    val lbs = bind(NewProcessController::lbsProperty)
-    val go = bind(NewProcessController::goProperty)
-    val tempExcl = bind(NewProcessController::tempExclProperty)
-    val restraint1 = bind(NewProcessController::restraint1Property)
-    val restraint2 = bind(NewProcessController::restraint2Property)
-    val restraint3 = bind(NewProcessController::restraint3Property)
-    val restraint4 = bind(NewProcessController::restraint4Property)
-    val traj = bind(NewProcessController::trajProperty)
-    val light = bind(NewProcessController::lightProperty)
-    val hours = bind(NewProcessController::hoursProperty)
 }
 

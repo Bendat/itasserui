@@ -64,13 +64,13 @@ class ITasser(
     private var executionTimePrivate by executionTimeProperty
     val executionTime get() = executionTimePrivate
 
-
     inner class ExecutionContext {
         var future: Option<Future<ProcessResult>> = None
         private var realProcess: Option<StartedProcess> = None
         private var sysProcess: Option<SystemProcess> = None
         private val processExecutor: ProcessExecutor = ExecutorFactory.executor(process.args, listener)
         var exitCode: Option<ExitCode> = None
+        val command get() = processExecutor.command.joinToString(" ")
         fun waitForFinish(): Option<ProcessResult> {
             return future.map {
                 while (!it.isCancelled and !it.isDone) {

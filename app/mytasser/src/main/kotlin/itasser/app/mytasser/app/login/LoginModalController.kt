@@ -5,6 +5,7 @@ import arrow.core.Option
 import arrow.core.Some
 import itasser.app.mytasser.app.login.LoginModal.LoginDuration
 import itasser.app.mytasser.app.login.LoginModal.LoginDuration.*
+import itasserui.app.mytasser.lib.extensions.bind
 import itasserui.app.mytasser.lib.kInject
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.ProfileManager.Profile
@@ -14,6 +15,7 @@ import itasserui.common.interfaces.inline.RawPassword
 import itasserui.common.interfaces.inline.Username
 import itasserui.common.logger.Logger
 import javafx.beans.property.SimpleObjectProperty
+import javafx.collections.FXCollections
 import tornadofx.Controller
 import tornadofx.getValue
 import tornadofx.setValue
@@ -23,7 +25,8 @@ import java.time.Duration
 class LoginModalController : Controller(), Logger {
 
     val profileManager: ProfileManager by kInject<ProfileManager>()
-
+    val usersProperty = FXCollections.observableArrayList<String>()
+        .bind(profileManager.profiles) { it.user.username.value }
     val usernameProperty = SimpleObjectProperty("")
     val username: String by usernameProperty
 

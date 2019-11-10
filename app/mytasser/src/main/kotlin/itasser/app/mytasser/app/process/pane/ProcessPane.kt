@@ -85,8 +85,8 @@ class ProcessPane(di: DI, scope: Scope? = null) : View("My View") {
 
     private fun ListView<ITasser>.widget() {
         return cellFormat { process ->
-            val user = model.profileManager.find(process.process.createdBy).user
-            graphic = ProcessWidget(user, process).root
+            val user = model.profileManager.find(process.process.createdBy)?.user
+            user?.let { graphic = ProcessWidget(user, process).root }
         }
     }
 }

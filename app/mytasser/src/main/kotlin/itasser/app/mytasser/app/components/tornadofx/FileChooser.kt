@@ -24,12 +24,19 @@ enum class FileChooserType {
 fun EventTarget.itFileChooser(
     property: Property<SimpleObjectProperty<Path?>>,
     type: FileChooserType = File,
-    op: FileChooser.() -> Unit = {}
-): FileChooser = FileChooser(property, type).also { it.root.attachTo(this) }.apply(op)
+    acceptEmpty: Boolean = false,
+    disableManual: Boolean = false,
+    op: FileChooser .() -> Unit = {}
+): FileChooser = FileChooser(property, type, acceptEmpty, disableManual).also { it.root.attachTo(this) }.apply(op)
 
-class FileChooser(property: Property<SimpleObjectProperty<Path?>>, val type: FileChooserType = File) :
+class FileChooser(
+    val property: Property<SimpleObjectProperty<Path?>>,
+    private val type: FileChooserType = File,
+    private val acceptEmpty: Boolean = false,
+    private val disableManual: Boolean = false
+) :
     View("File Choose"), Logger {
-    lateinit var input: TextField
+    private lateinit var input: TextField
     override val root = anchorpane {
         hbox {
             val sicon = imageview(resources["/icons/folder.png"]) {
@@ -40,22 +47,38 @@ class FileChooser(property: Property<SimpleObjectProperty<Path?>>, val type: Fil
                 spacing = 10.0
             }
             input = textfield(property, pathConverter) {
+                addClass("file-chooser-input")
                 validator {
-                    val path = Paths.get(text)
-                    if (text.isNullOrBlank())
+                    val resolveText = text?.replace("~", System.getProperty("user.home")) ?: ""
+                    val path = Paths.get(resolveText)
+                    if (resolveText.isBlank() && !acceptEmpty)
                         error("Path can't be empty")
                     else if (type == Directory)
                         if (!Files.isDirectory(path))
                             error("Must be valid directory")
                         else null
                     else if (type == File && !Files.isRegularFile(path) or !Files.exists(path))
-                        error("Must be a valid file")
+                        if (acceptEmpty && resolveText.isBlank())
+                            null
+                        else error("Must be a valid file")
                     else if (!Files.exists(path))
                         error("File does not exist")
                     else null
                 }
             }
+            if (disableManual) {
+                checkbox {
+                    tooltip(
+                        """This field is automatically generated based on your user. 
+                            |You can manually set a dirctory when this is selected. """.trimMargin()
+                    )
+                    addClass("set-manually-toggle")
+                    input.enableWhen { selectedProperty() }
+                }
+            }
+
             button(graphic = sicon) {
+                disableProperty().bind(input.disableProperty())
                 setOnMouseClicked {
                     val ef = arrayOf(ExtensionFilter("All Files", "*.*"))
                     val item: String = when (type) {
@@ -82,4 +105,17 @@ val pathConverter
 
         override fun fromString(string: String?): SimpleObjectProperty<Path?> =
             SimpleObjectProperty(Paths.get(string ?: ""))
+    }
+val intConverter
+    get() = object : StringConverter<SimpleObjectProperty<Int?>>() {
+        override fun toString(path: SimpleObjectProperty<Int?>) =
+            path.value?.toString()
+
+        override fun fromString(string: String?): SimpleObjectProperty<Int?> {
+            val res = when (string?.isInt()) {
+                true -> string.toInt()
+                else -> null
+            }
+            return SimpleObjectProperty(res)
+        }
     }

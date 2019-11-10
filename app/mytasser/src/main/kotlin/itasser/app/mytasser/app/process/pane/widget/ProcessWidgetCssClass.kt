@@ -4,7 +4,6 @@ import tornadofx.CssRule
 import tornadofx.cssclass
 
 val CssRule.value get() = ".$name"
-
 object WidgetCss {
     @JvmStatic
     val timerLabel by cssclass("process-widget-timer-label-value")

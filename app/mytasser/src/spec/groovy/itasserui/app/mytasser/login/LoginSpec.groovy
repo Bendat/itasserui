@@ -9,6 +9,7 @@ import itasserui.app.user.UnregisteredUser
 import itasserui.common.interfaces.inline.EmailAddress
 import itasserui.common.interfaces.inline.RawPassword
 import itasserui.common.interfaces.inline.Username
+import org.kodein.di.Kodein
 import org.testfx.api.FxAssert
 import org.testfx.api.FxToolkit
 import org.testfx.matcher.control.ComboBoxMatchers
@@ -39,20 +40,25 @@ abstract class LoginSpec extends AppSpec<LoginModal> {
         and:
         "A new user $username to exist in the database"
         view.model.item.profileManager.database.launch()
-        view.model.item.profileManager.createUserProfile(user)
+        view.model.item.profileManager.new(user)
     }
 
     @Override
     LoginModal create() {
         println("Dir is ${tmpdirPath.toAbsolutePath()}")
         def path = tmpdirPath as Path
+        Kodein kodein = initKodein(path)
+        def view = new LoginModal("User Login", new Scope())
+        view.setInScope(new DI(kodein), view.scope)
+        return view
+    }
+
+    private Kodein initKodein(Path path) {
         def kodein = DependencyInjector.INSTANCE.initializeKodein(
                 username,
                 password,
                 settins,
                 path)
-        def view = new LoginModal("User Login", new Scope())
-        view.setInScope(new DI(kodein), view.scope)
-        return view
+        return kodein
     }
 }

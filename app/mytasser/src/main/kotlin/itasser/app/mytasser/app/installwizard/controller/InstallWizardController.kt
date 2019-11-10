@@ -103,7 +103,7 @@ class InstallWizardController : Controller(), Logger {
         val db by di.instance<Database>()
         val pm by di.instance<ProfileManager>()
         db.launch()
-        val profile = pm.createUserProfile(toUser())
+        val profile = pm.new(toUser())
         val dbWrite = db.create(toSettings())
         info { "Creating user profile: $profile" }
         info { "Creating database settings: $dbWrite" }
