@@ -1,26 +1,28 @@
 package itasser.app.mytasser.views
 
-import itasser.app.mytasser.Styles
-import javafx.scene.control.Alert.AlertType.INFORMATION
-import tornadofx.*
+import tornadofx.View
+import tornadofx.anchorpane
+import tornadofx.label
+import tornadofx.splitpane
 
 class MainView : View("Hello TornadoFX") {
-    override val root = borderpane {
-        addClass(Styles.welcomeScreen)
-        top {
-            stackpane {
-                label(title).addClass(Styles.heading)
-            }
+    override val root = splitpane {
+        anchorpane {
+            prefHeight = 500.0
+            prefWidth = 250.0
+            label("Hello")
         }
-        center {
-            stackpane {
-                addClass(Styles.content)
-                button("Click me") {
-                    setOnAction {
-                        alert(INFORMATION, "Well done!", "You clicked me!")
-                    }
-                }
-            }
+
+        anchorpane {
+            prefHeight = 500.0
+            prefWidth = 250.0
+            label("Hello")
+        }
+
+        anchorpane {
+            prefHeight = 500.0
+            prefWidth = 250.0
+            label("Hello")
         }
     }
 }

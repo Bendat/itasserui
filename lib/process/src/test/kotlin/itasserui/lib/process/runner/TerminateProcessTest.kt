@@ -49,7 +49,7 @@ class TerminateProcessTest : DescribeSpec({
         }
 
         it("Should verify the process did not execute to completion") {
-            runner.std.output.size should beLessThan(5)
+            runner.std.out.size should beLessThan(5)
         }
 
         it("Verifies the exitcode is accurate") {
@@ -89,8 +89,8 @@ class TerminateProcessTest : DescribeSpec({
         }
 
         it("Should verify the process did not execute to once") {
-            println("STD ${runner.std.output}")
-            runner.std.output.size should beLessThan(1)
+            println("STD ${runner.std.out}")
+            runner.std.out.size should beLessThan(1)
         }
 
         it("Should verify the state is $Paused") {

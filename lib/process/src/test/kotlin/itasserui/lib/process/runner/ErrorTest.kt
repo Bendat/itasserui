@@ -39,7 +39,7 @@ class ErrorTest : DescribeSpec({
         }
 
         it("Should verify that the stdout is empty") {
-            runner.std.output.size should be(0)
+            runner.std.out.size should be(0)
         }
 
         it("Should verify that the stderr has exactly one item") {

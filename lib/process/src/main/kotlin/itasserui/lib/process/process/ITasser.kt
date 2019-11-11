@@ -12,8 +12,11 @@ import itasserui.lib.process.*
 import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.details.ExecutionState.*
 import itasserui.lib.process.details.ExitCode
+import itasserui.lib.process.details.ProcessOutput
 import itasserui.lib.process.details.TrackingList
+import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.property.StandardObservableProperty
+import org.joda.time.DateTime
 import org.zeroturnaround.exec.ProcessExecutor
 import org.zeroturnaround.exec.ProcessResult
 import org.zeroturnaround.exec.StartedProcess
@@ -90,8 +93,8 @@ class ITasser(
 
 
         init {
-            processExecutor.redirectOutput(ProcessLogAppender(STDType.Out, std.output))
-            processExecutor.redirectError(ProcessLogAppender(STDType.Err, std.err))
+            processExecutor.redirectOutput(ProcessLogAppender(STDType.Out, std.stream))
+            processExecutor.redirectError(ProcessLogAppender(STDType.Err, std.stream))
             with(listener) {
                 beforeStart += {
                     state = Starting
@@ -185,11 +188,11 @@ class ITasser(
 
         inner class ProcessLogAppender<T : STDType>(
             val std: T,
-            val list: TrackingList<String>
+            val list: ObservableList<ProcessOutput>
         ) : LogOutputStream(), Logger {
             override fun processLine(p0: String) {
                 info { "[STD$std] << capturing line [$p0] for runner [${process.name}][${process.id}]" }
-                list += p0
+                list += ProcessOutput(p0, DateTime.now(), std)
             }
         }
 

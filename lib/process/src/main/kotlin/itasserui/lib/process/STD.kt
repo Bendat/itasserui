@@ -1,8 +1,17 @@
 package itasserui.lib.process
 
-import itasserui.lib.process.details.TrackingList
+import com.fasterxml.jackson.annotation.JsonIgnore
+import itasserui.lib.process.details.ProcessOutput
+import itasserui.lib.process.process.STDType
+import lk.kotlin.observable.list.ObservableList
+import lk.kotlin.observable.list.filtering
+import lk.kotlin.observable.list.observableListOf
 
 data class STD(
-    val output: TrackingList<String> = TrackingList(),
-    val err: TrackingList<String> = TrackingList()
-)
+    val stream: ObservableList<ProcessOutput> = observableListOf()
+) {
+    @JsonIgnore
+    val out = stream.filtering { it.stdType == STDType.Out }
+    @JsonIgnore
+    val err = stream.filtering { it.stdType == STDType.Err }
+}
