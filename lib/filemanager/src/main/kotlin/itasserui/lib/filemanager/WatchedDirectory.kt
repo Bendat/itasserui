@@ -44,8 +44,7 @@ class WatchedDirectory(
         count = Files.list(path).count()
         deepCount = Files.walk(path).map {
             if (Files.isDirectory(it))
-                Files.list(it)
-                    ?.count()
+                Files.list(it)?.count()
             else null
         }.toList()
             .mapNotNull { it }

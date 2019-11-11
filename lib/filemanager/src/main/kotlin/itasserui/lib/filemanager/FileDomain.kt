@@ -29,8 +29,9 @@ interface FileDomain : Identifiable {
     }
 
     interface Subcategory {
+        val name: String
         val directory: Path
             get() =
-                FS[javaClass.simpleName.toLowerCase()]
+                FS[name.toLowerCase()]
     }
 }

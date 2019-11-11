@@ -10,3 +10,9 @@ data class TestDomain(
     override val id: UUID,
     override val categories: List<Subcategory> = listOf()
 ) : FileDomain
+
+enum class TestCategories: Subcategory{
+    First,
+    Second,
+    Third
+}
