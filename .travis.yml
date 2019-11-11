@@ -33,10 +33,8 @@ cache:
   directories:
     - $HOME/.m2
 
-deploy:
-  # Deploy snapshots & releases on every commit made to master
-  - provider: script
-    script: "mvn clean test"
-    skip_cleanup: true
-    on:
-      all_branches: true
+before_script:
+  "mvn dependency:resolve"
+
+script:
+  "mvn clean test"
