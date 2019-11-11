@@ -38,7 +38,7 @@ interface FileManager : Logger {
     operator fun get(
         domain: FileDomain,
         path: List<Subcategory>
-    ): List<Path> = FS.create[fullPath(domain), path.toList().also { info { "Paths are ${it}" } }]
+    ): List<Path> = FS.create[fullPath(domain), path]
 
     fun mkdirs(
         domain: FileDomain,

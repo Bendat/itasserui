@@ -13,6 +13,7 @@ import itasserui.lib.filemanager.LocalFileManager
 import itasserui.lib.filemanager.WatchedDirectory
 import itasserui.lib.filemanager.utils.TestDomain
 import java.nio.file.Files
+import java.nio.file.Paths
 
 class CreateDirectoryTest : DescribeSpec({
     val root = Files.createTempDirectory("fmtest")
@@ -26,20 +27,23 @@ class CreateDirectoryTest : DescribeSpec({
         val testDomain = TestDomain(
             Test,
             "testchild",
-            uuid
+            uuid,
+            TestCategories.values().toList()
         )
 
         it("Creates a new directory") {
-            fm.new(domain = testDomain)
-                .map { watchedDirectory = it } as OK
+            fm.new(domain = testDomain){
+                print("Directory Change $it")
+            }.map { watchedDirectory = it } as OK
         }
 
         it("Creates numeric subcategories") {
             fm[testDomain, TestCategories.values().toList()]
         }
 
-        it("Validates the c orrect number of entries") {
+        it("Validates the correct number of entries") {
             safeWait(100)
+            watchedDirectory.update()
             watchedDirectory.count should be(3L)
         }
 

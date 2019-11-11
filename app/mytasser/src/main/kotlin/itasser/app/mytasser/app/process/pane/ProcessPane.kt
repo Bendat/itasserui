@@ -1,6 +1,8 @@
 package itasser.app.mytasser.app.process.pane
 
+import itasser.app.mytasser.app.process.newDialog.NewProcessDialog
 import itasser.app.mytasser.app.process.pane.widget.ProcessWidget
+import itasser.app.mytasser.app.process.pane.widget.dialogWindow
 import itasserui.app.mytasser.lib.DI
 import itasserui.lib.process.process.ITasser
 import javafx.beans.property.SimpleIntegerProperty
@@ -31,7 +33,11 @@ class ProcessPane(di: DI, scope: Scope? = null) : View("My View") {
                         }
                     }
                     spacer { }
-                    button("+") { }
+                    button("+") {
+                        setOnMouseClicked {
+                            dialogWindow<NewProcessDialog>(scope) {}
+                        }
+                    }
                 }
                 field("Max running: ") {
                     textfield(SimpleIntegerProperty(3)) {}
