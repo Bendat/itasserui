@@ -12,12 +12,24 @@ import itasserui.common.logger.Logger
 import itasserui.lib.process.manager.ProcessManager
 import itasserui.lib.process.process.ITasser
 import javafx.animation.AnimationTimer
+import javafx.event.EventTarget
 import javafx.scene.control.Dialog
 import javafx.util.StringConverter
 import org.joda.time.DateTime
 import org.kodein.di.generic.instance
 import tornadofx.*
 import java.time.Duration.ofMillis
+
+inline fun <reified K : UIComponent> EventTarget.dialogWindow(
+    scope: Scope? = DefaultScope,
+    op: K.() -> Unit
+): K {
+    val vm = find<K>(scope ?: DefaultScope).apply(op)
+    val d = Dialog<K>()
+    d.dialogPane.content = vm.root
+    d.showAndWait()
+    return vm
+}
 
 val <T : UIComponent> T.loginModal
     get() = fun(username: String?) {

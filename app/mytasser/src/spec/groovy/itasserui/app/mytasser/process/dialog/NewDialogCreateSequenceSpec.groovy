@@ -63,8 +63,9 @@ class NewDialogCreateSequenceSpec extends AbstractNewDialogSpec {
         clickOn(seqFileField).write(seqFile.toString())
         clickOn(description).write("This boys got a lot amoxy")
         clickOn(createButton)
+
         then:
-        1 == 1
+        extractor.proc.processes.all.size == 1
         SafeWaitKt.safeWait(15000)
     }
 }

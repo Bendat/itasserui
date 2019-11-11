@@ -72,6 +72,6 @@ class NewProcessDialogModel : ItemViewModel<NewProcessController>(NewProcessCont
         return processManager.new(
             uuid, 0, seqFile.value.value ?: Paths.get("/seqfile empty"),
             name.value, args, profile.value.value!!.user.id, dataDir.value.value!!
-        ).also { println("New process is $it") }
+        )
     }
 }
