@@ -52,6 +52,7 @@ sealed class Arg<out T : ArgParam>(
     object AutoFlush : Arg<Flag>("", "MDevel::Autoflush", false, true, Flag)
     object PkgDir : Arg<Directory>("-", "pkgdir", false, true, Directory)
     object LibDir : Arg<Directory>("-", "lbdir", false, true, Directory)
+    object JavaHome : Arg<Directory>("-", "java_home", false, true, Directory)
     object SeqName : Arg<Text>("-", "seqname", true, true, Text)
     object DataDir : Arg<Directory>("-", "datadir", true, true, Directory)
     object RunStyle : Arg<TextSelection>("-", "runstyle", false, false, TextSelection(arrayListOf(), "gnuparallel"))
@@ -75,6 +76,8 @@ sealed class Arg<out T : ArgParam>(
     object Traj : Arg<Flag>("-", "traj", true, false, Flag)
     object Light : Arg<Flag>("-", "light", true, false, Flag)
     object Hours : Arg<IntParam>("-", "hours", true, false, IntParam)
+
+    val arg get() = prefix + name
 
     companion object {
         val values

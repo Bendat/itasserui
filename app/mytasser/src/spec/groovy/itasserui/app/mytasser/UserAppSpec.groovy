@@ -34,7 +34,8 @@ abstract class UserAppSpec<T extends UIComponent> extends AppSpec<T> {
     User user = null
     Kodein kodein = null
     KodeinExtractor extractor = null
-    Path file = FS.INSTANCE.get(this.class.getResource("/Infinity.pl").file)
+    Path file = FS.INSTANCE.get(this.class.getResource("/run-ITASSER.pl").file)
+    Path seqFile = FS.INSTANCE.get(this.class.getResource("/seq.fasta").file)
     Scope testScope = new Scope()
 
     void login(Boolean succeed = true) {

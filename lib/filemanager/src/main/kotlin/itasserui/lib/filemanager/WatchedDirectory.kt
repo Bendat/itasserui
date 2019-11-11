@@ -53,7 +53,7 @@ class WatchedDirectory(
     }
 
     override fun toString(): String {
-        return "WatchedDirectory(path=${path.toAbsolutePath()}, category=${file.category}, count=$count, deepCount=$deepCount)"
+        return path.toString()
     }
 
     override fun equals(other: Any?): Boolean {

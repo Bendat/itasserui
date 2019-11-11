@@ -6,6 +6,7 @@ import itasser.app.mytasser.app.styles.MainStylee
 import itasserui.common.logger.Logger
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.SimpleStringProperty
 import javafx.event.EventTarget
 import javafx.scene.control.TextField
 import javafx.stage.FileChooser.ExtensionFilter
@@ -36,6 +37,8 @@ class FileChooser(
     private val disableManual: Boolean = false
 ) :
     View("File Choose"), Logger {
+    val textProperty = SimpleStringProperty("")
+    var text by textProperty
     private lateinit var input: TextField
     override val root = anchorpane {
         hbox {
@@ -48,6 +51,7 @@ class FileChooser(
             }
             input = textfield(property, pathConverter) {
                 addClass("file-chooser-input")
+                this@FileChooser.textProperty.bindBidirectional(textProperty())
                 validator {
                     val resolveText = text?.replace("~", System.getProperty("user.home")) ?: ""
                     val path = Paths.get(resolveText)

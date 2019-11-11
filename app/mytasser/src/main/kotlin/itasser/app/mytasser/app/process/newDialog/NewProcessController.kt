@@ -3,18 +3,24 @@ package itasser.app.mytasser.app.process.newDialog
 import itasserui.app.mytasser.lib.extensions.bind
 import itasserui.app.mytasser.lib.kInject
 import itasserui.app.user.ProfileManager
+import itasserui.app.user.ProfileManager.Profile
 import itasserui.lib.process.Arg
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import tornadofx.Controller
 import java.nio.file.Path
-
+import tornadofx.*
 class NewProcessController : Controller() {
     val profileManager: ProfileManager by kInject<ProfileManager>()
     val usersProperty = FXCollections.observableArrayList<String>()
         .bind(profileManager.profiles) { it.user.username.value }
-    val user = SimpleObjectProperty("")
-    val seqNameProperty = SimpleObjectProperty<String>(null)
+    val userProperty = SimpleObjectProperty("")
+    var user: String by userProperty
+    val profileProperty = SimpleObjectProperty<Profile?>(null)
+    var profile by profileProperty
+    val nameProperty = SimpleObjectProperty<String>("")
+    val seqNameProperty = SimpleObjectProperty<String>("")
+    val seqFileProperty = SimpleObjectProperty<Path?>(null)
     val dataDirProperty = SimpleObjectProperty<Path?>(null)
     val outDirProperty = SimpleObjectProperty<Path?>(null)
     val homoFlagProperty = SimpleObjectProperty(Arg.HomoFlag.argType.default)
@@ -32,4 +38,6 @@ class NewProcessController : Controller() {
     val trajProperty = SimpleObjectProperty<Boolean>(null)
     val lightProperty = SimpleObjectProperty(false)
     val hoursProperty = SimpleObjectProperty<Int?>(null)
+
+
 }

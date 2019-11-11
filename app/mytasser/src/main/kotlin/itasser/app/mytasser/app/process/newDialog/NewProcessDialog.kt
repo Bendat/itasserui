@@ -1,10 +1,13 @@
 package itasser.app.mytasser.app.process.newDialog
 
+import arrow.core.Either.Right
 import itasser.app.mytasser.app.components.tornadofx.FileChooserType
 import itasser.app.mytasser.app.components.tornadofx.intConverter
 import itasser.app.mytasser.app.components.tornadofx.itFileChooser
 import itasser.app.mytasser.app.process.pane.widget.loginModal
+import itasserui.app.user.ProfileManager.Profile
 import itasserui.common.interfaces.inline.Username
+import itasserui.common.logger.Logger
 import itasserui.lib.process.Arg
 import javafx.beans.binding.BooleanExpression
 import javafx.scene.control.TextField
@@ -12,13 +15,11 @@ import org.controlsfx.control.textfield.TextFields.bindAutoCompletion
 import tornadofx.*
 import itasser.app.mytasser.app.process.newDialog.NewSequenceCss as css
 
-class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process") {
+class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"), Logger {
     override val scope: Scope = scope ?: super.scope
     val model: NewProcessDialogModel by inject()
     override val complete: BooleanExpression = model.valid(
-        model.dataDir, model.outDir, model.seqName,
-        model.tempExcl, model.restraint1, model.restraint2,
-        model.restraint3, model.restraint4
+        model.seqName, model.dataDir, model.outDir, model.seqName
     )
     @Suppress("UNCHECKED_CAST")
     override val root = vbox {
@@ -34,6 +35,11 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
                         itemsProperty().bind(model.users)
                         isEditable = true
                         bindAutoCompletion(editor, model.users.value)
+                        model.user.onChange {
+                            val prof = model.item.profileManager.findUser(Username(it ?: ""))
+                            if (prof is Right)
+                                model.item.profile = prof.b
+                        }
                     }
                 }
             }
@@ -45,7 +51,7 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
                 fieldset("Sequence details") {
                     separator { }
                     field("Name") {
-                        nameField = textfield(model.seqName) {
+                        nameField = textfield(model.name) {
                             addClass(css.name)
                             user.prefWidthProperty().bind(user.widthProperty())
                         }
@@ -59,6 +65,12 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
                             prefColumnCount = 20
                             prefRowCount = 5
                             isWrapText = true
+                        }
+                    }
+
+                    field("Fasta file") {
+                        itFileChooser(model.seqFile, FileChooserType.File) {
+                            addClass("new-sequence-seq-file")
                         }
                     }
 
@@ -84,15 +96,21 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
                     field("Data Directory") {
                         itFileChooser(model.dataDir, FileChooserType.Directory, disableManual = true) {
                             addClass(css.dataDir)
+                            model.item.profileProperty.onChange {
+                                text = if (it is Profile)
+                                    it.dataDir.path.toString()
+                                else ""
+                            }
                         }
                     }
 
                     field("Out Directory") {
                         itFileChooser(model.outDir, FileChooserType.Directory, disableManual = true) {
                             addClass(css.outDir)
-                            validator(ValidationTrigger.OnBlur) {
-                                if (text.isNullOrBlank()) error("Sequence name must not be empty")
-                                else null
+                            model.item.profileProperty.onChange {
+                                text = if (it is Profile)
+                                    it.outDir.path.toString()
+                                else ""
                             }
                         }
                     }
@@ -259,6 +277,10 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
                                     .value
                                     .perform(username, { loginModal(username.value) }) {
                                         model.commit()
+                                        if (model.isValid) {
+                                            model.makeProcess()
+                                            currentStage?.close()
+                                        }
                                         invalidLabel.isVisible = !model.isValid
                                     }
 

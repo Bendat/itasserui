@@ -151,7 +151,7 @@ class ProfileManager(
         }
     }
 
-    fun findUSer(name: Username): Either<RuntimeError, Profile> {
+    fun findUser(name: Username): Either<RuntimeError, Profile> {
         val user = User(uuid, name, RawPassword("").hashed, EmailAddress(""), false)
         return getProfile(user, null)
     }
