@@ -1,5 +1,6 @@
 package itasser.app.mytasser.app.mainview.consoletab
 
+import itasser.app.mytasser.app.process.pane.widget.loginModal
 import itasserui.app.mytasser.lib.kInject
 import itasserui.common.extensions.unless
 import itasserui.lib.process.details.ProcessOutput
@@ -17,6 +18,7 @@ class ConsoleView(scope: Scope? = null) : View("ITasser console") {
     val model: ConsoleViewModel by inject()
     val processManager: ProcessManager by kInject()
     override val root = vbox {
+
         textfield(model.command) { isEditable = false }
         scrollpane {
             isFitToHeight = true
@@ -31,9 +33,15 @@ class ConsoleView(scope: Scope? = null) : View("ITasser console") {
         hbox {
             maxHeight = 80.0
             button("Play") {
-//                onMouseClicked {}
+                setOnMouseClicked {
+                    model.perform({loginModal("")}){
+                        processManager.run(it)
+                    }
+                }
             }
-            button("Stop")
+            button("Stop"){
+                processManager
+            }
         }
     }
 }
@@ -41,8 +49,8 @@ class ConsoleView(scope: Scope? = null) : View("ITasser console") {
 val outMapper
     get() = fun(item: ProcessOutput): Text {
         return when (item.stdType) {
-            STDType.Err -> Text("$[${item.timestamp.toString("MM-dd HH:mm:ss")}]: ${item.item}\n")
-            else -> Text("$[${item.timestamp.toString("MM-dd HH:mm:ss")}]: ${item.item}\n")
+            STDType.Err -> Text("[${item.timestamp.toString("MM-dd HH:mm:ss")}]: ${item.item}\n")
+            else -> Text("[${item.timestamp.toString("MM-dd HH:mm:ss")}]: ${item.item}\n")
         }.apply { { fill = Color.RED } unless (item.stdType == STDType.Out) }
     }
 

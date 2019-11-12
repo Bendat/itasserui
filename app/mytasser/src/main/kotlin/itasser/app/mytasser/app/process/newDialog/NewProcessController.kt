@@ -11,7 +11,7 @@ import tornadofx.Controller
 import java.nio.file.Path
 import tornadofx.*
 class NewProcessController : Controller() {
-    val profileManager: ProfileManager by kInject<ProfileManager>()
+    val profileManager: ProfileManager by kInject()
     val usersProperty = FXCollections.observableArrayList<String>()
         .bind(profileManager.profiles) { it.user.username.value }
     val userProperty = SimpleObjectProperty("")

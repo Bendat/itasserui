@@ -24,7 +24,7 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
     @Suppress("UNCHECKED_CAST")
     override val root = vbox {
         print("Hello world")
-        prefWidth = 410.0
+        prefWidth = 450.0
         prefHeight = 690.0
         lateinit var user: Field
         form {

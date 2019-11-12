@@ -5,7 +5,7 @@ import itasserui.app.user.ProfileManager
 import tornadofx.ItemViewModel
 
 class ProcessPaneViewModel : ItemViewModel<ProcessPaneController>(ProcessPaneController()) {
-    val profileManager: ProfileManager by kInject<ProfileManager>()
+    val profileManager: ProfileManager by kInject()
     val autoRun = bind(ProcessPaneController::autoRun)
     val maxExecuting = bind(ProcessPaneController::maxExecuting)
     val processes = bind(ProcessPaneController::processes)

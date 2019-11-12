@@ -1,22 +1,22 @@
 package itasser.app.mytasser.views
 
-import tornadofx.View
-import tornadofx.anchorpane
-import tornadofx.label
-import tornadofx.splitpane
+import itasser.app.mytasser.app.mainview.consoletab.ConsoleView
+import itasser.app.mytasser.app.process.pane.ProcessPane
+import tornadofx.*
 
-class MainView : View("Hello TornadoFX") {
+class MainView(scope: Scope? = null) : View("Hello TornadoFX") {
+    override val scope = scope ?: super.scope
     override val root = splitpane {
         anchorpane {
             prefHeight = 500.0
             prefWidth = 250.0
-            label("Hello")
+            this += ProcessPane(scope)
         }
 
         anchorpane {
             prefHeight = 500.0
             prefWidth = 250.0
-            label("Hello")
+            this += ConsoleView(scope)
         }
 
         anchorpane {

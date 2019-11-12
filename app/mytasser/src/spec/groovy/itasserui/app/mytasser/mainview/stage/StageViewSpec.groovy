@@ -1,0 +1,46 @@
+package itasserui.app.mytasser.mainview.stage
+
+import itasser.app.mytasser.app.mainview.consoletab.EventShooter
+import itasser.app.mytasser.app.mainview.consoletab.SelectedSequenceEvent
+import itasser.app.mytasser.views.MainView
+import itasserui.app.mytasser.UserAppSpec
+import itasserui.common.utils.SafeWaitKt
+import itasserui.lib.process.process.ITasser
+
+import java.time.Duration
+
+class StageViewSpec extends UserAppSpec<MainView> {
+    ITasser itasser = null
+    EventShooter event = null
+
+    @Override
+    MainView create() {
+        setupStuff()
+        def ls = new ArrayList()
+        ls.add(file.toAbsolutePath().toString())
+        ls.add("-hello")
+        ls.add("-world")
+        itasser = extractor.proc.new(
+                UUID.randomUUID(),
+                0,
+                file,
+                file.fileName.toString(),
+                ls,
+                user.id,
+                dataDir
+        )
+        event = new EventShooter(testScope)
+        extractor.profile.login(user.username, account.password, Duration.ofMinutes(1))
+        return new MainView(testScope)
+    }
+
+    void "Lets see"() {
+        given:
+        event.fire(new SelectedSequenceEvent(itasser))
+        SafeWaitKt.safeWait(1000)
+//        itasser.executor.start$process()
+
+        expect:
+        SafeWaitKt.safeWait(90000)
+    }
+}

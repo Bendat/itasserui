@@ -62,6 +62,7 @@ class ProcessManager(
         args: List<String>,
         createdBy: UUID,
         dataDir: Path,
+        outDir: Path = dataDir,
         state: ExecutionState = Queued
     ): ITasser {
         val fullArgs = defaultArgs
@@ -75,7 +76,8 @@ class ProcessManager(
                 args = fullArgs,
                 createdAt = Date(),
                 createdBy = createdBy,
-                dataDir = dataDir
+                dataDir = dataDir,
+                outDir = outDir
             ),
             priority = priority,
             state = state,
@@ -105,7 +107,6 @@ class ProcessManager(
                 res.exitValue
             }
         }
-
 
 
     @Suppress("MemberVisibilityCanBePrivate")

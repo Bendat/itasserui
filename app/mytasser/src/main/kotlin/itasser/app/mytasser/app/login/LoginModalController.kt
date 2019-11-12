@@ -24,7 +24,7 @@ import java.time.Duration
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class LoginModalController : Controller(), Logger {
 
-    val profileManager: ProfileManager by kInject<ProfileManager>()
+    val profileManager: ProfileManager by kInject()
     val usersProperty = FXCollections.observableArrayList<String>()
         .bind(profileManager.profiles) { it.user.username.value }
     val usernameProperty = SimpleObjectProperty("")

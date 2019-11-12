@@ -8,7 +8,7 @@ import javafx.collections.FXCollections.observableArrayList
 import tornadofx.Controller
 
 class ProcessPaneController : Controller() {
-    val processManager: ProcessManager by kInject<ProcessManager>()
+    val processManager: ProcessManager by kInject()
     private val procs = processManager.processes
 
     val autoRun = processManager.autorunProperty.toFx()

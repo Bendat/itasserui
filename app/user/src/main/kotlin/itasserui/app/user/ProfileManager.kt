@@ -74,6 +74,12 @@ class ProfileManager(
             op()
     }
 
+    fun perform(user: UUID, onNotLoggedIn: () -> Unit, op: () -> Unit) {
+        if (!isLoggedIn(user))
+            onNotLoggedIn()
+        if (isLoggedIn(user))
+            op()
+    }
     fun perform(user: Username, onNotLoggedIn: () -> Unit, op: () -> Unit) {
         if (!isLoggedIn(user))
             onNotLoggedIn()

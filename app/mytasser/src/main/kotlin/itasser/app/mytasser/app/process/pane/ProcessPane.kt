@@ -3,30 +3,25 @@ package itasser.app.mytasser.app.process.pane
 import itasser.app.mytasser.app.process.newDialog.NewProcessDialog
 import itasser.app.mytasser.app.process.pane.widget.ProcessWidget
 import itasser.app.mytasser.app.process.pane.widget.dialogWindow
-import itasserui.app.mytasser.lib.DI
+import itasserui.common.logger.Logger
 import itasserui.lib.process.process.ITasser
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.scene.control.ListView
-import javafx.scene.control.ScrollPane
 import tornadofx.*
 
-class ProcessPane(di: DI, scope: Scope? = null) : View("My View") {
+class ProcessPane(scope: Scope? = null) : View("My View"), Logger {
     override val scope: Scope = scope ?: super.scope
     val model: ProcessPaneViewModel by inject()
 
-    init {
-        setInScope(di, this.scope)
-    }
-
     override val root = vbox {
-        prefHeight = 500.0
-        prefWidth = 250.0
+        info { "Processes are ${model.item.processManager.processes.all.toList()}" }
+        fitToParentWidth()
         form {
             prefWidthProperty().bind(this@vbox.prefWidthProperty())
             fieldset {
                 hbox(5) {
                     field {
-                        checkbox("...") {
+                        checkbox("Auto-execute sequences") {
                             tooltip = tooltip("If selected, new ITasser processes will run automatically")
                             this.isSelected = true
                             prefHeightProperty().bind(this@hbox.prefHeightProperty())
@@ -44,49 +39,55 @@ class ProcessPane(di: DI, scope: Scope? = null) : View("My View") {
                 }
             }
         }
-        scrollpane {
-            hbarPolicy = ScrollPane.ScrollBarPolicy.NEVER
-            squeezebox {
 
-                fold("Failed") {
-                    addClass("failed-fold")
-                    listview(model.failed) {
-                        addClass("failed-list")
-                        widget()
-                    }
+        tabpane {
+            tab("Failed") {
+                addClass("failed-tab")
+                listview(model.failed) {
+                    addClass("failed-list")
+                    widget()
                 }
-                fold("Completed") {
-                    addClass("completed-fold")
-                    listview(model.completed) {
-                        addClass("completed-list")
-                        widget()
-                    }
-                }
-                fold("Paused") {
-                    addClass("paused-fold")
-                    listview(model.paused) {
-                        addClass("paused-list")
-                        widget()
-                    }
-                }
+            }
+            tab("Completed") {
 
-                fold("Runnning") {
-                    addClass("running-fold")
+                addClass("completed-tab")
+                listview(model.completed) {
+                    addClass("completed-list")
+                    widget()
+                }
+            }
+            tab("Paused") {
+                addClass("paused-tab")
+                listview(model.paused) {
+                    addClass("paused-list")
+                    widget()
+                }
+            }
+
+            tab("Running") {
+                addClass("running-tab")
+                anchorpane {
+                    fitToParentHeight()
                     listview(model.running) {
                         addClass("running-list")
                         widget()
                     }
                 }
+            }
 
-                fold("Queued") {
-                    addClass("queued-fold")
-                    listview(model.queued) {
-                        addClass("queued-list")
-                        widget()
+            tab("Queued") {
+                addClass("queued-tab")
+                listview(model.queued) {
+                    this.selectionModelProperty().onChange { item ->
+                        info { "Changee to ${item}" }
                     }
+                    addClass("queued-list")
+                    widget()
                 }
             }
+
         }
+
     }
 
     private fun ListView<ITasser>.widget() {
