@@ -15,7 +15,7 @@ class DI(
 ) : Component(), KodeinAware, ScopedInstance
 
 
-inline fun <reified T : Any> Component.kInject(): KodeinInjector {
+fun Component.kInject(): KodeinInjector {
     return KodeinInjector { find<DI>() }
 }
 

@@ -55,7 +55,9 @@ class ITasser(
     @JsonIgnore
     val startedTimeProperty = StandardObservableProperty(0L)
     var startedTime by startedTimeProperty
-
+    @get:JsonIgnore
+    val command
+        get() = executor.command
     private var timer: Option<Timer> = None
     private val startTimesPrivate = arrayListOf<Long>()
     val startTimes: List<Long> get() = startTimesPrivate

@@ -13,12 +13,4 @@ class AbstractNewDialogSpec extends UserAppSpec<NewProcessDialog> {
         return new NewProcessDialog(testScope)
     }
 
-    protected void loginWithModal(Closure<TextInputControl> loginUserPassword) {
-        clickOn(loginUserPassword()).write(account.password.value)
-        for (int i = 0; i < 30; i++) {
-            clickOn(".login-modal .increment-arrow-button")
-        }
-
-        clickOn("#login_login")
-    }
 }

@@ -13,6 +13,7 @@ import itasserui.common.interfaces.inline.RawPassword
 import itasserui.common.interfaces.inline.Username
 import itasserui.lib.filemanager.FS
 import itasserui.lib.process.process.ITasser
+import javafx.scene.control.TextInputControl
 import javafx.scene.input.KeyCode
 import org.kodein.di.Kodein
 import tornadofx.Scope
@@ -79,6 +80,15 @@ abstract class UserAppSpec<T extends UIComponent> extends AppSpec<T> {
     protected User createUser(KodeinExtractor extractor) {
         def res = extractor.profile.new(account) as Ior.Right<NonEmptyList<RuntimeError>, User>
         res.value
+    }
+
+    protected void loginWithModal(Closure<TextInputControl> loginUserPassword) {
+        clickOn(loginUserPassword()).write(account.password.value)
+        for (int i = 0; i < 30; i++) {
+            clickOn(".login-modal .increment-arrow-button")
+        }
+
+        clickOn("#login_login")
     }
 
     @SuppressWarnings("unused")
