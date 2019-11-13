@@ -19,22 +19,32 @@ class LocalFileManager(
 ) : FileManager {
     override fun getDirectories(domain: FileDomain): Map<Subcategory, WatchedDirectory> {
         val dir = fullPath(domain)
+
+        info { "Domain is $dir" }
         return domain
             .categories
-            .map { it to dir.resolve(it.directory) }
-            .filter { Files.exists(it.second) }
-            .map { it.first to watchDirectory(it.second, domain) }
+            .map { it to watchDirectory(dir, domain, it) }
             .toMap()
+//        return domain
+//            .categories
+//            .map { it to dir.resolve(it.directory) }
+//            .map { info { "Resolution is $it" }; it }
+//            .map { if (!Files.exists(it.second)) Files.createDirectories(it.second); it }
+//            .also { info { "After creation list is $it" } }
+//            .map { it.first to watchDirectory(it.second, domain) }
+//            .also { info { "After second creation list is $it" } }
+//            .toMap()
     }
 
     override fun new(
         domain: FileDomain,
+        category: Subcategory,
         op: (DirectoryChangeEvent) -> Unit
     ): Outcome<WatchedDirectory> {
         val dir = fullPath(domain)
         return when (val res = FS.Create.directories(dir)) {
             is Either.Left -> res
-            is Either.Right -> watchDirectory(dir, domain, op).right()
+            is Either.Right -> watchDirectory(dir, domain, category, op).right()
         }
     }
 
@@ -69,21 +79,24 @@ class LocalFileManager(
     override fun watchDirectory(
         path: Path,
         domain: FileDomain,
+        category: Subcategory,
         op: (DirectoryChangeEvent) -> Unit
     ): WatchedDirectory {
         val shouldWatch = System.getProperty("itasserui.directory.watch") ?: true
         info { "Should watch $shouldWatch" }
         return when (shouldWatch) {
-            false -> createWatchedDirectory(path, domain, op)
-            else -> createWatchedDirectory(path, domain, op)
+            false -> createWatchedDirectory(path, domain, category, op)
+            else -> createWatchedDirectory(path, domain, category, op)
         }
     }
 
     private fun createUnwatchedDirectory(
-        file: FileDomain
+        file: FileDomain,
+        category: Subcategory
     ) = WatchedDirectory(
         rootDir = basedir,
         file = file,
+        subcategory = category,
         watcher = None
     ).also {
         inner += it
@@ -93,6 +106,7 @@ class LocalFileManager(
     private fun createWatchedDirectory(
         path: Path,
         domain: FileDomain,
+        category: Subcategory,
         op: (DirectoryChangeEvent) -> Unit
     ) = DirectoryWatcher
         .builder()
@@ -104,8 +118,9 @@ class LocalFileManager(
         }.build()
         .let {
             WatchedDirectory(
-                rootDir = basedir,
+                rootDir = basedir.resolve(path),
                 file = domain,
+                subcategory = category,
                 watcher = Some(it)
             )
         }.also {

@@ -7,6 +7,7 @@ import itasserui.lib.process.Arg
 import itasserui.lib.process.manager.ProcessManager
 import itasserui.lib.process.process.ITasser
 import tornadofx.ItemViewModel
+import java.nio.file.Files
 import java.nio.file.Paths
 
 class NewProcessDialogModel : ItemViewModel<NewProcessController>(NewProcessController()) {
@@ -37,9 +38,19 @@ class NewProcessDialogModel : ItemViewModel<NewProcessController>(NewProcessCont
     val light = bind(NewProcessController::lightProperty)
     val hours = bind(NewProcessController::hoursProperty)
 
-    fun moveFasta(){
+    fun moveFasta() {
+        item.seqFile?.let { seqfile ->
+            item.dataDir?.let { dataDir ->
+                Files.createDirectories(dataDir)
+                Files.copy(seqfile, dataDir)
+            }
 
+            item.outDir?.let { outDir ->
+                Files.createDirectories(outDir)
+            }
+        }
     }
+
     fun makeProcess(): ITasser {
         val optionalArgs = mapOf<String, String?>(
             Arg.HomoFlag.arg to homoFlag.value,

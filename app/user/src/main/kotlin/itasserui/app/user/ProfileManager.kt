@@ -80,6 +80,7 @@ class ProfileManager(
         if (isLoggedIn(user))
             op()
     }
+
     fun perform(user: Username, onNotLoggedIn: () -> Unit, op: () -> Unit) {
         if (!isLoggedIn(user))
             onNotLoggedIn()
@@ -122,7 +123,9 @@ class ProfileManager(
         return database.find<User> { User::username eq user.username }
             .flatMap { it.firstOrNone().toEither { NoSuchUser(user) } }
             .map {
+                info { "Building directories" }
                 val directories = fileManager.getDirectories(user)
+                info { "Directories are $directories" }
                 val profile = profiles.find { p -> p.user.username == user.username } ?: Profile(
                     user = it,
                     directories = directories.toList().map { it.second },
@@ -212,7 +215,7 @@ class ProfileManager(
 
     internal fun setupUserDirectories(user: Account) =
         fileManager
-            .new(user)
+            .new(user, user)
             .also { fileManager[user, user.categories] }
 
 

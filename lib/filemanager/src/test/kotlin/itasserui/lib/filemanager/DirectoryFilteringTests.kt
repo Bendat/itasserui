@@ -7,6 +7,7 @@ import io.kotlintest.specs.DescribeSpec
 import itasserui.common.logger.Logger
 import itasserui.common.utils.uuid
 import itasserui.lib.filemanager.FileDomain.FileCategory.Test
+import itasserui.lib.filemanager.utils.TestCategories
 import itasserui.lib.filemanager.utils.TestDomain
 import itasserui.test_utils.matchers.Be
 import java.nio.file.Files
@@ -34,7 +35,7 @@ class DirectoryFilteringTests : DescribeSpec({
 
         context("Creating a directory hierarchy under testDomain1") {
             it("Creates the domain root") {
-                fm.new(testDomain)
+                fm.new(testDomain, TestCategories.First)
             }
 
             arrayListOf(1, 2, 3, 4)
@@ -57,7 +58,7 @@ class DirectoryFilteringTests : DescribeSpec({
 
         context("Creating filler directories") {
             it("Creates the domain root") {
-                fm.new(fillerDomain)
+                fm.new(fillerDomain, TestCategories.First)
             }
 
             arrayListOf(1, 2, 3, 4)
@@ -67,7 +68,8 @@ class DirectoryFilteringTests : DescribeSpec({
                     lateinit var returnedDirectory: WatchedDirectory
                     it("Adds path $path to the file manager") {
                         fm.new(
-                            fillerDomain.copy(relativeRootName = fillerDomain.relativeRootName + path)
+                            fillerDomain.copy(relativeRootName = fillerDomain.relativeRootName + path),
+                            TestCategories.First
                         ).map { ret -> watchedDirectory = ret }
                     }
 

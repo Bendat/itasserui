@@ -25,9 +25,10 @@ interface Directory {
 class WatchedDirectory(
     override val rootDir: Path,
     override val file: FileDomain,
+    val subcategory: FileDomain.Subcategory,
     override val watcher: Option<DirectoryWatcher> = None
 ) : Path by rootDir.resolve(file.relativeRoot), Logger, Directory {
-    override val path: Path get() = rootDir.resolve(file.relativeRoot)
+    override val path: Path get() = rootDir.resolve(file.relativeRoot).resolve(subcategory.directory)
     override val realPath: Path get() = path.toAbsolutePath().toRealPath()
     val countProperty = StandardObservableProperty(0L)
     override var count: Long by countProperty
@@ -40,6 +41,8 @@ class WatchedDirectory(
     }
 
     fun update(num: Int = 0) {
+        if (!Files.exists(path))
+            Files.createDirectories(path)
         info { "Updating $num $path[${Files.list(path).toList()}]" }
         count = Files.list(path).count()
         deepCount = Files.walk(path).map {
@@ -72,21 +75,21 @@ class WatchedDirectory(
         result = 31 * result + file.category.hashCode()
         return result
     }
-//     TODO: make these return directry watchers
 
-//    override fun normalize(): Path {
-//        return
-//    }
-//
-//    override fun resolve(other: String): Path {
-//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//    }
-//
-//    override fun resolve(other: Path): Path {
-//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//    }
-//
-//    override fun toAbsolutePath(): Path {
-//        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-//    }
+    override fun normalize(): Path {
+        return path.normalize()
+    }
+
+    override fun resolve(other: String): Path {
+        return path.resolve(other)
+    }
+
+    override fun resolve(other: Path): Path {
+        return path.resolve(other)
+
+    }
+
+    override fun toAbsolutePath(): Path {
+        return path.toAbsolutePath()
+    }
 }

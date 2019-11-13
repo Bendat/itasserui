@@ -4,15 +4,18 @@ import arrow.core.Either.Right
 import itasser.app.mytasser.app.components.tornadofx.FileChooserType
 import itasser.app.mytasser.app.components.tornadofx.intConverter
 import itasser.app.mytasser.app.components.tornadofx.itFileChooser
+import itasser.app.mytasser.app.components.tornadofx.pathConverter
 import itasser.app.mytasser.app.process.pane.widget.loginModal
-import itasserui.app.user.ProfileManager.Profile
 import itasserui.common.interfaces.inline.Username
 import itasserui.common.logger.Logger
 import itasserui.lib.process.Arg
 import javafx.beans.binding.BooleanExpression
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.control.TextField
 import org.controlsfx.control.textfield.TextFields.bindAutoCompletion
 import tornadofx.*
+import java.nio.file.Files
+import java.nio.file.Paths
 import itasser.app.mytasser.app.process.newDialog.NewSequenceCss as css
 
 class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"), Logger {
@@ -27,6 +30,7 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
         prefWidth = 450.0
         prefHeight = 690.0
         lateinit var user: Field
+        val proceedDetails = SimpleBooleanProperty(false)
         form {
             fieldset {
                 user = field("User") {
@@ -37,8 +41,10 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
                         bindAutoCompletion(editor, model.users.value)
                         model.user.onChange {
                             val prof = model.item.profileManager.findUser(Username(it ?: ""))
-                            if (prof is Right)
+                            if (prof is Right) {
                                 model.item.profile = prof.b
+                                proceedDetails.value = true
+                            }
                         }
                     }
                 }
@@ -46,13 +52,17 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
         }
         separator { }
         scrollpane {
+            val canContinue = SimpleBooleanProperty(false)
+
             lateinit var nameField: TextField
             form {
-                fieldset("Sequence details") {
-                    separator { }
+                enableWhen(proceedDetails)
+                separator { }
+                fieldset("Sequence Details") {
                     field("Name") {
                         nameField = textfield(model.name) {
                             addClass(css.name)
+                            textProperty().bindBidirectional(model.name)
                             user.prefWidthProperty().bind(user.widthProperty())
                         }
                         spacer { }
@@ -68,9 +78,12 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
                         }
                     }
 
-                    field("Fasta file") {
-                        itFileChooser(model.seqFile, FileChooserType.File) {
+                    field("Fasta location") {
+                        itFileChooser(model.seqFile, FileChooserType.Directory) {
                             addClass("new-sequence-seq-file")
+                            textProperty.onChange {
+                                if (it != null && Files.exists(Paths.get(it))) canContinue.value = true
+                            }
                         }
                     }
 
@@ -78,6 +91,7 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
 
                 fieldset("ITasser Required Parameters") {
                     separator { }
+                    enableWhen(canContinue)
                     field("Sequence Name") {
                         textfield(model.seqName) {
                             addClass(css.sequenceName)
@@ -95,11 +109,10 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
 
                     field("Data Directory") {
                         itFileChooser(model.dataDir, FileChooserType.Directory, disableManual = true) {
+                            textProperty.bindBidirectional(model.dataDir, pathConverter)
                             addClass(css.dataDir)
-                            model.item.profileProperty.onChange {
-                                text = if (it is Profile)
-                                    it.dataDir.path.toString()
-                                else ""
+                            model.name.onChange { value ->
+                                text = model.item.profile?.dataDir?.resolve(value ?: "/no-user-defined").toString()
                             }
                         }
                     }
@@ -107,10 +120,9 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
                     field("Out Directory") {
                         itFileChooser(model.outDir, FileChooserType.Directory, disableManual = true) {
                             addClass(css.outDir)
-                            model.item.profileProperty.onChange {
-                                text = if (it is Profile)
-                                    it.outDir.path.toString()
-                                else ""
+                            model.name.onChange { value ->
+                                text = model.item.profile?.outDir?.resolve(value ?: "/no-user-defined").toString()
+
                             }
                         }
                     }
@@ -278,6 +290,7 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
                                     .perform(username, { loginModal(username.value) }) {
                                         model.commit()
                                         if (model.isValid) {
+                                            model.moveFasta()
                                             model.makeProcess()
                                             currentStage?.close()
                                         }

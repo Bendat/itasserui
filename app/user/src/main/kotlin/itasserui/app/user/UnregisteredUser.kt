@@ -11,7 +11,7 @@ import itasserui.lib.filemanager.FileDomain.FileCategory.Users
 import itasserui.lib.filemanager.FileDomain.Subcategory
 import java.util.*
 
-interface Account : FileDomain {
+interface Account : FileDomain, Subcategory {
     val username: Username
     val password: Password
     val emailAddress: EmailAddress
@@ -25,6 +25,8 @@ data class UnregisteredUser(
     override val emailAddress: EmailAddress,
     override val isAdmin: Boolean = false
 ) : Account {
+    override val name: String
+        get() = username.value
     override val category: FileCategory
         get() = Users
     override val relativeRootName: String

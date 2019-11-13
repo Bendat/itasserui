@@ -32,7 +32,7 @@ class CreateDirectoryTest : DescribeSpec({
         )
 
         it("Creates a new directory") {
-            fm.new(domain = testDomain){
+            fm.new(domain = testDomain, category = TestCategories.First){
                 print("Directory Change $it")
             }.map { watchedDirectory = it } as OK
         }

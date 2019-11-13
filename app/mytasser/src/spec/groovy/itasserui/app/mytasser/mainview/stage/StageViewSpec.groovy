@@ -30,7 +30,7 @@ class StageViewSpec extends UserAppSpec<MainView> {
                 dataDir
         )
         event = new EventShooter(testScope)
-        extractor.profile.login(user.username, account.password, Duration.ofMinutes(1))
+        extractor.profile.login(user.username, account.password, Duration.ofMinutes(5))
         return new MainView(testScope)
     }
 

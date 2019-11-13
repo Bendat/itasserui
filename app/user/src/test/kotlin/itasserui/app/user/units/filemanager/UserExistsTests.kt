@@ -9,17 +9,17 @@ import itasserui.test_utils.matchers.Be
 class UserExistsTests : DescribeSpec({
     val data = SetupObject()
 
-    describe("User Exists Tests") {
-        it("Verifies the profile manager cannot find an existing users file") {
-            data.pm.existsInFileSystem(data.user) should be(false)
-        }
-
-        it("Creates a user file manually") {
-            data.pm.fileManager.new(data.user) should Be.ok()
-        }
-
-        it("Verifies the profile manager can find an existing users file") {
-            data.pm.existsInFileSystem(data.user) should be(true)
-        }
-    }
+//    describe("User Exists Tests") {
+//        it("Verifies the profile manager cannot find an existing users file") {
+//            data.pm.existsInFileSystem(data.user) should be(false)
+//        }
+//
+//        it("Creates a user file manually") {
+//            data.pm.fileManager.new(data.user, ) should Be.ok()
+//        }
+//
+//        it("Verifies the profile manager can find an existing users file") {
+//            data.pm.existsInFileSystem(data.user) should be(true)
+//        }
+//    }
 })
