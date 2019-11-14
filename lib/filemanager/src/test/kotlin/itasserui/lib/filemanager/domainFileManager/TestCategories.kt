@@ -1,4 +1,4 @@
-package itasserui.lib.filemanager.manager
+package itasserui.lib.filemanager.domainFileManager
 
 import itasserui.lib.filemanager.FileDomain
 

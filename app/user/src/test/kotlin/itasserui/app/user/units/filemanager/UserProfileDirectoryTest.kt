@@ -6,7 +6,7 @@ import io.kotlintest.specs.DescribeSpec
 import itasserui.app.user.UserMocks
 import itasserui.app.user.units.utils.SetupObject
 import itasserui.common.`typealias`.OK
-import itasserui.lib.filemanager.WatchedDirectory
+import itasserui.lib.filemanager.DomainDirectory
 
 class UserProfileDirectoryTest : DescribeSpec({
 //    describe("Setting up subcategory directories") {

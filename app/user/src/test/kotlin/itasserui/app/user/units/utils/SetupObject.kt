@@ -3,8 +3,7 @@ package itasserui.app.user.units.utils
 import io.kotlintest.shouldBe
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.UserMocks
-import itasserui.lib.filemanager.FileManager
-import itasserui.lib.filemanager.LocalFileManager
+import itasserui.lib.filemanager.DomainFileManager
 import itasserui.lib.store.Database
 import itasserui.lib.store.Database.PersistentDatabase
 import itasserui.test_utils.matchers.Be
@@ -23,9 +22,9 @@ internal class SetupObject(val testRoot: Path = Files.createTempDirectory("itass
         Kodein.Module("Test Module") {
             val db = PersistentDatabase(testRoot, "Test Database", "Admin", "Admin")
                 .also { it.launch() shouldBe Be.none() }
-            val fm = LocalFileManager(testRoot)
+            val fm = DomainFileManager(testRoot)
             bind<Database>() with singleton { db }
-            bind<FileManager>() with singleton { fm }
+            bind<DomainFileManager>() with singleton { fm }
             bind<ProfileManager>() with singleton { ProfileManager(fm, db) }
         }
     val kodein = ConfigurableKodein(mutable = true).also { it.addImport(testModule) }

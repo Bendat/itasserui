@@ -7,7 +7,6 @@ import itasserui.common.utils.uuid
 import itasserui.lib.filemanager.DomainDirectory
 import itasserui.lib.filemanager.DomainFileManager
 import itasserui.lib.filemanager.FileDomain
-import itasserui.lib.filemanager.manager.TestCategories
 import itasserui.lib.filemanager.utils.TestDomain
 import java.nio.file.Files
 

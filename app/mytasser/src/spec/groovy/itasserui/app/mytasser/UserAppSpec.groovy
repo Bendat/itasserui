@@ -26,7 +26,6 @@ import static java.util.UUID.randomUUID
 
 abstract class UserAppSpec<T extends UIComponent> extends AppSpec<T> {
     private ITasserSettings settings = new ITasserSettings(tmpdirPath, libdir, javaHome, datadir, "gnuparallel", randomUUID())
-    Path dataDir = null
     UnregisteredUser account = new UnregisteredUser(
             new Username(Fake.name().username()),
             new RawPassword(Fake.internet().password()),
@@ -64,7 +63,6 @@ abstract class UserAppSpec<T extends UIComponent> extends AppSpec<T> {
         extractor.db.launch()
         user = createUser(extractor)
         extractor.profile.getUserDir(user, User.UserCategory.DataDir)
-                .map { dataDir = it.toAbsolutePath() }
         def ls = new ArrayList<String>()
         ls.add(file.toAbsolutePath().toString())
         extractor.proc.autoRun = false

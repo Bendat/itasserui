@@ -5,6 +5,7 @@ import itasser.app.mytasser.app.mainview.consoletab.SelectedSequenceEvent
 import itasser.app.mytasser.views.MainView
 import itasserui.app.mytasser.UserAppSpec
 import itasserui.common.utils.SafeWaitKt
+import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.process.ITasser
 
 import java.time.Duration
@@ -20,14 +21,17 @@ class StageViewSpec extends UserAppSpec<MainView> {
         ls.add(file.toAbsolutePath().toString())
         ls.add("-hello")
         ls.add("-world")
+        println("File is $file")
         itasser = extractor.proc.new(
                 UUID.randomUUID(),
                 0,
                 file,
-                file.fileName.toString(),
+                "Hello",
                 ls,
                 user.id,
-                dataDir
+                datadir,
+                datadir,
+                ExecutionState.Queued.INSTANCE
         )
         event = new EventShooter(testScope)
         extractor.profile.login(user.username, account.password, Duration.ofMinutes(5))
