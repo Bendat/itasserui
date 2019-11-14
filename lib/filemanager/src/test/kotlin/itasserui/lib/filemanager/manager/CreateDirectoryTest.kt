@@ -7,6 +7,7 @@ import itasserui.common.`typealias`.OK
 import itasserui.common.logger.Logger
 import itasserui.common.utils.safeWait
 import itasserui.common.utils.uuid
+import itasserui.lib.filemanager.FileDomain
 import itasserui.lib.filemanager.FileDomain.FileCategory.Test
 import itasserui.lib.filemanager.FileManager
 import itasserui.lib.filemanager.LocalFileManager
@@ -32,7 +33,7 @@ class CreateDirectoryTest : DescribeSpec({
         )
 
         it("Creates a new directory") {
-            fm.new(domain = testDomain, category = TestCategories.First){
+            fm.new(domain = testDomain, category = FileDomain.NoSubCategoryProxy){
                 print("Directory Change $it")
             }.map { watchedDirectory = it } as OK
         }

@@ -124,6 +124,11 @@ class LocalFileManager(
                 watcher = Some(it)
             )
         }.also {
+            if (category is FileDomain.NoSubCategoryProxy)
+                domain.categories.forEach { category ->
+                    info { "Printing category $category" }
+                    new(domain, category)
+                }
             inner += it
         }
 

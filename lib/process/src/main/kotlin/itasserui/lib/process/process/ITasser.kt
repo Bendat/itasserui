@@ -140,8 +140,9 @@ class ITasser(
                 .sum() + abs(currentTimeMillis() - startTimes.last())
         }
 
-        internal fun start(): Outcome<StartedProcess> {
-            return Try { processExecutor.start() }
+        internal fun start(): Outcome<StartedProcess> = when (state) {
+            is Completed -> Left(ProcessError.ProcessCompletedError(process.name, process.id))
+            else -> Try { processExecutor.start() }
                 .toEither { e -> FailedStart(process.name, e).also { errors += it } }
                 .map { process -> process.also { realProcess = Some(process) } }
                 .map { process ->
@@ -149,6 +150,7 @@ class ITasser(
                     future = Some(process.future)
                     process
                 }
+
         }
 
         fun await(): Outcome<ProcessResult> = realProcess

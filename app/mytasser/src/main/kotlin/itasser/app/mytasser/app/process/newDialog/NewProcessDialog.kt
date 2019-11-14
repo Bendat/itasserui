@@ -122,7 +122,6 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
                             addClass(css.outDir)
                             model.name.onChange { value ->
                                 text = model.item.profile?.outDir?.resolve(value ?: "/no-user-defined").toString()
-
                             }
                         }
                     }

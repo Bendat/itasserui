@@ -201,7 +201,7 @@ class ProfileManager(
             .map { user }
 
     fun getUserDir(user: User, category: UserCategory) =
-        fileManager[user].map { it.path.resolve(category.directory) }
+        fileManager[user].map { it.unixPath.resolve(category.directory) }
 
     private fun trySaveToDb(user: User): Outcome<User> = when (val exists = existsInDatabase(user)) {
         is None -> saveToDb(user)

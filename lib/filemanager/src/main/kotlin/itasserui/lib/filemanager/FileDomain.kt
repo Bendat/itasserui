@@ -5,6 +5,7 @@ package itasserui.lib.filemanager
 import com.fasterxml.jackson.annotation.JsonIgnore
 import itasserui.common.interfaces.Identifiable
 import java.nio.file.Path
+import java.nio.file.Paths
 
 interface FileDomain : Identifiable {
     @get:JsonIgnore
@@ -31,7 +32,13 @@ interface FileDomain : Identifiable {
     interface Subcategory {
         val name: String
         val directory: Path
-            get() =
-                FS[name.toLowerCase()]
+            get() = FS[name.toLowerCase()]
     }
+
+    interface NoSubCategory : Subcategory {
+        override val name get() = ""
+        override val directory get() = Paths.get("")
+    }
+
+    object NoSubCategoryProxy : NoSubCategory
 }

@@ -1,6 +1,8 @@
 package itasser.app.mytasser.app.mainview.consoletab
 
+import itasser.app.mytasser.app.process.pane.widget.WidgetCss
 import itasser.app.mytasser.app.process.pane.widget.loginModal
+import itasser.app.mytasser.app.styles.MainStylee
 import itasserui.app.mytasser.lib.kInject
 import itasserui.common.extensions.unless
 import itasserui.lib.process.details.ProcessOutput
@@ -31,17 +33,48 @@ class ConsoleView(scope: Scope? = null) : View("ITasser console") {
         }
 
         hbox {
+            spacer()
             maxHeight = 80.0
-            button("Play") {
+            val ricon = imageview(model.runPauseIcon) {
+                addClass(MainStylee.paddedImage2)
+                addClass("process-widget-run-pause-icon")
+                fitHeight = 32.0
+                isPreserveRatio = true
+            }
+            button(graphic = ricon) {
+                addClass(MainStylee.transparentButton)
+                addClass(WidgetCss.controlButton)
                 setOnMouseClicked {
-                    model.perform({loginModal("")}){
+                    model.perform({ loginModal("") }) {
                         processManager.run(it)
                     }
                 }
             }
-            button("Stop"){
+            val dicon = imageview(model.stopIcon) {
+                addClass(MainStylee.paddedImage2)
+                addClass("process-widget-run-pause-icon")
+                fitHeight = 32.0
+                isPreserveRatio = true
+            }
+            button(graphic = dicon) {
+                addClass(MainStylee.transparentButton)
+                addClass(WidgetCss.controlButton)
+
                 processManager
             }
+            val cicon = imageview(model.copyIcon) {
+                addClass(MainStylee.paddedImage2)
+                addClass("process-widget-run-pause-icon")
+                fitHeight = 32.0
+                isPreserveRatio = true
+            }
+            button(graphic = cicon) {
+                setOnMouseClicked {
+                    clipboard.putString(model.item.stdStream.joinToString { outMapper(it).text })
+                }
+            }
+            spacer()
+
         }
     }
 }

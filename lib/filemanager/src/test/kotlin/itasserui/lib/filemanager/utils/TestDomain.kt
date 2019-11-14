@@ -8,7 +8,7 @@ data class TestDomain(
     override val category: FileDomain.FileCategory,
     override val relativeRootName: String,
     override val id: UUID,
-    override val categories: List<Subcategory> = listOf()
+    override val categories: List<Subcategory> = TestCategories.values().toList()
 ) : FileDomain
 
 enum class TestCategories: Subcategory{

@@ -35,7 +35,7 @@ class DirectoryFilteringTests : DescribeSpec({
 
         context("Creating a directory hierarchy under testDomain1") {
             it("Creates the domain root") {
-                fm.new(testDomain, TestCategories.First)
+                fm.new(testDomain)
             }
 
             arrayListOf(1, 2, 3, 4)

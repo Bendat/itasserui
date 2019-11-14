@@ -1,6 +1,7 @@
 package itasserui.lib.process
 
 import itasserui.common.errors.RuntimeError
+import java.util.*
 
 typealias Timeout = ProcessError.ProcessExceptionError.TimeoutError
 typealias TerminationError = ProcessError.ProcessExceptionError.TerminationError
@@ -31,5 +32,10 @@ sealed class ProcessError : RuntimeError() {
 
     class NoProcessError(
         override val processName: String
+    ) : ProcessError()
+
+    class ProcessCompletedError(
+        override val processName: String,
+        val id: UUID
     ) : ProcessError()
 }

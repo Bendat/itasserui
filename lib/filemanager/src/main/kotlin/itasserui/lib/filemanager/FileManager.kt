@@ -67,7 +67,7 @@ interface FileManager : Logger {
 
     fun new(
         domain: FileDomain,
-        category: Subcategory,
+        category: Subcategory = FileDomain.NoSubCategoryProxy,
         op: (DirectoryChangeEvent) -> Unit = {}
     ): Outcome<WatchedDirectory>
 
