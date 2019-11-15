@@ -13,6 +13,7 @@ import itasserui.common.`typealias`.Err
 import itasserui.common.`typealias`.OK
 import itasserui.common.`typealias`.Outcome
 import itasserui.common.errors.RuntimeError
+import itasserui.common.extensions.ifTrue
 import itasserui.common.extensions.isFalse
 import itasserui.common.interfaces.inline.EmailAddress
 import itasserui.common.interfaces.inline.RawPassword
@@ -39,7 +40,7 @@ class ProfileManager(
     val id = uuid
     val profiles: ObservableList<Profile> = ObservableListWrapper()
     val sessions: Map<UUID, Session?> = mutableMapOf()
-
+    val activeSessions get() = sessions.filter{it.value?.isActive == true}
     data class Session(val start: Long, val duration: Duration) {
         val sessionTimeRemaining: Long get() = start + duration.toMillis() - currentTimeMillis()
         @Suppress("MemberVisibilityCanBePrivate", "unused")
@@ -64,6 +65,7 @@ class ProfileManager(
     fun getAdmin(password: RawPassword): Outcome<User> {
         val results = database.read<User> { Account::isAdmin eq true }
         lateinit var user: User
+        true.ifTrue {  }
         return results
             .map { it.first() }
             .map { user = it; it }
@@ -127,24 +129,30 @@ class ProfileManager(
         return database.find<User> { User::username eq user.username }
             .flatMap { it.firstOrNone().toEither { NoSuchUser(user) } }
             .map {
-                info { "Building directories" }
                 val found = fileManager[user]
                 val directory: DomainDirectory = found ?: fileManager.new(user)
                 val directories = directory?.subdirectories
-                info { "Directories are $directories" }
-                val profile = profiles.find { p -> p.user.username == user.username } ?: Profile(
-                    user = it,
-                    directories = directories,
-                    dataDir = directory[DataDir],
-                    outDir = directory[OutDir],
-                    settings = directory[Settings],
-                    manager = this
-                )
-                info { "Profiles are ${profiles.find { it.user.id == user.id }} " }
+                val profile = findOrCreateProfile(user, it, directories, directory)
                 profiles += profile
                 addSession(profile.user, session)
                 profile
             }
+    }
+
+    private fun findOrCreateProfile(
+        user: User,
+        it: User,
+        directories: List<SubdomainDirectory>,
+        directory: DomainDirectory
+    ): Profile {
+        return profiles.find { p -> p.user.username == user.username } ?: Profile(
+            user = it,
+            directories = directories,
+            dataDir = directory[DataDir],
+            outDir = directory[OutDir],
+            settings = directory[Settings],
+            manager = this
+        )
     }
 
     fun login(

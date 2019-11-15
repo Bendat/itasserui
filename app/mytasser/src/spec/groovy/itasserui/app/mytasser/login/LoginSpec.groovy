@@ -28,16 +28,13 @@ abstract class LoginSpec extends AppSpec<LoginModal> {
     }
 
     void setup() {
-        setup:
         def user = new UnregisteredUser(new Username(username), new RawPassword(password), new EmailAddress(email), false).toUser(UUID.randomUUID())
         timeUnit = lookup("#timeout_unit")
 
-        expect:
         "The combobox to have ${LoginModal.LoginDuration.values().size()}"
         FxAssert.verifyThat(timeUnit, ComboBoxMatchers.hasItems(3))
         FxAssert.verifyThat(timeUnit, ComboBoxMatchers.hasSelectedItem(LoginModal.LoginDuration.Seconds))
 
-        and:
         "A new user $username to exist in the database"
         view.model.item.profileManager.database.launch()
         view.model.item.profileManager.new(user)

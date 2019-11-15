@@ -39,9 +39,6 @@ class LoginModalController : Controller(), Logger {
     val durationProperty = SimpleObjectProperty<Int>()
     val duration: Int by durationProperty
 
-    val sessionProperty = SimpleObjectProperty<Option<Profile>>(None)
-    var profile: Option<Profile> by sessionProperty
-
     val loginErrorProperty = SimpleObjectProperty<Option<RuntimeError>>(None)
     var loginError: Option<RuntimeError> by loginErrorProperty
 
@@ -55,9 +52,6 @@ class LoginModalController : Controller(), Logger {
             it.also { err ->
                 loginError = Some(err)
             }
-        }.map {
-            profile = Some(it)
-            it
         }
 
 

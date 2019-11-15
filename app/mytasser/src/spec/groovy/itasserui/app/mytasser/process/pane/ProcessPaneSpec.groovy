@@ -31,7 +31,7 @@ class ProcessPaneSpec extends UserAppSpec<ProcessPane> {
                 file.fileName.toString(),
                 ls,
                 user.id,
-                dataDir
+                datadir
         )
         return view
     }
