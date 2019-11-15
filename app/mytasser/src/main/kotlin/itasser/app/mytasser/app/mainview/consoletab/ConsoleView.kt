@@ -13,6 +13,7 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import javafx.util.StringConverter
+import org.controlsfx.control.Notifications
 import tornadofx.*
 
 class ConsoleView(scope: Scope? = null) : View("ITasser console") {
@@ -21,11 +22,15 @@ class ConsoleView(scope: Scope? = null) : View("ITasser console") {
     val processManager: ProcessManager by kInject()
     override val root = vbox {
 
-        textfield(model.command) { isEditable = false }
+        textfield(model.command) {
+            addClass("sequence-console-command")
+            isEditable = false
+        }
         scrollpane {
             isFitToHeight = true
             isFitToWidth = true
             textflow {
+                addClass("console-view-textflow")
                 prefHeight = 450.0
                 prefWidth = 450.0
                 bindChildren(model.stream.value, outMapper)
@@ -37,13 +42,15 @@ class ConsoleView(scope: Scope? = null) : View("ITasser console") {
             maxHeight = 80.0
             val ricon = imageview(model.runPauseIcon) {
                 addClass(MainStylee.paddedImage2)
-                addClass("process-widget-run-pause-icon")
+                addClass("console-widget-run-pause-icon")
                 fitHeight = 32.0
                 isPreserveRatio = true
             }
             button(graphic = ricon) {
                 addClass(MainStylee.transparentButton)
                 addClass(WidgetCss.controlButton)
+                model.executionStateProperty
+                    .addListener { _, _, new -> model.setRunPlayIcon(new) }
                 setOnMouseClicked {
                     model.perform({ loginModal("") }) {
                         processManager.run(it)
@@ -71,6 +78,9 @@ class ConsoleView(scope: Scope? = null) : View("ITasser console") {
             button(graphic = cicon) {
                 setOnMouseClicked {
                     clipboard.putString(model.item.stdStream.joinToString { outMapper(it).text })
+                    Notifications.create()
+                        .text("Copied output to clipboard")
+                        .showInformation()
                 }
             }
             spacer()
@@ -85,6 +95,7 @@ val outMapper
             STDType.Err -> Text("[${item.timestamp.toString("MM-dd HH:mm:ss")}]: ${item.item}\n")
             else -> Text("[${item.timestamp.toString("MM-dd HH:mm:ss")}]: ${item.item}\n")
         }.apply { { fill = Color.RED } unless (item.stdType == STDType.Out) }
+            .apply { if (item.stdType is STDType.Err) addClass("err-text") }
     }
 
 val commandConverter

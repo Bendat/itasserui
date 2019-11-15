@@ -1,5 +1,6 @@
 package itasserui.lib.filemanager
 
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -13,7 +14,7 @@ class DomainFileManager(val basedir: Path) {
     }
 
     fun exists(domain: FileDomain) =
-        domains.any { it.key == domain }
+        domains.any { it.key == domain } || Files.exists(basedir.resolve(domain.relativeRoot))
 
     fun fullPath(domain: FileDomain) =
         domains[domain]?.unixPath ?: Paths.get("/No-file-found-for-domain$domain")

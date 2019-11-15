@@ -1,15 +1,17 @@
 package itasser.app.mytasser.app.mainview.tabpane
 
-import tornadofx.View
-import tornadofx.tab
-import tornadofx.tabpane
+import itasser.app.mytasser.app.mainview.consoletab.ConsoleView
+import tornadofx.*
 
-class MainViewTabPane : View("ITasser Tab View") {
+class MainViewTabPane(scope: Scope? = null) : View("ITasser Tab View") {
+    override val scope = scope ?: super.scope
     override val root = tabpane {
-        tab("Hello"){
-
+        maxWidth = Double.MAX_VALUE
+        prefWidth = 500.0
+        tab("Sequence") {
+            addChildIfPossible(ConsoleView(scope).root)
         }
 
-        tab("World")
+        tab("3D Viewer")
     }
 }

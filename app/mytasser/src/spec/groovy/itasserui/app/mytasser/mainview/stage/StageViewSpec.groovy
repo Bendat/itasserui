@@ -40,7 +40,7 @@ class StageViewSpec extends UserAppSpec<MainView> {
 
     void "Lets see"() {
         given:
-        event.fire(new SelectedSequenceEvent(itasser))
+//        event.fire(new SelectedSequenceEvent(itasser))
         SafeWaitKt.safeWait(1000)
 //        itasser.executor.start$process()
 

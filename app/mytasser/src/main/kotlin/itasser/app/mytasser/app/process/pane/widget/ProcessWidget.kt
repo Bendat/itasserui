@@ -14,6 +14,7 @@ import itasserui.lib.process.process.ITasser
 import javafx.animation.AnimationTimer
 import javafx.event.EventTarget
 import javafx.scene.control.Dialog
+import javafx.scene.image.ImageView
 import javafx.util.StringConverter
 import org.joda.time.DateTime
 import org.kodein.di.generic.instance
@@ -61,31 +62,29 @@ class ProcessWidget(
 
     override val root = vbox {
         prefWidth = 150.0
-        prefHeight = 100.0
         addClass(itasser.process.id.toString())
         addStylesheet(MainStylee::class)
         info { "ITasser is ${itasser.process.name}" }
+        fun EventTarget.icon(url: String): ImageView {
+            return imageview(resources.image(url)) {
+                this.isSmooth = true
+                addClass(paddedImage2)
+                fitHeight = iconHeight
+                isPreserveRatio = true
+            }
+        }
         hbox(10) {
             borderpane {
                 left {
                     vbox {
                         hbox(10) {
-                            imageview(resources.image("/icons/users.png")) {
-                                addClass(paddedImage2)
-                                fitHeight = iconHeight
-                                isPreserveRatio = true
-                            }
+                            icon("/icons/users.png")
                             label(model.username) {
                                 addClass("process-widget-username-label")
                             }
                         }
                         hbox(10) {
-                            imageview(resources.image("/icons/stopwatch.png")) {
-                                this.isSmooth = true
-                                addClass(paddedImage2)
-                                fitHeight = iconHeight
-                                isPreserveRatio = true
-                            }
+                            icon("/icons/stopwatch.png")
                             val timerLabel = label {
                                 addClass(WidgetCss.timerLabel)
                             }
@@ -104,28 +103,9 @@ class ProcessWidget(
                 right {
                     vbox {
                         hbox(10) {
-                            imageview(resources.image("/icons/clock.png")) {
-                                this.isSmooth = true
-                                addClass(paddedImage2)
-                                fitHeight = iconHeight
-                                isPreserveRatio = true
-                            }
+                            icon("/icons/clock.png")
                             label(model.startTime, converter = date) {
                                 addClass(WidgetCss.startDate)
-                                if (model.startTime.value == 0L) isVisible = false
-                                textProperty().addListener { _, _, _ -> isVisible = true }
-                            }
-                        }
-                        hbox(10) {
-                            imageview(resources.image("/icons/clock.png")) {
-                                this.isSmooth = true
-                                addClass(paddedImage2)
-                                fitHeight = iconHeight
-                                isPreserveRatio = true
-                                isVisible = false
-                            }
-                            label(model.startTime, converter = time) {
-                                addClass(WidgetCss.startTime)
                                 if (model.startTime.value == 0L) isVisible = false
                                 textProperty().addListener { _, _, _ -> isVisible = true }
                             }
@@ -135,19 +115,13 @@ class ProcessWidget(
             }
         }
         hbox(10) {
-
-            imageview(resources.image("/icons/dna.png")) {
-                this.isSmooth = true
-                addClass(paddedImage2)
-                fitHeight = iconHeight
-                isPreserveRatio = true
-            }
+            icon("/icons/dna.png")
             label(itasser.process.name) {
                 addClass(WidgetCss.sequenceName)
             }
         }
 
-        hbox(2) {
+        hbox(10) {
             val ricon = imageview(model.runPauseIcon) {
                 addClass(paddedImage2)
                 addClass("process-widget-run-pause-icon")

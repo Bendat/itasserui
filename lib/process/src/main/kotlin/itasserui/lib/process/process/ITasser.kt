@@ -151,7 +151,7 @@ class ITasser(
                     process
                 }
 
-        }
+        }.also { info { "Starting process ${process.name} with result $it" } }
 
         fun await(): Outcome<ProcessResult> = realProcess
             .toEither { ProcessError.NoProcessError("realProcess") }
