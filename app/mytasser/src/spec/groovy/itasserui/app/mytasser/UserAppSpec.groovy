@@ -5,6 +5,7 @@ import arrow.data.NonEmptyList
 import itasser.app.mytasser.kodeinmodules.DependencyInjector
 import itasser.app.mytasser.lib.DI
 import itasser.app.mytasser.lib.ITasserSettings
+import itasserui.app.user.Account
 import itasserui.app.user.UnregisteredUser
 import itasserui.app.user.User
 import itasserui.common.errors.RuntimeError
@@ -71,8 +72,8 @@ abstract class UserAppSpec<T extends UIComponent> extends AppSpec<T> {
     }
 
     @SuppressWarnings("unused")
-    private ITasser newProcess(KodeinExtractor extractor, Path file, ArrayList<String> ls, User user) {
-        extractor.proc.new(randomUUID(), 0, file, file.fileName.toString(), ls, user.id, dataDir)
+    protected ITasser newProcess(ArrayList<String> ls, User user) {
+        extractor.proc.new(randomUUID(), 0, file, fake.ancient().god(), ls, user.id, datadir)
     }
 
     protected User createUser(KodeinExtractor extractor) {
@@ -80,8 +81,10 @@ abstract class UserAppSpec<T extends UIComponent> extends AppSpec<T> {
         res.value
     }
 
-    protected void loginWithModal(Closure<TextInputControl> loginUserPassword) {
-        clickOn("#username_field").write(account.username.value)
+    protected void loginWithModal(Closure<TextInputControl> loginUserPassword,
+                                  Account account = this.account,
+                                  Boolean useUsername = true) {
+        if (useUsername) clickOn("#username_field").write(account.username.value)
         clickOn(loginUserPassword()).write(account.password.value)
         for (int i = 0; i < 30; i++) {
             clickOn(".login-modal .increment-arrow-button")

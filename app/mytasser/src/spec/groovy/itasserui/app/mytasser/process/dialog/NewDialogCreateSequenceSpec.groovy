@@ -3,26 +3,41 @@ package itasserui.app.mytasser.process.dialog
 import itasser.app.mytasser.app.process.newDialog.NewSequenceCss
 import itasserui.common.utils.SafeWaitKt
 
+import static itasser.app.mytasser.app.process.newDialog.NewSequenceCss.*
+
 class NewDialogCreateSequenceSpec extends AbstractNewDialogSpec {
+    void "Sequence details should be disabled until user selected"() {
+        given: "A user"
+        def user = account
+
+        and: "A locator for the sequence details fieldset"
+
+        when: "The username is entered"
+        clickOn(userField.render()).write(user.username.value)
+
+        then: "The New Sequence Details should be enabled"
+
+
+    }
 
     void "Verifies the sequence name and required dirs are autofilled"() {
         given: "Controls fields"
-        def createButton = lookup(NewSequenceCss.createButton.render()).queryButton()
-        def errorPrompt = { -> lookup(NewSequenceCss.errorLabel.render()).queryLabeled() }
-        def userField = lookup(NewSequenceCss.userField.render()).queryComboBox()
-        def description = lookup(NewSequenceCss.description.render()).queryTextInputControl()
-        def name = lookup(NewSequenceCss.name.render()).queryTextInputControl()
-        def seqName = lookup(NewSequenceCss.sequenceName.render()).queryTextInputControl()
-        def datadir = lookup("${NewSequenceCss.dataDir.render()} .text-input").queryTextInputControl()
-        def outdir = lookup("${NewSequenceCss.outDir.render()} .text-input").queryTextInputControl()
+        def createButton = lookup(createButton.render()).queryButton()
+        def errorPrompt = { -> lookup(errorLabel.render()).queryLabeled() }
+        def userField = lookup(userField.render()).queryComboBox()
+        def description = lookup(description.render()).queryTextInputControl()
+        def name = lookup(name.render()).queryTextInputControl()
+        def seqName = lookup(sequenceName.render()).queryTextInputControl()
+        def datadir = lookup("${dataDir.render()} .text-input").queryTextInputControl()
+        def outdir = lookup("${outDir.render()} .text-input").queryTextInputControl()
 
         and: "Login dialog fields"
         def loginUserPassword = { -> lookup("#password_field").queryTextInputControl() }
 
         when: "Logging in and completing form"
-        clickOn("$userField .text-field").write(account.username.value)
+        clickOn(userField).write(user.username.value)
         clickOn(createButton)
-        loginWithModal(loginUserPassword)
+        loginWithModal(loginUserPassword, account, false)
         clickOn(name).write("Amoxyl Dioxyn Junior")
         clickOn(description).write("This boys got a lot amoxy")
 
@@ -34,22 +49,22 @@ class NewDialogCreateSequenceSpec extends AbstractNewDialogSpec {
         seqName.text == name.text
     }
 
-    void "Wait"(){
+    void "Wait"() {
         expect:
         SafeWaitKt.safeWait(10000)
     }
 
     void "Verifies creating the sequence"() {
         given: "Controls fields"
-        def createButton = lookup(NewSequenceCss.createButton.render()).queryButton()
-        def errorPrompt = { -> lookup(NewSequenceCss.errorLabel.render()).queryLabeled() }
-        def userField = lookup(NewSequenceCss.userField.render()).queryComboBox()
-        def description = lookup(NewSequenceCss.description.render()).queryTextInputControl()
-        def name = lookup(NewSequenceCss.name.render()).queryTextInputControl()
-        def seqName = lookup(NewSequenceCss.sequenceName.render()).queryTextInputControl()
+        def createButton = lookup(createButton.render()).queryButton()
+        def errorPrompt = { -> lookup(errorLabel.render()).queryLabeled() }
+        def userField = lookup(userField.render()).queryComboBox()
+        def description = lookup(description.render()).queryTextInputControl()
+        def name = lookup(name.render()).queryTextInputControl()
+        def seqName = lookup(sequenceName.render()).queryTextInputControl()
         def seqFileField = lookup(".new-sequence-seq-file .file-chooser-input").queryTextInputControl()
-        def datadir = lookup("${NewSequenceCss.dataDir.render()} .text-input").queryTextInputControl()
-        def outdir = lookup("${NewSequenceCss.outDir.render()} .text-input").queryTextInputControl()
+        def datadir = lookup("${dataDir.render()} .text-input").queryTextInputControl()
+        def outdir = lookup("${outDir.render()} .text-input").queryTextInputControl()
 
         and: "Login dialog fields"
         def loginUserPassword = { -> lookup("#password_field").queryTextInputControl() }

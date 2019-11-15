@@ -18,7 +18,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import itasser.app.mytasser.app.process.newDialog.NewSequenceCss as css
 
-class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"), Logger {
+class NewSequenceDialog(scope: Scope? = null) : View("Create New ITasser Process"), Logger {
     override val scope: Scope = scope ?: super.scope
     val model: NewProcessDialogModel by inject()
     override val complete: BooleanExpression = model.valid(
@@ -57,8 +57,9 @@ class NewProcessDialog(scope: Scope? = null) : View("Create New ITasser Process"
             lateinit var nameField: TextField
             form {
                 enableWhen(proceedDetails)
+                addClass("protein-details-")
                 separator { }
-                fieldset("Sequence Details") {
+                fieldset("protein Details") {
                     field("Name") {
                         nameField = textfield(model.name) {
                             addClass(css.name)

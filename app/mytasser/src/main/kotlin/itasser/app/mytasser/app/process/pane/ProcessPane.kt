@@ -1,7 +1,7 @@
 package itasser.app.mytasser.app.process.pane
 
 import itasser.app.mytasser.app.mainview.consoletab.SelectedSequenceEvent
-import itasser.app.mytasser.app.process.newDialog.NewProcessDialog
+import itasser.app.mytasser.app.process.newDialog.NewSequenceDialog
 import itasser.app.mytasser.app.process.pane.widget.ProcessWidget
 import itasser.app.mytasser.app.process.pane.widget.dialogWindow
 import itasser.app.mytasser.app.styles.MainStylee
@@ -37,7 +37,7 @@ class ProcessPane(scope: Scope? = null) : View("My View"), Logger {
                     button(graphic = cicon) {
                         tooltip("Add new ITASSER sequence")
                         setOnMouseClicked {
-                            dialogWindow<NewProcessDialog>(scope) {}
+                            dialogWindow<NewSequenceDialog>(scope) {}
                         }
                     }
                     field {

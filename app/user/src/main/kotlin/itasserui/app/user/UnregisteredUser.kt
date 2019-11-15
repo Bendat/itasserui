@@ -17,6 +17,7 @@ interface Account : FileDomain, Subcategory {
     val emailAddress: EmailAddress
     val isAdmin: Boolean
     fun toUser(id: UUID = this.id): User
+
 }
 
 data class UnregisteredUser(
