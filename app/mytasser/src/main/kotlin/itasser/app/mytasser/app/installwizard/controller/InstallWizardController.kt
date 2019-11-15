@@ -7,7 +7,7 @@ import arrow.data.Ior
 import arrow.data.NonEmptyList
 import arrow.data.nel
 import itasser.app.mytasser.kodeinmodules.DependencyInjector.initializeKodein
-import itasserui.app.mytasser.lib.ITasserSettings
+import itasser.app.mytasser.lib.ITasserSettings
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.UnregisteredUser
 import itasserui.common.`typealias`.NelOutcome

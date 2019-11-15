@@ -4,7 +4,7 @@ import arrow.data.Ior
 import arrow.data.NonEmptyList
 import com.github.javafaker.Faker
 import itasser.app.mytasser.kodeinmodules.DependencyInjector
-import itasserui.app.mytasser.lib.ITasserSettings
+import itasser.app.mytasser.lib.ITasserSettings
 import itasserui.app.user.UnregisteredUser
 import itasserui.app.user.User
 import itasserui.common.errors.RuntimeError

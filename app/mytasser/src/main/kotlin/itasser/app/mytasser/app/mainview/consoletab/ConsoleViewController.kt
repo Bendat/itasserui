@@ -2,7 +2,7 @@ package itasser.app.mytasser.app.mainview.consoletab
 
 import itasser.app.mytasser.app.process.pane.ProcessPaneController
 import itasser.app.mytasser.app.process.pane.widget.ProcessWidgetController
-import itasserui.app.mytasser.lib.kInject
+import itasser.app.mytasser.lib.kInject
 import itasserui.app.user.ProfileManager
 import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.details.ProcessOutput
@@ -12,7 +12,7 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.image.Image
-import itasserui.app.mytasser.lib.extensions.bind
+import itasser.app.mytasser.lib.extensions.bind
 import lk.kotlin.observable.property.plusAssign
 import tornadofx.*
 

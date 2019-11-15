@@ -1,7 +1,7 @@
 package itasser.app.mytasser.app.process.pane
 
 import itasser.app.mytasser.app.process.pane.widget.ProcessWidgetController
-import itasserui.app.mytasser.lib.kInject
+import itasser.app.mytasser.lib.kInject
 import itasserui.app.user.ProfileManager
 import tornadofx.ItemViewModel
 

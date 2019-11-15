@@ -2,7 +2,7 @@ package itasserui.app.mytasser.installwizard.e2e
 
 import arrow.core.None
 import itasserui.app.mytasser.installwizard.InstallWizardSpec
-import itasserui.app.mytasser.lib.DI
+import itasser.app.mytasser.lib.DI
 import org.kodein.di.Kodein
 import org.testfx.api.FxAssert
 import org.testfx.matcher.base.NodeMatchers

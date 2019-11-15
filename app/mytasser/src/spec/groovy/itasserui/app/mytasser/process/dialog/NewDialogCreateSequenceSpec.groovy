@@ -20,7 +20,7 @@ class NewDialogCreateSequenceSpec extends AbstractNewDialogSpec {
         def loginUserPassword = { -> lookup("#password_field").queryTextInputControl() }
 
         when: "Logging in and completing form"
-        clickOn(userField).write(account.username.value)
+        clickOn("$userField .text-field").write(account.username.value)
         clickOn(createButton)
         loginWithModal(loginUserPassword)
         clickOn(name).write("Amoxyl Dioxyn Junior")

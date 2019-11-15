@@ -7,8 +7,8 @@ import itasser.app.mytasser.app.process.pane.widget.ProcessWidget
 import itasser.app.mytasser.kodeinmodules.DependencyInjector
 import itasserui.app.mytasser.AppSpec
 import itasserui.app.mytasser.KodeinExtractor
-import itasserui.app.mytasser.lib.DI
-import itasserui.app.mytasser.lib.ITasserSettings
+import itasser.app.mytasser.lib.DI
+import itasser.app.mytasser.lib.ITasserSettings
 import itasserui.app.user.Account
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.UnregisteredUser

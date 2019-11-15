@@ -1,6 +1,6 @@
 package itasser.app.mytasser.kodeinmodules
 
-import itasserui.app.mytasser.lib.SettingsManager
+import itasser.app.mytasser.lib.SettingsManager
 import itasserui.app.user.ProfileManager
 import itasserui.lib.filemanager.FS
 import itasserui.lib.filemanager.DomainFileManager

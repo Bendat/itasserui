@@ -3,8 +3,8 @@ package itasserui.app.mytasser
 import arrow.data.Ior
 import arrow.data.NonEmptyList
 import itasser.app.mytasser.kodeinmodules.DependencyInjector
-import itasserui.app.mytasser.lib.DI
-import itasserui.app.mytasser.lib.ITasserSettings
+import itasser.app.mytasser.lib.DI
+import itasser.app.mytasser.lib.ITasserSettings
 import itasserui.app.user.UnregisteredUser
 import itasserui.app.user.User
 import itasserui.common.errors.RuntimeError
@@ -81,6 +81,7 @@ abstract class UserAppSpec<T extends UIComponent> extends AppSpec<T> {
     }
 
     protected void loginWithModal(Closure<TextInputControl> loginUserPassword) {
+        clickOn("#username_field").write(account.username.value)
         clickOn(loginUserPassword()).write(account.password.value)
         for (int i = 0; i < 30; i++) {
             clickOn(".login-modal .increment-arrow-button")

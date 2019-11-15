@@ -1,7 +1,7 @@
 package itasser.app.mytasser.app.process.newDialog
 
-import itasserui.app.mytasser.lib.extensions.bind
-import itasserui.app.mytasser.lib.kInject
+import itasser.app.mytasser.lib.extensions.bind
+import itasser.app.mytasser.lib.kInject
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.ProfileManager.Profile
 import itasserui.lib.process.Arg

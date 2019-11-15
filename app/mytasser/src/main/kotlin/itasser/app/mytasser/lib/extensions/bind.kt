@@ -1,4 +1,4 @@
-package itasserui.app.mytasser.lib.extensions
+package itasser.app.mytasser.lib.extensions
 
 import itasserui.common.extensions.unless
 import itasserui.lib.process.process.ITasser

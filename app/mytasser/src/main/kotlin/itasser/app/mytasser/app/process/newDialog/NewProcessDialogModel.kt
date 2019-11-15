@@ -1,7 +1,7 @@
 package itasser.app.mytasser.app.process.newDialog
 
-import itasserui.app.mytasser.lib.SettingsManager
-import itasserui.app.mytasser.lib.kInject
+import itasser.app.mytasser.lib.SettingsManager
+import itasser.app.mytasser.lib.kInject
 import itasserui.common.utils.uuid
 import itasserui.lib.process.Arg
 import itasserui.lib.process.manager.ProcessManager

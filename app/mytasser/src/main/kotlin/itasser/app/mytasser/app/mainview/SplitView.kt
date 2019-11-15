@@ -1,4 +1,4 @@
-package itasser.app.mytasser.views
+package itasser.app.mytasser.app.mainview
 
 import itasser.app.mytasser.app.mainview.tabpane.SplitTabPane
 import itasser.app.mytasser.app.process.pane.ProcessPane

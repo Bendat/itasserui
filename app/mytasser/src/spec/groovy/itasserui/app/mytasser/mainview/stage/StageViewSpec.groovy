@@ -1,7 +1,7 @@
 package itasserui.app.mytasser.mainview.stage
 
 import itasser.app.mytasser.app.mainview.consoletab.EventShooter
-import itasser.app.mytasser.views.SplitView
+import itasser.app.mytasser.app.mainview.SplitView
 import itasserui.app.mytasser.UserAppSpec
 import itasserui.common.utils.SafeWaitKt
 import itasserui.lib.process.details.ExecutionState

@@ -5,8 +5,8 @@ import arrow.core.Option
 import arrow.core.Some
 import itasser.app.mytasser.app.login.LoginModal.LoginDuration
 import itasser.app.mytasser.app.login.LoginModal.LoginDuration.*
-import itasserui.app.mytasser.lib.extensions.bind
-import itasserui.app.mytasser.lib.kInject
+import itasser.app.mytasser.lib.extensions.bind
+import itasser.app.mytasser.lib.kInject
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.ProfileManager.Profile
 import itasserui.common.`typealias`.Outcome

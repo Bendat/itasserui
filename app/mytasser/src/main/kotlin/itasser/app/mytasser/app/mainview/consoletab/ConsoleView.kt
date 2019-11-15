@@ -3,7 +3,7 @@ package itasser.app.mytasser.app.mainview.consoletab
 import itasser.app.mytasser.app.process.pane.widget.WidgetCss
 import itasser.app.mytasser.app.process.pane.widget.loginModal
 import itasser.app.mytasser.app.styles.MainStylee
-import itasserui.app.mytasser.lib.kInject
+import itasser.app.mytasser.lib.kInject
 import itasserui.common.extensions.unless
 import itasserui.lib.process.details.ProcessOutput
 import itasserui.lib.process.manager.ProcessManager

@@ -1,8 +1,8 @@
 package itasser.app.mytasser.app.process.pane
 
-import itasserui.app.mytasser.lib.extensions.bind
-import itasserui.app.mytasser.lib.extensions.toFx
-import itasserui.app.mytasser.lib.kInject
+import itasser.app.mytasser.lib.extensions.bind
+import itasser.app.mytasser.lib.extensions.toFx
+import itasser.app.mytasser.lib.kInject
 import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.manager.ProcessManager
 import javafx.beans.property.SimpleObjectProperty

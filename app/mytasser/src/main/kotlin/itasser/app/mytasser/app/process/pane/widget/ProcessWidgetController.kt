@@ -1,6 +1,6 @@
 package itasser.app.mytasser.app.process.pane.widget
 
-import itasserui.app.mytasser.lib.extensions.bind
+import itasser.app.mytasser.lib.extensions.bind
 import itasserui.app.user.User
 import itasserui.common.logger.Logger
 import itasserui.lib.process.details.ExecutionState
