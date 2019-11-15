@@ -39,11 +39,11 @@ class HelloWorldProcessTest : DescribeSpec({
         }
 
         it("Should verify that the stdout contains at least one entry") {
-            runner.std.output.size should be(1)
+            runner.std.out.size should be(1)
         }
 
         it("Should verify the stdout of the program contains 'Hello World'") {
-            runner.std.output.first().item should be("Hello World")
+            runner.std.out.first().item should be("Hello World")
         }
         it("Should verify the state is ${ExecutionState.Completed}") {
             runner.state should beInstanceOf<ExecutionState.Completed>()
@@ -78,13 +78,13 @@ class HelloWorldProcessTest : DescribeSpec({
         }
 
         it("Should verify that the stdout contains at least one entry") {
-            runner.std.output.size should be(6)
+            runner.std.out.size should be(6)
 
         }
 
         listOf(0, 1, 2, 3, 4, 5).forEach { index ->
             it("Should verify that stdout[$index] is [$index]'") {
-                runner.std.output[index].item should be(index.toString())
+                runner.std.out[index].item should be(index.toString())
             }
         }
 

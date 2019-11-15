@@ -1,5 +1,6 @@
 package itasserui.lib.process.details
 
+import itasserui.lib.process.process.STDType
 import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.list.ObservableListWrapper
 import lk.kotlin.observable.property.ObservableProperty
@@ -95,6 +96,12 @@ class TrackingList<T> : ObservableList<TrackedItem<T>> {
 
 }
 
+
+data class ProcessOutput(
+    val item: String,
+    val timestamp: DateTime,
+    val stdType: STDType
+)
 data class TrackedItem<T>(
     val item: T,
     val timestamp: DateTime = DateTime.now()

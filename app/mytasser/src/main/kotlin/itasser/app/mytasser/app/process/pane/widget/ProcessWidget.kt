@@ -14,6 +14,7 @@ import itasserui.lib.process.process.ITasser
 import javafx.animation.AnimationTimer
 import javafx.event.EventTarget
 import javafx.scene.control.Dialog
+import javafx.scene.image.ImageView
 import javafx.util.StringConverter
 import org.joda.time.DateTime
 import org.kodein.di.generic.instance
@@ -55,123 +56,97 @@ class ProcessWidget(
     private val iconHeight: Double = 16.0
 
     init {
+        info { "ITasser is ${itasser.process.name}" }
         setInScope(model, this.scope)
     }
 
-    override val root = anchorpane {
-        prefWidth = 250.0
+    override val root = vbox {
+        prefWidth = 150.0
         addClass(itasser.process.id.toString())
         addStylesheet(MainStylee::class)
-        vbox {
-            hbox(10) {
-                borderpane {
-                    left {
-                        vbox {
-                            hbox(10) {
-                                imageview(resources.image("/icons/users.png")) {
-                                    addClass(paddedImage2)
-                                    fitHeight = iconHeight
-                                    isPreserveRatio = true
-                                }
-                                label(model.username) {
-                                    addClass("process-widget-username-label")
-                                }
-                            }
-                            hbox(10) {
-                                imageview(resources.image("/icons/stopwatch.png")) {
-                                    this.isSmooth = true
-                                    addClass(paddedImage2)
-                                    fitHeight = iconHeight
-                                    isPreserveRatio = true
-                                }
-                                val timerLabel = label {
-                                    addClass(WidgetCss.timerLabel)
-                                }
-                                object : AnimationTimer() {
-                                    override fun handle(now: Long) {
-                                        if (model.executionTimeProperty.value != 0L)
-                                            timerLabel.text = ofMillis(model.executionTimeProperty.value).format()
-                                    }
-                                }.start()
+        info { "ITasser is ${itasser.process.name}" }
+        fun EventTarget.icon(url: String): ImageView {
+            return imageview(resources.image(url)) {
+                this.isSmooth = true
+                addClass(paddedImage2)
+                fitHeight = iconHeight
+                isPreserveRatio = true
+            }
+        }
+        hbox(10) {
+            borderpane {
+                left {
+                    vbox {
+                        hbox(10) {
+                            icon("/icons/users.png")
+                            label(model.username) {
+                                addClass("process-widget-username-label")
                             }
                         }
-                    }
-                    center {
-                        spacer { }
-                    }
-                    right {
-                        vbox {
-                            hbox(10) {
-                                imageview(resources.image("/icons/clock.png")) {
-                                    this.isSmooth = true
-                                    addClass(paddedImage2)
-                                    fitHeight = iconHeight
-                                    isPreserveRatio = true
-                                }
-                                label(model.startTime, converter = date) {
-                                    addClass(WidgetCss.startDate)
-                                    if (model.startTime.value == 0L) isVisible = false
-                                    textProperty().addListener { _, _, _ -> isVisible = true }
-                                }
+                        hbox(10) {
+                            icon("/icons/stopwatch.png")
+                            val timerLabel = label {
+                                addClass(WidgetCss.timerLabel)
                             }
-                            hbox(10) {
-                                imageview(resources.image("/icons/clock.png")) {
-                                    this.isSmooth = true
-                                    addClass(paddedImage2)
-                                    fitHeight = iconHeight
-                                    isPreserveRatio = true
-                                    isVisible = false
+                            object : AnimationTimer() {
+                                override fun handle(now: Long) {
+                                    if (model.executionTimeProperty.value != 0L)
+                                        timerLabel.text = ofMillis(model.executionTimeProperty.value).format()
                                 }
-                                label(model.startTime, converter = time) {
-                                    addClass(WidgetCss.startTime)
-                                    if (model.startTime.value == 0L) isVisible = false
-                                    textProperty().addListener { _, _, _ -> isVisible = true }
-                                }
+                            }.start()
+                        }
+                    }
+                }
+                center {
+                    spacer { }
+                }
+                right {
+                    vbox {
+                        hbox(10) {
+                            icon("/icons/clock.png")
+                            label(model.startTime, converter = date) {
+                                addClass(WidgetCss.startDate)
+                                if (model.startTime.value == 0L) isVisible = false
+                                textProperty().addListener { _, _, _ -> isVisible = true }
                             }
                         }
                     }
                 }
             }
-            hbox(10) {
+        }
+        hbox(10) {
+            icon("/icons/dna.png")
+            label(itasser.process.name) {
+                addClass(WidgetCss.sequenceName)
+            }
+        }
 
-                imageview(resources.image("/icons/dna.png")) {
-                    this.isSmooth = true
-                    addClass(paddedImage2)
-                    fitHeight = iconHeight
-                    isPreserveRatio = true
-                }
-                label(itasser.process.name) {
-                    addClass(WidgetCss.sequenceName)
-                }
+        hbox(10) {
+            val ricon = imageview(model.runPauseIcon) {
+                addClass(paddedImage2)
+                addClass("process-widget-run-pause-icon")
+                fitHeight = iconHeight
+                isPreserveRatio = true
             }
-
-            hbox(2) {
-                val ricon = imageview(model.runPauseIcon) {
-                    addClass(paddedImage2)
-                    addClass("process-widget-run-pause-icon")
-                    fitHeight = iconHeight
-                    isPreserveRatio = true
-                }
-                button(graphic = ricon) {
-                    addClass(transparentButton)
-                    addClass(WidgetCss.controlButton)
-                    model.executionStateProperty
-                        .addListener { _, _, new -> model.setRunPlayIcon(new) }
-                    setOnMouseClicked {
-                        profileManager.perform(user, { loginModal("") }) {
-                            processManager.run(itasser)
-                        }
+            button(graphic = ricon) {
+                addClass(transparentButton)
+                addClass(WidgetCss.controlButton)
+                model.executionStateProperty
+                    .addListener { _, _, new -> model.setRunPlayIcon(new) }
+                setOnMouseClicked {
+                    profileManager.perform(user, { loginModal("") }) {
+                        processManager.run(itasser)
                     }
                 }
-                val sicon = imageview(model.stopIcon) {
-                    addClass(paddedImage2)
-                    this.isSmooth = true
-                    fitHeight = iconHeight
-                    isPreserveRatio = true
-                    spacing = 10.0
-                }
-                button(graphic = sicon) { addClass(transparentButton); }
             }
+            val sicon = imageview(model.stopIcon) {
+                addClass(paddedImage2)
+                this.isSmooth = true
+                fitHeight = iconHeight
+                isPreserveRatio = true
+                spacing = 10.0
+            }
+            button(graphic = sicon) { addClass(transparentButton); }
         }
 
 

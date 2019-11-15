@@ -1,12 +1,12 @@
 package itasser.app.mytasser
 
-import itasser.app.mytasser.views.MainView
+import itasser.app.mytasser.views.SplitView
 import javafx.application.Application
 import tornadofx.App
 import tornadofx.UIComponent
 import kotlin.reflect.KClass
 
-class MyApp : App(MainView::class, Styles::class)
+class MyApp : App(SplitView::class, Styles::class)
 
 /**
  * The main method is needed to support the mvn jfx:run goal.

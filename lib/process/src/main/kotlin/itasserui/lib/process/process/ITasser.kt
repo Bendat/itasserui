@@ -12,8 +12,11 @@ import itasserui.lib.process.*
 import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.details.ExecutionState.*
 import itasserui.lib.process.details.ExitCode
+import itasserui.lib.process.details.ProcessOutput
 import itasserui.lib.process.details.TrackingList
+import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.property.StandardObservableProperty
+import org.joda.time.DateTime
 import org.zeroturnaround.exec.ProcessExecutor
 import org.zeroturnaround.exec.ProcessResult
 import org.zeroturnaround.exec.StartedProcess
@@ -52,7 +55,9 @@ class ITasser(
     @JsonIgnore
     val startedTimeProperty = StandardObservableProperty(0L)
     var startedTime by startedTimeProperty
-
+    @get:JsonIgnore
+    val command
+        get() = executor.command
     private var timer: Option<Timer> = None
     private val startTimesPrivate = arrayListOf<Long>()
     val startTimes: List<Long> get() = startTimesPrivate
@@ -90,8 +95,8 @@ class ITasser(
 
 
         init {
-            processExecutor.redirectOutput(ProcessLogAppender(STDType.Out, std.output))
-            processExecutor.redirectError(ProcessLogAppender(STDType.Err, std.err))
+            processExecutor.redirectOutput(ProcessLogAppender(STDType.Out, std.stream))
+            processExecutor.redirectError(ProcessLogAppender(STDType.Err, std.stream))
             with(listener) {
                 beforeStart += {
                     state = Starting
@@ -135,8 +140,9 @@ class ITasser(
                 .sum() + abs(currentTimeMillis() - startTimes.last())
         }
 
-        internal fun start(): Outcome<StartedProcess> {
-            return Try { processExecutor.start() }
+        internal fun start(): Outcome<StartedProcess> = when (state) {
+            is Completed -> Left(ProcessError.ProcessCompletedError(process.name, process.id))
+            else -> Try { processExecutor.start() }
                 .toEither { e -> FailedStart(process.name, e).also { errors += it } }
                 .map { process -> process.also { realProcess = Some(process) } }
                 .map { process ->
@@ -144,7 +150,8 @@ class ITasser(
                     future = Some(process.future)
                     process
                 }
-        }
+
+        }.also { info { "Starting process ${process.name} with result $it" } }
 
         fun await(): Outcome<ProcessResult> = realProcess
             .toEither { ProcessError.NoProcessError("realProcess") }
@@ -185,11 +192,11 @@ class ITasser(
 
         inner class ProcessLogAppender<T : STDType>(
             val std: T,
-            val list: TrackingList<String>
+            val list: ObservableList<ProcessOutput>
         ) : LogOutputStream(), Logger {
             override fun processLine(p0: String) {
                 info { "[STD$std] << capturing line [$p0] for runner [${process.name}][${process.id}]" }
-                list += p0
+                list += ProcessOutput(p0, DateTime.now(), std)
             }
         }
 

@@ -7,12 +7,13 @@ import itasserui.lib.process.Arg
 import itasserui.lib.process.manager.ProcessManager
 import itasserui.lib.process.process.ITasser
 import tornadofx.ItemViewModel
+import java.nio.file.Files
 import java.nio.file.Paths
 
 class NewProcessDialogModel : ItemViewModel<NewProcessController>(NewProcessController()) {
     val profileManager = bind(NewProcessController::profileManager)
-    val processManager: ProcessManager by kInject<ProcessManager>()
-    val settings: SettingsManager by kInject<SettingsManager>()
+    val processManager: ProcessManager by kInject()
+    val settings: SettingsManager by kInject()
     val user = bind(NewProcessController::userProperty)
     val seqFile = bind(NewProcessController::seqFileProperty)
     val name = bind(NewProcessController::nameProperty)
@@ -36,6 +37,20 @@ class NewProcessDialogModel : ItemViewModel<NewProcessController>(NewProcessCont
     val traj = bind(NewProcessController::trajProperty)
     val light = bind(NewProcessController::lightProperty)
     val hours = bind(NewProcessController::hoursProperty)
+
+    fun moveFasta() {
+        item.seqFile?.let { seqfile ->
+            item.dataDir?.let { dataDir ->
+                Files.createDirectories(dataDir)
+                Files.copy(seqfile, dataDir)
+            }
+
+            item.outDir?.let { outDir ->
+                Files.createDirectories(outDir)
+            }
+        }
+    }
+
     fun makeProcess(): ITasser {
         val optionalArgs = mapOf<String, String?>(
             Arg.HomoFlag.arg to homoFlag.value,
@@ -69,9 +84,11 @@ class NewProcessDialogModel : ItemViewModel<NewProcessController>(NewProcessCont
             args.add(key)
             args.add(value!!)
         }
+
         return processManager.new(
             uuid, 0, seqFile.value.value ?: Paths.get("/seqfile empty"),
-            name.value, args, profile.value.value!!.user.id, dataDir.value.value!!
+            name.value, args, profile.value.value!!.user.id, dataDir.value.value!!,
+            outDir.value.value!!
         )
     }
 }

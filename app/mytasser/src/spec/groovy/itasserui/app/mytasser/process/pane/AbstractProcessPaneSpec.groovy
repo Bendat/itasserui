@@ -104,7 +104,7 @@ class AbstractProcessPaneSpec extends AppSpec<ProcessPane> {
     ProcessPane create() {
         println("Dir is ${tmpdirPath.toAbsolutePath()}")
         extractor.profile.login(user, account.password as RawPassword, Duration.ofSeconds(0)) as Either.Right<ProfileManager.Profile>
-        def view = new ProcessPane(new DI(kodein), new Scope())
+        def view = new ProcessPane(new DI(kodein))
         return view
     }
 }

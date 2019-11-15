@@ -21,6 +21,8 @@ data class User(
     override val emailAddress: EmailAddress,
     override val isAdmin: Boolean = false
 ) : Account, FileDomain, DBObject {
+    override val name: String
+        get() = username.value
     override val category = FileDomain.FileCategory.Users
     override val relativeRootName get() = username.value
     override val categories = UserCategory.values().toList()
@@ -52,7 +54,6 @@ data class User(
         override val directory: Path
             get() = Paths.get(name.toLowerCase())
     }
-
 
 
 }

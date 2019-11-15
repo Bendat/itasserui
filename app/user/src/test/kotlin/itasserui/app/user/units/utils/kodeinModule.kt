@@ -1,8 +1,7 @@
 package itasserui.app.user.units.utils
 
 import io.kotlintest.shouldBe
-import itasserui.lib.filemanager.FileManager
-import itasserui.lib.filemanager.LocalFileManager
+import itasserui.lib.filemanager.DomainFileManager
 import itasserui.lib.store.Database
 import itasserui.lib.store.Database.PersistentDatabase
 import itasserui.test_utils.matchers.Be.none
@@ -18,7 +17,7 @@ fun testModule(itasserHome: Path, username: String, pass: String) =
                 .also { it.launch() shouldBe none() }
         }
 
-        bind<FileManager>() with singleton {
-            LocalFileManager(itasserHome)
+        bind<DomainFileManager>() with singleton {
+            DomainFileManager(itasserHome)
         }
     }

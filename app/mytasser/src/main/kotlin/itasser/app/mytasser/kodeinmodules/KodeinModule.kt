@@ -3,8 +3,7 @@ package itasser.app.mytasser.kodeinmodules
 import itasserui.app.mytasser.lib.SettingsManager
 import itasserui.app.user.ProfileManager
 import itasserui.lib.filemanager.FS
-import itasserui.lib.filemanager.FileManager
-import itasserui.lib.filemanager.LocalFileManager
+import itasserui.lib.filemanager.DomainFileManager
 import itasserui.lib.process.manager.ProcessManager
 import itasserui.lib.store.Database
 import itasserui.lib.store.Database.MemoryDatabase
@@ -22,12 +21,12 @@ fun kodeinModules(
 ) = Module("Primary module") {
     val md = MemoryDatabase(dbUsername, dbPassword)
     val db = PersistentDatabase(homeDirectory, "database", dbUsername, dbPassword)
-    val fm = LocalFileManager(homeDirectory)
+    val fm = DomainFileManager(homeDirectory)
     val pm = ProfileManager(fm, db)
     val sm = SettingsManager().apply(settings)
     val im = ProcessManager()
     println("Creating File Manager module")
-    bind<FileManager>() with singleton { fm }
+    bind<DomainFileManager>() with singleton { fm }
     println("Creating Database module")
     bind<Database>() with singleton { db }
     bind<Database>("memdb") with singleton { md }

@@ -10,5 +10,6 @@ data class CCRCProcess(
     val createdAt: Date,
     val createdBy: UUID,
     val seq: Path,
-    val dataDir: Path
+    val dataDir: Path,
+    val outDir: Path = dataDir
 )

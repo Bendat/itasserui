@@ -33,11 +33,7 @@ class ProcessManager(
     var autoRun by autorunProperty
     private val defaultArgs = arrayOf(ArgNames.Perl, ArgNames.AutoFlush).map(Any::toString)
     fun run(itasser: ITasser) {
-        info {
-            "Starting run on ${itasser.process.name}:" +
-                    " IsRunning: ${itasser.state == Running}: ${itasser.state}\n" +
-                    "can execute: ${processes.running.size < maxExecuting}: ${processes.running.map { it }}:$maxExecuting"
-        }
+        info{"Executing itasser"}
         when {
             itasser.state == Running -> itasser.executor.kill()
             processes.running.size < maxExecuting -> itasser.executor.start()
@@ -62,6 +58,7 @@ class ProcessManager(
         args: List<String>,
         createdBy: UUID,
         dataDir: Path,
+        outDir: Path = dataDir,
         state: ExecutionState = Queued
     ): ITasser {
         val fullArgs = defaultArgs
@@ -75,7 +72,8 @@ class ProcessManager(
                 args = fullArgs,
                 createdAt = Date(),
                 createdBy = createdBy,
-                dataDir = dataDir
+                dataDir = dataDir,
+                outDir = outDir
             ),
             priority = priority,
             state = state,
@@ -105,7 +103,6 @@ class ProcessManager(
                 res.exitValue
             }
         }
-
 
 
     @Suppress("MemberVisibilityCanBePrivate")

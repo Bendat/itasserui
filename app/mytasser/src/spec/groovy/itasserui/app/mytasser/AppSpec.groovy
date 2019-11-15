@@ -81,7 +81,7 @@ abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {
      * @param expectedHeader Expected header of the dialog
      * @param expectedContent Expected content of the dialog
      */
-    private void alertDialogHasHeaderAndContent(final String expectedHeader, final String expectedContent) {
+    void alertDialogHasHeaderAndContent(final String expectedHeader, final String expectedContent) {
         final Stage actualAlertDialog = getTopModalStage();
         assertNotNull(actualAlertDialog);
 

@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package itasserui.app.user
 
 import arrow.core.*
@@ -11,14 +13,16 @@ import itasserui.common.`typealias`.Err
 import itasserui.common.`typealias`.OK
 import itasserui.common.`typealias`.Outcome
 import itasserui.common.errors.RuntimeError
+import itasserui.common.extensions.ifTrue
 import itasserui.common.extensions.isFalse
 import itasserui.common.interfaces.inline.EmailAddress
 import itasserui.common.interfaces.inline.RawPassword
 import itasserui.common.interfaces.inline.Username
 import itasserui.common.logger.Logger
 import itasserui.common.utils.uuid
-import itasserui.lib.filemanager.FileManager
-import itasserui.lib.filemanager.WatchedDirectory
+import itasserui.lib.filemanager.DomainDirectory
+import itasserui.lib.filemanager.DomainFileManager
+import itasserui.lib.filemanager.SubdomainDirectory
 import itasserui.lib.store.Database
 import lk.kotlin.observable.list.ObservableList
 import lk.kotlin.observable.list.ObservableListWrapper
@@ -28,14 +32,15 @@ import java.lang.System.currentTimeMillis
 import java.time.Duration
 import java.util.*
 
+@Suppress("MemberVisibilityCanBePrivate")
 class ProfileManager(
-    val fileManager: FileManager,
+    val fileManager: DomainFileManager,
     val database: Database
 ) : Logger {
-    @Suppress("MemberVisibilityCanBePrivate")
+    val id = uuid
     val profiles: ObservableList<Profile> = ObservableListWrapper()
     val sessions: Map<UUID, Session?> = mutableMapOf()
-
+    val activeSessions get() = sessions.filter{it.value?.isActive == true}
     data class Session(val start: Long, val duration: Duration) {
         val sessionTimeRemaining: Long get() = start + duration.toMillis() - currentTimeMillis()
         @Suppress("MemberVisibilityCanBePrivate", "unused")
@@ -54,12 +59,13 @@ class ProfileManager(
         }
     }
 
-    fun find(id: UUID) = profiles.firstOrNull() { it.user.id == id }
-    fun find(name: Username) = profiles.firstOrNull() { it.user.username == name }
+    fun find(id: UUID) = profiles.firstOrNull { it.user.id == id }
+    fun find(name: Username) = profiles.firstOrNull { it.user.username == name }
     @Suppress("unused")
     fun getAdmin(password: RawPassword): Outcome<User> {
         val results = database.read<User> { Account::isAdmin eq true }
         lateinit var user: User
+        true.ifTrue {  }
         return results
             .map { it.first() }
             .map { user = it; it }
@@ -68,6 +74,13 @@ class ProfileManager(
     }
 
     fun perform(user: User, onNotLoggedIn: () -> Unit, op: () -> Unit) {
+        if (!isLoggedIn(user))
+            onNotLoggedIn()
+        if (isLoggedIn(user))
+            op()
+    }
+
+    fun perform(user: UUID, onNotLoggedIn: () -> Unit, op: () -> Unit) {
         if (!isLoggedIn(user))
             onNotLoggedIn()
         if (isLoggedIn(user))
@@ -116,20 +129,30 @@ class ProfileManager(
         return database.find<User> { User::username eq user.username }
             .flatMap { it.firstOrNone().toEither { NoSuchUser(user) } }
             .map {
-                val directories = fileManager.getDirectories(user)
-                val profile = profiles.find { p -> p.user.username == user.username } ?: Profile(
-                    user = it,
-                    directories = directories.toList().map { it.second },
-                    dataDir = directories.getValue(DataDir),
-                    outDir = directories.getValue(OutDir),
-                    settings = directories.getValue(Settings),
-                    manager = this
-                )
-                info { "Profiles are ${profiles.find { it.user.id == user.id }} " }
+                val found = fileManager[user]
+                val directory: DomainDirectory = found ?: fileManager.new(user)
+                val directories = directory?.subdirectories
+                val profile = findOrCreateProfile(user, it, directories, directory)
                 profiles += profile
                 addSession(profile.user, session)
                 profile
             }
+    }
+
+    private fun findOrCreateProfile(
+        user: User,
+        it: User,
+        directories: List<SubdomainDirectory>,
+        directory: DomainDirectory
+    ): Profile {
+        return profiles.find { p -> p.user.username == user.username } ?: Profile(
+            user = it,
+            directories = directories,
+            dataDir = directory[DataDir],
+            outDir = directory[OutDir],
+            settings = directory[Settings],
+            manager = this
+        )
     }
 
     fun login(
@@ -157,8 +180,7 @@ class ProfileManager(
     }
 
     fun removeProfile(user: User): Option<User> {
-        val result = profiles.removeIf { it.user.id == user.id }
-        return when (result) {
+        return when (profiles.removeIf { it.user.id == user.id }) {
             true -> Some(user)
             false -> None
         }
@@ -192,22 +214,20 @@ class ProfileManager(
             .map { user }
 
     fun getUserDir(user: User, category: UserCategory) =
-        fileManager[user].map { it.path.resolve(category.directory) }
+        fileManager[user]!![category]
 
     private fun trySaveToDb(user: User): Outcome<User> = when (val exists = existsInDatabase(user)) {
         is None -> saveToDb(user)
         is Some -> CannotCreateUserProfileError(user, exists.t).left()
     }
 
-    private fun createProfileDir(user: Account): Outcome<WatchedDirectory> = when {
-        !existsInFileSystem(user) -> setupUserDirectories(user)
+    private fun createProfileDir(user: Account): Outcome<DomainDirectory> = when {
+        !existsInFileSystem(user) -> Right(setupUserDirectories(user))
         else -> Left(UserDirectoryAlreadyExists(user, fileManager.fullPath(user)))
     }
 
     internal fun setupUserDirectories(user: Account) =
-        fileManager
-            .new(user)
-            .also { fileManager[user, user.categories] }
+        fileManager.new(user)
 
 
     private fun anyUserExists(op: () -> ObjectFilter): Option<User> =
@@ -227,13 +247,17 @@ class ProfileManager(
         return true
     }
 
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
 
     data class Profile(
         val user: User,
-        val directories: List<WatchedDirectory>,
-        val dataDir: WatchedDirectory,
-        val outDir: WatchedDirectory,
-        val settings: WatchedDirectory,
+        val directories: List<SubdomainDirectory>,
+        val dataDir: SubdomainDirectory,
+        val outDir: SubdomainDirectory,
+        val settings: SubdomainDirectory,
         private val manager: ProfileManager
     ) {
         fun login(user: User, password: RawPassword, duration: Duration) =

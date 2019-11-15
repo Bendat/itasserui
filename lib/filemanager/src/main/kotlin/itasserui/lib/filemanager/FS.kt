@@ -36,10 +36,6 @@ object FS {
             paths.map { root.resolve(it.directory.also { info { "Resolving ${it}" } }) }
                 .map { directory(it); it }
 
-        operator fun get(root: WatchedDirectory, vararg path: Subcategory): List<Path> =
-            path.map { root.resolve(it.toString().toLowerCase()) }
-                .map { directory(it); it }
-
         fun directories(path: Path): Outcome<Path> =
             Try { Files.createDirectories(path) }
                 .toEither { CannotCreateFile(path, it) }

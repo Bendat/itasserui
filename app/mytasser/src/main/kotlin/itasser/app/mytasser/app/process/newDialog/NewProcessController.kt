@@ -8,10 +8,13 @@ import itasserui.lib.process.Arg
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import tornadofx.Controller
+import tornadofx.getValue
+import tornadofx.onChange
+import tornadofx.setValue
 import java.nio.file.Path
-import tornadofx.*
+
 class NewProcessController : Controller() {
-    val profileManager: ProfileManager by kInject<ProfileManager>()
+    val profileManager: ProfileManager by kInject()
     val usersProperty = FXCollections.observableArrayList<String>()
         .bind(profileManager.profiles) { it.user.username.value }
     val userProperty = SimpleObjectProperty("")
@@ -19,10 +22,15 @@ class NewProcessController : Controller() {
     val profileProperty = SimpleObjectProperty<Profile?>(null)
     var profile by profileProperty
     val nameProperty = SimpleObjectProperty<String>("")
+    val name by nameProperty
     val seqNameProperty = SimpleObjectProperty<String>("")
+    val seqName by seqNameProperty
     val seqFileProperty = SimpleObjectProperty<Path?>(null)
+    val seqFile by seqFileProperty
     val dataDirProperty = SimpleObjectProperty<Path?>(null)
+    var dataDir by dataDirProperty
     val outDirProperty = SimpleObjectProperty<Path?>(null)
+    val outDir by outDirProperty
     val homoFlagProperty = SimpleObjectProperty(Arg.HomoFlag.argType.default)
     val idCutProperty = SimpleObjectProperty(Arg.IdCut.argType.default)
     val nTempProperty = SimpleObjectProperty(Arg.NTemp.argType.default)
@@ -39,5 +47,7 @@ class NewProcessController : Controller() {
     val lightProperty = SimpleObjectProperty(false)
     val hoursProperty = SimpleObjectProperty<Int?>(null)
 
-
+    init {
+        nameProperty.onChange { println("Changed") }
+    }
 }

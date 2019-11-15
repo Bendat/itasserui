@@ -27,8 +27,8 @@ class NewDialogCreateSequenceSpec extends AbstractNewDialogSpec {
         clickOn(description).write("This boys got a lot amoxy")
 
         then: "The Directories should match those of the selected profile"
-        datadir.text == view.model.item.profile?.dataDir?.path?.toString()
-        outdir.text == view.model.item.profile?.outDir?.path?.toString()
+        datadir.text == view.model.item.profile?.dataDir?.unixPath?.toString()
+        outdir.text == view.model.item.profile?.outDir?.unixPath?.toString()
 
         and: "The sequence name should match the seqname value"
         seqName.text == name.text

@@ -1,5 +1,6 @@
 package itasserui.app.mytasser.lib.extensions
 
+import itasserui.common.extensions.unless
 import itasserui.lib.process.process.ITasser
 import javafx.application.Platform
 import javafx.beans.property.ObjectProperty
@@ -22,16 +23,17 @@ fun <T : Any> ObjectProperty<T>.bind(to: ObservableProperty<T>): ObjectProperty<
 
 fun <T : Any> FXList<T>.bind(to: LKList<T>): FXList<T> {
     to.onAdd += { item, index ->
-        this.add(index, item)
+        Platform.runLater {
+            { this.add(index, item) } unless contains(item)
+        }
     }
 
     to.onRemove += { item, _ ->
-        this.remove(item)
+        Platform.runLater { this.remove(item) }
     }
 
     to.onChange += { item1, item, index ->
-        println("Moving items $index $item1, $item")
-        this.move(item, index)
+        Platform.runLater { this.move(item, index) }
     }
     return this
 }
