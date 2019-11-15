@@ -1,8 +1,7 @@
 package itasserui.app.mytasser.mainview.stage
 
 import itasser.app.mytasser.app.mainview.consoletab.EventShooter
-import itasser.app.mytasser.app.mainview.consoletab.SelectedSequenceEvent
-import itasser.app.mytasser.views.MainView
+import itasser.app.mytasser.views.SplitView
 import itasserui.app.mytasser.UserAppSpec
 import itasserui.common.utils.SafeWaitKt
 import itasserui.lib.process.details.ExecutionState
@@ -10,12 +9,12 @@ import itasserui.lib.process.process.ITasser
 
 import java.time.Duration
 
-class StageViewSpec extends UserAppSpec<MainView> {
+class StageViewSpec extends UserAppSpec<SplitView> {
     ITasser itasser = null
     EventShooter event = null
 
     @Override
-    MainView create() {
+    SplitView create() {
         setupStuff()
         def ls = new ArrayList()
         ls.add(file.toAbsolutePath().toString())
@@ -35,7 +34,7 @@ class StageViewSpec extends UserAppSpec<MainView> {
         )
         event = new EventShooter(testScope)
         extractor.profile.login(user.username, account.password, Duration.ofMinutes(5))
-        return new MainView(testScope)
+        return new SplitView(testScope)
     }
 
     void "Lets see"() {
