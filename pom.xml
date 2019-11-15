@@ -9,7 +9,6 @@
 
     <modules>
         <module>test_utils</module>
-
         <module>common</module>
         <module>lib</module>
         <module>app</module>
