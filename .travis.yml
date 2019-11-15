@@ -34,9 +34,7 @@ cache:
     - $HOME/.m2
 
 before_script:
-  - "cd test_utils"
   - "mvn clean install -DskipTests=true"
-  - "cd ../"
   - "mvn dependency:resolve"
 
 script:
