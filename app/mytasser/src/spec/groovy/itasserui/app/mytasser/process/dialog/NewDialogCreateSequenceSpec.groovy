@@ -1,7 +1,6 @@
 package itasserui.app.mytasser.process.dialog
 
 
-import itasserui.common.utils.SafeWaitKt
 import javafx.scene.input.KeyCode
 import org.testfx.matcher.base.NodeMatchers
 
@@ -104,7 +103,7 @@ class NewDialogCreateSequenceSpec extends AbstractNewDialogSpec {
         and: "The protein details are entered"
         clickOn(name.render()).write("Amoxylinezine")
         clickOn(description.render()).write("This isn't gonna work")
-        clickOn(".new-protein-seq-file").write(tmpdirPath.toString())
+        clickOn(fastaLocation.render()).write(tmpdirPath.toString())
 
         and: "The create button is clicked"
         clickOn(createButton.render())

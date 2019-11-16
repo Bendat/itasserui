@@ -4,11 +4,14 @@ import itasserui.common.extensions.unless
 import itasserui.lib.process.process.ITasser
 import javafx.application.Platform
 import javafx.beans.property.ObjectProperty
+import javafx.beans.property.Property
+import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
+import lk.kotlin.observable.property.MutableObservableProperty
 import lk.kotlin.observable.property.ObservableProperty
-import lk.kotlin.observable.property.StandardObservableProperty
 import lk.kotlin.observable.property.plusAssign
 import tornadofx.move
+import tornadofx.onChange
 import javafx.collections.ObservableList as FXList
 import lk.kotlin.observable.list.ObservableList as LKList
 
@@ -59,12 +62,15 @@ fun <T> ObservableProperty<T>.bind(to: ObjectProperty<T>): ObservableProperty<T>
     return this
 }
 
-fun <T> ObservableProperty<T>.toFx(): StandardObservableProperty<T> {
-    val prop = StandardObservableProperty(this.value)
+fun <T> MutableObservableProperty<T>.toFx(): Property<T> {
+    val prop = SimpleObjectProperty(this.value)
     this += {
         prop.value = it
     }
 
+    prop.onChange {
+        it?.let{ value = it }
+    }
     return prop
 }
 

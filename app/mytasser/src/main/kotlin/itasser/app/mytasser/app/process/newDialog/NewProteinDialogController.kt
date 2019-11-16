@@ -22,11 +22,11 @@ class NewProteinDialogController : Controller() {
     val userProperty = SimpleObjectProperty("")
     var user: String by userProperty
     val profileProperty = SimpleObjectProperty<Profile?>(null)
-    var profile by profileProperty
-    val nameProperty = SimpleObjectProperty<String>("")
-    val name by nameProperty
-    val seqNameProperty = SimpleObjectProperty<String>("")
-    val seqName by seqNameProperty
+    var profile: Profile? by profileProperty
+    val nameProperty = SimpleObjectProperty("")
+    val name: String? by nameProperty
+    val seqNameProperty = SimpleObjectProperty("")
+    val seqName: String by seqNameProperty
     val seqFileProperty = SimpleObjectProperty<Path?>(null)
     val seqFile by seqFileProperty
     val dataDirProperty = SimpleObjectProperty<Path?>(null)

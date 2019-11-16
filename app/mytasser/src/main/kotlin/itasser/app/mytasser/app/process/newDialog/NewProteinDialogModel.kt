@@ -90,9 +90,9 @@ class NewProteinDialogModel :
         info { "Outdir is ${outDir.value.value}" }
         info { "Seqname is ${seqName.value}" }
         return item.processManager.new(
-            uuid, 0, seqFile.value.value ?: Paths.get("/seqfile empty"),
-            seqName.value, args, item.profile!!.user.id, dataDir.value.value!!,
-            outDir.value.value!!
+            uuid, 0, item.seqFile ?: Paths.get("/seqfile empty"),
+            item.seqName, args, item.profile!!.user.id,
+            item.dataDir!!, item.outDir!!
         )
     }
 }

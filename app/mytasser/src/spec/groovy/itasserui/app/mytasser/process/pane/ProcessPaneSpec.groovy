@@ -8,8 +8,12 @@ import itasserui.app.user.ProfileManager
 import itasserui.common.interfaces.inline.RawPassword
 import itasserui.common.utils.SafeWaitKt
 import itasserui.lib.process.process.ITasser
+import org.testfx.api.FxAssert
+import org.testfx.matcher.control.ListViewMatchers
 
 import java.time.Duration
+
+import static itasser.app.mytasser.app.process.pane.ProcessPaneCss.*
 
 class ProcessPaneSpec extends UserAppSpec<ProcessPane> {
     ITasser itasser = null
@@ -24,16 +28,29 @@ class ProcessPaneSpec extends UserAppSpec<ProcessPane> {
         ls.add(file.toAbsolutePath().toString())
         ls.add("-hello")
         ls.add("-world")
-        itasser = extractor.proc.new(
-                UUID.randomUUID(),
-                0,
-                file,
-                file.fileName.toString(),
-                ls,
-                user.id,
-                datadir
-        )
         return view
+    }
+
+    void "Adding a process should be reflected in the queued tab"() {
+        def ls = new ArrayList()
+        ls.add(file.toAbsolutePath().toString())
+        ls.add("-hello")
+        ls.add("-world")
+
+        given: "Locator for the queued list"
+
+        def queuedlocator = { -> lookup(getQueuedList().render()) }
+        when: "Auto run is disabled"
+        clickOn(autoRunToggle.render())
+
+        and: "A new process is created"
+        newProcess(ls, user)
+
+        and: "The queued tab is opened"
+        clickOn(queuedTab.render())
+
+        then:
+        FxAssert.verifyThat(queuedlocator(), ListViewMatchers.hasItems(1))
     }
 
     void "Basic interactions with existing process"() {
