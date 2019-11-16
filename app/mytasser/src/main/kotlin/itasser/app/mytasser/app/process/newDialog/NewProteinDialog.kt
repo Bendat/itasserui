@@ -4,8 +4,8 @@ import arrow.core.Either.Right
 import itasser.app.mytasser.app.components.tornadofx.FileChooserType
 import itasser.app.mytasser.app.components.tornadofx.intConverter
 import itasser.app.mytasser.app.components.tornadofx.itFileChooser
-import itasser.app.mytasser.app.components.tornadofx.pathConverter
 import itasser.app.mytasser.app.process.pane.widget.loginModal
+import itasserui.app.user.User
 import itasserui.common.interfaces.inline.Username
 import itasserui.common.logger.Logger
 import itasserui.lib.process.Arg
@@ -15,18 +15,19 @@ import javafx.scene.control.TextField
 import org.controlsfx.control.textfield.TextFields.bindAutoCompletion
 import tornadofx.*
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import itasser.app.mytasser.app.process.newDialog.NewSequenceCss as css
 
-class NewSequenceDialog(scope: Scope? = null) : View("Create New ITasser Process"), Logger {
+fun path(path: String): Path = Paths.get(path)
+class NewProteinDialog(scope: Scope? = null) : View("Create New ITasser Process"), Logger {
     override val scope: Scope = scope ?: super.scope
-    val model: NewProcessDialogModel by inject()
+    val model: NewProteinDialogModel by inject()
+    val controller: NewProteinDialogController by lazy { model.item }
     override val complete: BooleanExpression = model.valid(
         model.seqName, model.dataDir, model.outDir, model.seqName
     )
-    @Suppress("UNCHECKED_CAST")
     override val root = vbox {
-        print("Hello world")
         prefWidth = 450.0
         prefHeight = 690.0
         lateinit var user: Field
@@ -42,7 +43,7 @@ class NewSequenceDialog(scope: Scope? = null) : View("Create New ITasser Process
                         model.user.onChange {
                             val prof = model.item.profileManager.findUser(Username(it ?: ""))
                             if (prof is Right) {
-                                model.item.profile = prof.b
+                                controller.profile = prof.b
                                 proceedDetails.value = true
                             }
                         }
@@ -57,7 +58,7 @@ class NewSequenceDialog(scope: Scope? = null) : View("Create New ITasser Process
             lateinit var nameField: TextField
             form {
                 enableWhen(proceedDetails)
-                addClass("protein-details-")
+                addClass(css.proteinDetailsFieldSet)
                 separator { }
                 fieldset("protein Details") {
                     field("Name") {
@@ -81,7 +82,7 @@ class NewSequenceDialog(scope: Scope? = null) : View("Create New ITasser Process
 
                     field("Fasta location") {
                         itFileChooser(model.seqFile, FileChooserType.Directory) {
-                            addClass("new-sequence-seq-file")
+                            addClass(css.fastaLocation)
                             textProperty.onChange {
                                 if (it != null && Files.exists(Paths.get(it))) canContinue.value = true
                             }
@@ -92,6 +93,7 @@ class NewSequenceDialog(scope: Scope? = null) : View("Create New ITasser Process
 
                 fieldset("ITasser Required Parameters") {
                     separator { }
+                    addClass(css.requiredFieldSet)
                     enableWhen(canContinue)
                     field("Sequence Name") {
                         textfield(model.seqName) {
@@ -109,20 +111,41 @@ class NewSequenceDialog(scope: Scope? = null) : View("Create New ITasser Process
                     }
 
                     field("Data Directory") {
-                        itFileChooser(model.dataDir, FileChooserType.Directory, disableManual = true) {
-                            textProperty.bindBidirectional(model.dataDir, pathConverter)
+                        itFileChooser(
+                            model.dataDir,
+                            FileChooserType.Directory,
+                            disableManual = true,
+                            allowEmptyChild = true
+                        ) {
                             addClass(css.dataDir)
                             model.name.onChange { value ->
-                                text = model.item.profile?.dataDir?.resolve(value ?: "/no-user-defined").toString()
+                                val profile = controller.profile
+                                if (profile != null) {
+                                    text = controller.profileManager
+                                        .getUserDir(profile.user, User.UserCategory.DataDir)
+                                        .resolve(model.seqName.value)
+                                        .toString()
+                                }
                             }
                         }
                     }
 
                     field("Out Directory") {
-                        itFileChooser(model.outDir, FileChooserType.Directory, disableManual = true) {
+                        itFileChooser(
+                            model.outDir,
+                            FileChooserType.Directory,
+                            disableManual = true,
+                            allowEmptyChild = true
+                        ) {
                             addClass(css.outDir)
                             model.name.onChange { value ->
-                                text = model.item.profile?.outDir?.resolve(value ?: "/no-user-defined").toString()
+                                val profile = controller.profile
+                                if (profile != null) {
+                                    text = controller.profileManager
+                                        .getUserDir(profile.user, User.UserCategory.OutDir)
+                                        .resolve(model.seqName.value)
+                                        .toString()
+                                }
                             }
                         }
                     }
@@ -132,6 +155,8 @@ class NewSequenceDialog(scope: Scope? = null) : View("Create New ITasser Process
 
                 fieldset("Default parameters") {
                     separator { }
+                    enableWhen(canContinue)
+                    addClass(css.defaultParams)
                     field("ID Cut") {
                         val type = Arg.IdCut.argType
                         spinner(
@@ -214,6 +239,8 @@ class NewSequenceDialog(scope: Scope? = null) : View("Create New ITasser Process
                 }
 
                 fieldset("Optional Parameters") {
+                    enableWhen(canContinue)
+                    addClass(css.optionalParams)
                     separator { }
                     field("Homoflag") {
                         val items = Arg
@@ -285,8 +312,7 @@ class NewSequenceDialog(scope: Scope? = null) : View("Create New ITasser Process
                             addClass(css.createButton)
                             setOnMouseClicked {
                                 val username = Username(model.user.value)
-                                model.profileManager
-                                    .value
+                                controller.profileManager
                                     .perform(username, { loginModal(username.value) }) {
                                         model.commit()
                                         if (model.isValid) {

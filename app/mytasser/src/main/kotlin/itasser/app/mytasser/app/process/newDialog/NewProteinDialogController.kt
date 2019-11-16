@@ -5,6 +5,7 @@ import itasser.app.mytasser.lib.kInject
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.ProfileManager.Profile
 import itasserui.lib.process.Arg
+import itasserui.lib.process.manager.ProcessManager
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import tornadofx.Controller
@@ -13,8 +14,9 @@ import tornadofx.onChange
 import tornadofx.setValue
 import java.nio.file.Path
 
-class NewProcessController : Controller() {
+class NewProteinDialogController : Controller() {
     val profileManager: ProfileManager by kInject()
+    val processManager: ProcessManager by kInject()
     val usersProperty = FXCollections.observableArrayList<String>()
         .bind(profileManager.profiles) { it.user.username.value }
     val userProperty = SimpleObjectProperty("")

@@ -1,7 +1,6 @@
 package itasser.app.mytasser.app.process.newDialog
 
 import tornadofx.cssclass
-import tornadofx.cssid
 
 
 object NewSequenceCss {
@@ -53,5 +52,15 @@ object NewSequenceCss {
     val createButton by cssclass("sequence-create-button")
     @JvmStatic
     val errorLabel by cssclass("new-process-invalid-text")
+    @JvmStatic
+    val proteinDetailsFieldSet by cssclass("protein-details-fieldset")
+    @JvmStatic
+    val fastaLocation by cssclass("new-protein-seq-file")
+    @JvmStatic
+    val requiredFieldSet by cssclass("protein-details-required-parameters")
+    @JvmStatic
+    val optionalParams by cssclass("protein-details-optional-parameters")
+    @JvmStatic
+    val defaultParams by cssclass("protein-details-default-parameters")
 
 }

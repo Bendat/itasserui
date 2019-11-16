@@ -27,14 +27,17 @@ fun EventTarget.itFileChooser(
     type: FileChooserType = File,
     acceptEmpty: Boolean = false,
     disableManual: Boolean = false,
+    allowEmptyChild: Boolean = false,
     op: FileChooser .() -> Unit = {}
-): FileChooser = FileChooser(property, type, acceptEmpty, disableManual).also { it.root.attachTo(this) }.apply(op)
+): FileChooser =
+    FileChooser(property, type, acceptEmpty, disableManual, allowEmptyChild).also { it.root.attachTo(this) }.apply(op)
 
 class FileChooser(
     val property: Property<SimpleObjectProperty<Path?>>,
     private val type: FileChooserType = File,
     private val acceptEmpty: Boolean = false,
-    private val disableManual: Boolean = false
+    private val disableManual: Boolean = false,
+    private val allowEmptyChild: Boolean = false
 ) :
     View("File Choose"), Logger {
     val textProperty = SimpleStringProperty("")
@@ -55,19 +58,20 @@ class FileChooser(
                 validator {
                     val resolveText = text?.replace("~", System.getProperty("user.home")) ?: ""
                     val path = Paths.get(resolveText)
-                    if (resolveText.isBlank() && !acceptEmpty)
-                        error("Path can't be empty")
-                    else if (type == Directory)
-                        if (!Files.isDirectory(path))
-                            error("Must be valid directory")
-                        else null
-                    else if (type == File && !Files.isRegularFile(path) or !Files.exists(path))
-                        if (acceptEmpty && resolveText.isBlank())
-                            null
-                        else error("Must be a valid file")
-                    else if (!Files.exists(path))
-                        error("File does not exist")
-                    else null
+                    when {
+                        resolveText.isBlank() && !acceptEmpty -> error("Path can't be empty")
+                        type == Directory -> when {
+                            allowEmptyChild && Files.exists(path.parent) -> null
+                            !Files.isDirectory(path) -> error("Must be valid directory")
+                            else -> null
+                        }
+                        type == File && !Files.isRegularFile(path) or !Files.exists(path) -> when {
+                            acceptEmpty && resolveText.isBlank() -> null
+                            else -> error("Must be a valid file")
+                        }
+                        !Files.exists(path) -> error("File does not exist")
+                        else -> null
+                    }
                 }
             }
             if (disableManual) {

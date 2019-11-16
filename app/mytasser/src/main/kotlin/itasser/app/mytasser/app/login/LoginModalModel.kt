@@ -1,8 +1,5 @@
 package itasser.app.mytasser.app.login
 
-import arrow.core.None
-import arrow.core.Some
-import itasser.app.mytasser.app.process.newDialog.NewProcessController
 import tornadofx.ItemViewModel
 
  class LoginModalModel : ItemViewModel<LoginModalController>(LoginModalController()) {

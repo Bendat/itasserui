@@ -1,14 +1,14 @@
 package itasserui.app.mytasser.process.dialog
 
-import itasser.app.mytasser.app.process.newDialog.NewSequenceDialog
+import itasser.app.mytasser.app.process.newDialog.NewProteinDialog
 import itasserui.app.mytasser.UserAppSpec
 
-class AbstractNewDialogSpec extends UserAppSpec<NewSequenceDialog> {
+class AbstractNewDialogSpec extends UserAppSpec<NewProteinDialog> {
 
     @Override
-    NewSequenceDialog create() {
+    NewProteinDialog create() {
         setupStuff()
-        return new NewSequenceDialog(testScope)
+        return new NewProteinDialog(testScope)
     }
 
 }
