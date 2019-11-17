@@ -36,7 +36,7 @@ class InstallWizardE2ESpec extends InstallWizardSpec {
 
         and: "The generated Kodein is set in scope"
         def di = view.model.kodeinModule.value as arrow.core.Some<Kodein>
-        view.setInScope(new DI(view.scope, di.t), view.scope)
+        view.setInScope(new DI(di.t), view.scope)
 
         then: "Verify the viewmodel data is accurate"
         view.model.name.value == username

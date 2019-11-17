@@ -2,12 +2,9 @@ package itasserui.app.mytasser.process.pane
 
 import arrow.core.Either
 import itasser.app.mytasser.app.process.pane.ProcessPane
-import itasser.app.mytasser.app.process.pane.widget.WidgetCss
 import itasserui.app.mytasser.UserAppSpec
 import itasserui.app.user.ProfileManager
 import itasserui.common.interfaces.inline.RawPassword
-import itasserui.common.utils.SafeWaitKt
-import itasserui.lib.process.process.ITasser
 import org.testfx.api.FxAssert
 import org.testfx.matcher.control.ListViewMatchers
 
@@ -16,7 +13,6 @@ import java.time.Duration
 import static itasser.app.mytasser.app.process.pane.ProcessPaneCss.*
 
 class ProcessPaneSpec extends UserAppSpec<ProcessPane> {
-    ITasser itasser = null
 
     @Override
     ProcessPane create() {
@@ -31,15 +27,20 @@ class ProcessPaneSpec extends UserAppSpec<ProcessPane> {
         return view
     }
 
-    void "Adding a process should be reflected in the queued tab"() {
+    ArrayList args() {
         def ls = new ArrayList()
         ls.add(file.toAbsolutePath().toString())
         ls.add("-hello")
         ls.add("-world")
+        return ls
+    }
+
+    void "Adding a process should be reflected in the queued tab"() {
+        def ls = args()
 
         given: "Locator for the queued list"
-
         def queuedlocator = { -> lookup(getQueuedList().render()) }
+
         when: "Auto run is disabled"
         clickOn(autoRunToggle.render())
 
@@ -53,30 +54,26 @@ class ProcessPaneSpec extends UserAppSpec<ProcessPane> {
         FxAssert.verifyThat(queuedlocator(), ListViewMatchers.hasItems(1))
     }
 
-    void "Basic interactions with existing process"() {
-        given:
-        def id = itasser.process.id
-        SafeWaitKt.safeWait(2500)
-        expect:
-        clickOn(".queued-tab")
-        lookup(".queued-list").queryListView().items.size() == 1
+    void "Verify max executing works correctly"() {
+        def ls = args()
 
-        when:
-        clickOn(".$id .${WidgetCss.controlButton.name}")
-        login()
+        given: "Locator for the running list"
+        def runningLocator = { -> lookup(runningList.render()) }
+        def queuedlocator = { -> lookup(getQueuedList().render()) }
 
-        then:
-        clickOn(".running-tab")
-        lookup(".running-list").queryListView().items.size() == 1
+        and: "Five processes"
+        newProcess(ls, user)
+        newProcess(ls, user)
+        newProcess(ls, user)
+        newProcess(ls, user)
+        newProcess(ls, user)
 
-        and:
-        clickOn(".queued-tab")
-        clickOn(".running-tab")
+        when: "Navigating to the running sequences tab"
+        clickOn(runningTab.render())
 
-        clickOn(".$id .${WidgetCss.controlButton.name}")
-        clickOn(".paused-tab")
-
-        then:
-        lookup(".paused-list").queryListView().items.size() == 1
+        then: "List view should have 3 items"
+        FxAssert.verifyThat(runningLocator(), ListViewMatchers.hasItems(3))
+        FxAssert.verifyThat(queuedlocator(), ListViewMatchers.hasItems(2))
     }
+
 }

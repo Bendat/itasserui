@@ -9,7 +9,7 @@ import javafx.scene.Parent
 import javafx.scene.control.Alert.AlertType.ERROR
 import javafx.scene.control.ButtonType
 import tornadofx.*
-
+import itasser.app.mytasser.app.login.LoginModalCss as css
 class LoginModal(
     titleText: String = "User Login",
     scope: Scope? = null
@@ -27,7 +27,7 @@ class LoginModal(
     }
 
     override val root: Parent = hbox {
-        addClass("login-modal")
+        addClass(css.loginModal)
         spacer()
         form {
             maxWidth = 520.0
@@ -35,24 +35,24 @@ class LoginModal(
             fieldset(titleText) {
                 field("Username") {
                     combobox(model.username) {
-                        id = "username_field"
+                        setId(css.loginUsernameField)
                         isEditable = true
                         itemsProperty().bind(model.users)
                     }
                 }
                 field("Password") {
                     passwordfield(model.password)
-                    { id = "password_field" }
+                    { setId(css.loginPasswordField) }
                 }
                 field("Log in for:") {
                     hbox {
                         val values = values().toList()
                         spinner(-1, 100000, 0, 1, false, model.duration, true) {
-                            id = "user_timeout"
+                            setId(css.loginTimeoutSpinner)
                             maxWidth = 80.0
                         }
                         combobox(model.timeUnit, values) {
-                            id = "timeout_unit"
+                            setId(css.loginTimeoutUnitCombo)
                             value = Seconds
                         }
                     }
@@ -61,12 +61,12 @@ class LoginModal(
             hbox {
                 spacer()
                 button("Cancel") {
-                    id = "login_cancel"
+                    setId(css.loginCancelButton)
                     setOnMouseClicked { currentStage?.close() }
                 }
                 spacer()
                 button("Login") {
-                    id = "login_login"
+                    setId(css.loginLoginButton)
                     setOnMouseClicked {
                         when (val login = model.login()) {
                             is Either.Right -> currentStage?.close()

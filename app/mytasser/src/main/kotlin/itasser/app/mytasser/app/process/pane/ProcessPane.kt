@@ -1,6 +1,6 @@
 package itasser.app.mytasser.app.process.pane
 
-import itasser.app.mytasser.app.mainview.consoletab.SelectedSequenceEvent
+import itasser.app.mytasser.app.events.SelectedSequenceEvent
 import itasser.app.mytasser.app.process.newDialog.NewProteinDialog
 import itasser.app.mytasser.app.process.pane.widget.ProcessWidget
 import itasser.app.mytasser.app.process.pane.widget.dialogWindow
@@ -20,7 +20,7 @@ import itasser.app.mytasser.app.process.pane.ProcessPaneCss as css
 class ProcessPane(scope: Scope? = null) : View("My View"), Logger {
     override val scope: Scope = scope ?: super.scope
     val model: ProcessPaneViewModel by inject()
-    val controller by lazy { model.item }
+    val controller: ProcessPaneController by lazy { model.item }
     override val root = vbox {
         maxWidth = Double.MAX_VALUE
         minWidth = 200.0
@@ -151,6 +151,7 @@ class ProcessPane(scope: Scope? = null) : View("My View"), Logger {
         }
     }
 }
+
 val intConverter = object : StringConverter<Int>() {
     override fun fromString(string: String?): Int = string?.toInt() ?: -1
 

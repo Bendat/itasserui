@@ -133,7 +133,7 @@ class ProfileManager(
             .map {
                 val found = fileManager[user]
                 val directory: DomainDirectory = found ?: fileManager.new(user)
-                val directories = directory?.subdirectories
+                val directories = directory.subdirectories
                 val profile = findOrCreateProfile(user, it, directories, directory)
                 profiles += profile
                 addSession(profile.user, session)

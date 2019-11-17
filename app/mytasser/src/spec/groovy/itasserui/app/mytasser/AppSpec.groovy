@@ -82,17 +82,17 @@ abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {
      * @param expectedContent Expected content of the dialog
      */
     void alertDialogHasHeaderAndContent(final String expectedHeader, final String expectedContent) {
-        final Stage actualAlertDialog = getTopModalStage();
-        assertNotNull(actualAlertDialog);
+        final Stage actualAlertDialog = getTopModalStage()
+        assertNotNull(actualAlertDialog)
 
-        final DialogPane dialogPane = (DialogPane) actualAlertDialog.getScene().getRoot();
-        assertEquals(expectedHeader, dialogPane.getHeaderText());
-        assertEquals(expectedContent, dialogPane.getContentText());
+        final DialogPane dialogPane = (DialogPane) actualAlertDialog.getScene().getRoot()
+        assertEquals(expectedHeader, dialogPane.getHeaderText())
+        assertEquals(expectedContent, dialogPane.getContentText())
     }
 
     String alertHeader() {
-        final Stage actualAlertDialog = getTopModalStage();
-        assertNotNull("Alert dialog should exist", actualAlertDialog);
+        final Stage actualAlertDialog = getTopModalStage()
+        assertNotNull("Alert dialog should exist", actualAlertDialog)
         final DialogPane dialogPane = (DialogPane) actualAlertDialog.getScene().getRoot()
         return dialogPane.getHeaderText()
     }

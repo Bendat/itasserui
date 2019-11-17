@@ -1,6 +1,6 @@
 package itasser.app.mytasser.app.mainview.consoletab
 
-import itasser.app.mytasser.app.process.pane.ProcessPaneController
+import itasser.app.mytasser.app.events.SelectedSequenceEvent
 import itasser.app.mytasser.app.process.pane.widget.ProcessWidgetController
 import itasser.app.mytasser.lib.kInject
 import itasserui.app.user.ProfileManager
@@ -12,14 +12,12 @@ import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
 import javafx.scene.image.Image
-import itasser.app.mytasser.lib.extensions.bind
 import lk.kotlin.observable.property.plusAssign
-import tornadofx.*
+import tornadofx.Controller
+import tornadofx.getValue
+import tornadofx.onChange
+import tornadofx.setValue
 
-class SelectedSequenceEvent(val sequence: ITasser) : FXEvent()
-class EventShooter(override val scope: Scope) : View("Event Shootr") {
-    override val root = vbox { }
-}
 
 class ConsoleViewController : Controller() {
     val profileManager: ProfileManager by kInject()
@@ -63,22 +61,6 @@ class ConsoleViewController : Controller() {
     }
 }
 
-class ConsoleViewModel : ItemViewModel<ConsoleViewController>(ConsoleViewController()) {
-    val selectedSequence = bind(ConsoleViewController::selectedSequenceProperty)
-    val command = bind(ConsoleViewController::commandProperty)
-    val stream = bind(ConsoleViewController::stdStream)
-    val runPauseIcon = bind(ConsoleViewController::runPauseIconProperty)
-    val stopIcon = bind(ConsoleViewController::stopIconProperty)
-    val copyIcon = bind(ConsoleViewController::copyIcon)
-    val executionStateProperty = bind(ConsoleViewController::executionStateProperty)
-    fun setRunPlayIcon(state: ExecutionState) =
-        item.setRunPlayIcon(state)
 
-    fun perform(ifNot: () -> Unit, op: (ITasser) -> Unit) {
-        item.selectedSequence?.let { seq ->
-            item.profileManager.perform(seq.process.createdBy, ifNot) { op(seq) }
-        }
-    }
-}
 
 

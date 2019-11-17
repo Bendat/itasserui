@@ -27,3 +27,16 @@ operator fun <T> Outcome<T>.plus(
 
 fun <T, K> Try<T>.mapLeft(op: (Throwable) -> K) =
     toEither().mapLeft(op)
+
+class ExceptionError(val e: Throwable) : RuntimeError()
+
+fun <T> Try(
+    eOp: (Throwable) -> RuntimeError = { ExceptionError(it) },
+    op: () -> T
+): Outcome<T> {
+    return try {
+        Either.Right(op())
+    } catch (e: Throwable) {
+        Either.Left(eOp(e))
+    }
+}
