@@ -9,7 +9,7 @@ import static itasser.app.mytasser.app.login.LoginModalCss.INSTANCE as css
 import static org.testfx.api.FxAssert.verifyThat
 import static org.testfx.matcher.control.ComboBoxMatchers.hasSelectedItem
 
-class BasicLoginSpec extends UserAppSpec<LoginModal> {
+class SuccessfulLoginSpec extends UserAppSpec<LoginModal> {
     void "There should be no users logged in"() {
         expect:
         extractor.profile.activeSessions.size() == 0

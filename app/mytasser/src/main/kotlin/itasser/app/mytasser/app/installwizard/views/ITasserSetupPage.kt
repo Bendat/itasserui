@@ -104,10 +104,10 @@ class ITasserSetupPage : View("ITasser setup"), InstallWizardPage {
             validationContext.error(nullMessage)
         } else {
             val chosen = Paths.get(textField.text)
-            val hasname = chosen.toAbsolutePath().toString().endsWith("runI-TASSER.pl")
+            val hasname = Files.exists(chosen.resolve("run-ITASSER.pl"))
             if (hasname)
-                validationContext.validateFile(chosen)
-            else validationContext.error("Could not find 'runI-TASSER.pl'")
+                validationContext.validateFile(chosen.resolve("run-ITASSER.pl"))
+            else validationContext.error("Could not find 'run-ITASSER.pl'")
         }
     }
 }

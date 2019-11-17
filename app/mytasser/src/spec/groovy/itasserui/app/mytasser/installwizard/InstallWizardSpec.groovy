@@ -1,42 +1,33 @@
 package itasserui.app.mytasser.installwizard
 
-import arrow.core.Either
+
 import itasser.app.mytasser.app.installwizard.InstallWizard
-import itasserui.app.mytasser.AppSpec
-import itasserui.lib.filemanager.FS
-import org.testfx.api.FxAssert
-import org.testfx.matcher.base.NodeMatchers
+import itasserui.app.mytasser.UserAppSpec
 import org.testfx.service.query.NodeQuery
 import tornadofx.Scope
 
+import java.nio.file.Files
 
-abstract class InstallWizardSpec extends AppSpec<InstallWizard> {
+abstract class InstallWizardSpec extends UserAppSpec<InstallWizard> {
     NodeQuery next_node = null
     NodeQuery finish_node = null
     NodeQuery back_node = null
 
-    @Override InstallWizard create() {
-        def wiz = new InstallWizard(new Scope())
-        return wiz
-    }
-
-    void setup(){
-        given:
+    void setup() {
         next_node = lookup(".button").nth(2)
         finish_node = lookup(".button").nth(1)
         back_node = lookup(".button").nth(0)
+        def file = pkg.resolve("run-ITASSER.pl")
+        Files.createDirectories(pkg)
+        Files.createFile(file)
+        Files.createDirectories(datadir)
+        Files.createDirectories(libdir)
+        Files.createDirectories(javaHome)
+    }
 
-        then:
-        FxAssert.verifyThat(next_node, NodeMatchers.isDisabled())
-        def pkgCreated = FS.create.file(pkg)
-        def dataCreated = FS.create.directories(datadir)
-        def libCreated = FS.create.directories(libdir)
-        def javaCreated = FS.create.directories(javaHome)
-
-        then:
-        pkgCreated instanceof Either.Right
-        dataCreated instanceof Either.Right
-        libCreated instanceof Either.Right
-        javaCreated instanceof Either.Right
+    @Override
+    InstallWizard create() {
+        setupStuff()
+        return new InstallWizard(new Scope())
     }
 }

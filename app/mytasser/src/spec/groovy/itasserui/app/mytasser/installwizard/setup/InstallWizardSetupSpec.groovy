@@ -22,6 +22,9 @@ abstract class InstallWizardSetupSpec extends InstallWizardSpec {
         dataDirNode = lookup(".datadir")
         libDirNode = lookup(".libdir")
         javaHomeNode = lookup('.java_home')
+        next_node = lookup(".button").nth(2)
+        finish_node = lookup(".button").nth(1)
+        back_node = lookup(".button").nth(0)
 
         when:
         clickOn(".name").write(fake.name().username())

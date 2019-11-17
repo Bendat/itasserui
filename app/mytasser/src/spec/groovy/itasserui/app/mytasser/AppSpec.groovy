@@ -42,7 +42,7 @@ abstract class AppSpec<T extends UIComponent> extends ApplicationSpec {
     String username = "admin"
     String email = fake.internet().emailAddress()
 
-    Path pkg = tmpdirPath.resolve("runI-TASSER.pl").toAbsolutePath()
+    Path pkg = tmpdirPath.resolve("pkgdir").toAbsolutePath()
     Path datadir = tmpdirPath.resolve("datadir").toAbsolutePath()
     Path libdir = tmpdirPath.resolve("lib").toAbsolutePath()
     Path javaHome = tmpdirPath.resolve("jdk").toAbsolutePath()

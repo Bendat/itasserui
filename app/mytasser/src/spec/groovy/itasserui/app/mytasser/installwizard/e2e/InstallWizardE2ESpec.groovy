@@ -2,8 +2,7 @@ package itasserui.app.mytasser.installwizard.e2e
 
 import arrow.core.None
 import itasserui.app.mytasser.installwizard.InstallWizardSpec
-import itasser.app.mytasser.lib.DI
-import org.kodein.di.Kodein
+import itasserui.common.utils.SafeWaitKt
 import org.testfx.api.FxAssert
 import org.testfx.matcher.base.NodeMatchers
 
@@ -12,6 +11,7 @@ import java.nio.file.Files
 class InstallWizardE2ESpec extends InstallWizardSpec {
 
     void "Successful E2E test for the install wizard"() {
+
         given:
         view.model.databasePath.value = tmpdirPath
 
@@ -24,7 +24,7 @@ class InstallWizardE2ESpec extends InstallWizardSpec {
         view.model.item.databasePath = tmpdirPath
 
         then: "The wizard should allow user to proceed"
-        FxAssert.verifyThat(next_node, NodeMatchers.isEnabled())
+        FxAssert.verifyThat(lookup("Next >"), NodeMatchers.isEnabled())
 
         when: "Proceeded to the ITasser setup page"
         clickOn(next_node.queryButton())
@@ -32,11 +32,8 @@ class InstallWizardE2ESpec extends InstallWizardSpec {
         clickOn(".datadir").write(datadir.toString())
         clickOn(".libdir").write(libdir.toString())
         clickOn(".java_home ").write(javaHome.toString())
+        SafeWaitKt.safeWait(25000)
         clickOn(finish_node.queryButton())
-
-        and: "The generated Kodein is set in scope"
-        def di = view.model.kodeinModule.value as arrow.core.Some<Kodein>
-        view.setInScope(new DI(di.t), view.scope)
 
         then: "Verify the viewmodel data is accurate"
         view.model.name.value == username

@@ -42,7 +42,8 @@ class FailedLoginSpec extends LoginSpec {
         and: "Verify the error modal is displayed"
         def error = view.model.loginError.value as Some<RuntimeError>
         alertHeader() == "Wrong Password"
-        alertContent().substring(0, 50) == error.t.toString().substring(0, 50)
+        alertContent().contains(error.t.toString())
+
     }
 
 }
