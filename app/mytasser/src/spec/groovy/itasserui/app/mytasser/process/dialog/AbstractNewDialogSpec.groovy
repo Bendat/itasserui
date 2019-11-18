@@ -1,16 +1,14 @@
 package itasserui.app.mytasser.process.dialog
 
-import itasser.app.mytasser.app.process.newDialog.NewProcessDialog
+import itasser.app.mytasser.app.process.newDialog.NewProteinDialog
 import itasserui.app.mytasser.UserAppSpec
-import javafx.scene.control.TextInputControl
 
-
-class AbstractNewDialogSpec extends UserAppSpec<NewProcessDialog> {
+class AbstractNewDialogSpec extends UserAppSpec<NewProteinDialog> {
 
     @Override
-    NewProcessDialog create() {
+    NewProteinDialog create() {
         setupStuff()
-        return new NewProcessDialog(testScope)
+        return new NewProteinDialog(testScope)
     }
 
 }

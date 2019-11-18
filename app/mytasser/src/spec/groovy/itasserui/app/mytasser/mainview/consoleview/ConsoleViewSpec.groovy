@@ -1,15 +1,19 @@
 package itasserui.app.mytasser.mainview.consoleview
 
+import itasser.app.mytasser.app.events.EventShooter
+import itasser.app.mytasser.app.events.SelectedSequenceEvent
 import itasser.app.mytasser.app.mainview.consoletab.ConsoleView
-import itasser.app.mytasser.app.mainview.consoletab.EventShooter
-import itasser.app.mytasser.app.mainview.consoletab.SelectedSequenceEvent
+import itasser.app.mytasser.app.mainview.consoletab.ConsoleViewCss as css
 import itasser.app.mytasser.app.process.pane.widget.WidgetCss
 import itasserui.app.mytasser.UserAppSpec
+import itasserui.lib.process.details.ExecutionState
 import itasserui.lib.process.process.ITasser
 import org.testfx.api.FxAssert
 import org.testfx.matcher.control.TextInputControlMatchers
 
 import java.time.Duration
+
+import static itasser.app.mytasser.app.login.LoginModalCss.INSTANCE as logincss
 
 class ConsoleViewSpec extends UserAppSpec<ConsoleView> {
     EventShooter event = null
@@ -49,8 +53,9 @@ class ConsoleViewSpec extends UserAppSpec<ConsoleView> {
         extractor.profile.login(user, account.password, Duration.ofMinutes(1))
 
         and: "Given the error text and command textfield nodes"
-        def text = { -> lookup(".err-text").queryText() }
+        def text = { -> lookup(css.consoleErrorText.render()).queryText() }
         def command = { -> lookup(".sequence-console-command") }
+
         when: "A new sequence event is fired"
         view.fire(new SelectedSequenceEvent(itasser))
 
@@ -65,6 +70,26 @@ class ConsoleViewSpec extends UserAppSpec<ConsoleView> {
 
         and: "The textfield should display the executed command"
         FxAssert.verifyThat(command(), TextInputControlMatchers.hasText(itasser.command))
+    }
+
+    void "Logs in after clicking run sequence"() {
+        given: "The password input"
+        def loginUserPassword = { ->
+            lookup(logincss.loginPasswordField.render())
+                    .queryTextInputControl()
+        }
+
+        when: "A new sequence is selected"
+        view.fire(new SelectedSequenceEvent(itasser))
+
+        and: "The run sequence button is clicked"
+        clickOn(WidgetCss.controlButton.render())
+
+        and: "The user logs in"
+        loginWithModal(loginUserPassword)
+
+        then: "The process should be running"
+        itasser.state == ExecutionState.Running.INSTANCE
     }
 
 }

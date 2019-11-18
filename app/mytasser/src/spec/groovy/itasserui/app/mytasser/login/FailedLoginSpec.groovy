@@ -4,43 +4,46 @@ import arrow.core.Some
 import itasserui.common.errors.RuntimeError
 import org.testfx.service.query.NodeQuery
 
+import static itasser.app.mytasser.app.login.LoginModalCss.INSTANCE as css
+
 class FailedLoginSpec extends LoginSpec {
     NodeQuery timeoutTime = null
 
     void setup() {
-        timeoutTime = lookup("#user_timeout")
+        timeoutTime = lookup(css.loginTimeoutSpinner.render())
     }
 
     void "Invalid username"() {
         when: "An unknown username is entered"
-        clickOn("#username_field").write("badAdmin")
-        clickOn("#password_field").write(password)
+        clickOn(css.loginUsernameField.render()).write("badAdmin")
+        clickOn(css.loginPasswordField.render()).write(password)
 
         then: "Attempt to login"
-        clickOn("#login_login")
+        clickOn(css.loginLoginButton.render())
 
         and: "Verify the error modal is displayed"
         def error = view.model.loginError.value as Some<RuntimeError>
         error.t.errorType == "NoSuchUser"
-        alertHeader() == "NoSuchUser"
-        alertContent().substring(0, 50) == error.t.toString().substring(0, 50)
+        alertHeader() == "No Such User"
+        alertContent().contains("User: Username(value=badAdmin)")
 
         and: "Close the modal"
-//        clickOn(".button")
+        clickOn("OK")
     }
 
     void "Invalid password"() {
         when: "An unknown username is entered"
-        clickOn("#username_field").write(username)
-        clickOn("#password_field").write("123}}")
+        clickOn(css.loginUsernameField.render()).write(user.username.value)
+        clickOn(css.loginPasswordField.render()).write("123}}")
 
         then: "Attempt to login"
-        clickOn("#login_login")
+        clickOn(css.loginLoginButton.render())
 
         and: "Verify the error modal is displayed"
         def error = view.model.loginError.value as Some<RuntimeError>
-        alertHeader() == "WrongPassword"
-        alertContent().substring(0, 50) == error.t.toString().substring(0, 50)
+        alertHeader() == "Wrong Password"
+        alertContent().contains(error.t.toString())
+
     }
 
 }

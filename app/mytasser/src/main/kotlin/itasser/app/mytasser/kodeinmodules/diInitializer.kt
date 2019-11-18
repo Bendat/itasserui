@@ -1,6 +1,6 @@
 package itasser.app.mytasser.kodeinmodules
 
-import itasserui.app.mytasser.lib.ITasserSettings
+import itasser.app.mytasser.lib.ITasserSettings
 import itasserui.common.logger.Logger
 import itasserui.lib.filemanager.FS
 import org.kodein.di.Kodein

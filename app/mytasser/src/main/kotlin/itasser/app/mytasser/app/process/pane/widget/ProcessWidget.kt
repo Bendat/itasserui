@@ -4,7 +4,7 @@ import itasser.app.mytasser.app.login.LoginModal
 import itasser.app.mytasser.app.styles.MainStylee
 import itasser.app.mytasser.app.styles.MainStylee.Companion.paddedImage2
 import itasser.app.mytasser.app.styles.MainStylee.Companion.transparentButton
-import itasserui.app.mytasser.lib.DI
+import itasser.app.mytasser.lib.DI
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.User
 import itasserui.common.extensions.format

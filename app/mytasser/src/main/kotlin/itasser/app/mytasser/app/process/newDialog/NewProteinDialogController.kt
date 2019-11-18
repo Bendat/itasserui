@@ -1,10 +1,11 @@
 package itasser.app.mytasser.app.process.newDialog
 
-import itasserui.app.mytasser.lib.extensions.bind
-import itasserui.app.mytasser.lib.kInject
+import itasser.app.mytasser.lib.extensions.bind
+import itasser.app.mytasser.lib.kInject
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.ProfileManager.Profile
 import itasserui.lib.process.Arg
+import itasserui.lib.process.manager.ProcessManager
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import tornadofx.Controller
@@ -13,18 +14,19 @@ import tornadofx.onChange
 import tornadofx.setValue
 import java.nio.file.Path
 
-class NewProcessController : Controller() {
+class NewProteinDialogController : Controller() {
     val profileManager: ProfileManager by kInject()
+    val processManager: ProcessManager by kInject()
     val usersProperty = FXCollections.observableArrayList<String>()
         .bind(profileManager.profiles) { it.user.username.value }
     val userProperty = SimpleObjectProperty("")
     var user: String by userProperty
     val profileProperty = SimpleObjectProperty<Profile?>(null)
-    var profile by profileProperty
-    val nameProperty = SimpleObjectProperty<String>("")
-    val name by nameProperty
-    val seqNameProperty = SimpleObjectProperty<String>("")
-    val seqName by seqNameProperty
+    var profile: Profile? by profileProperty
+    val nameProperty = SimpleObjectProperty("")
+    val name: String? by nameProperty
+    val seqNameProperty = SimpleObjectProperty("")
+    val seqName: String by seqNameProperty
     val seqFileProperty = SimpleObjectProperty<Path?>(null)
     val seqFile by seqFileProperty
     val dataDirProperty = SimpleObjectProperty<Path?>(null)

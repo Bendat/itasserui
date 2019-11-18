@@ -1,6 +1,6 @@
 package itasser.app.mytasser
 
-import itasser.app.mytasser.views.SplitView
+import itasser.app.mytasser.app.mainview.SplitView
 import javafx.application.Application
 import tornadofx.App
 import tornadofx.UIComponent

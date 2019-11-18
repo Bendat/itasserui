@@ -1,4 +1,4 @@
-package itasser.app.mytasser.views
+package itasser.app.mytasser.app.mainview
 
 import itasser.app.mytasser.app.mainview.tabpane.SplitTabPane
 import itasser.app.mytasser.app.process.pane.ProcessPane
@@ -10,9 +10,7 @@ class SplitView(scope: Scope? = null) : View("Hello TornadoFX") {
         prefWidth = 600.0
         setDividerPositions(0.4, 1.0, 2.0)
         this += ProcessPane(scope)
-
         this += SplitTabPane(scope)
-
         label("Hello")
     }
 }

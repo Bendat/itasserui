@@ -1,42 +1,41 @@
 package itasser.app.mytasser.app.process.newDialog
 
-import itasserui.app.mytasser.lib.SettingsManager
-import itasserui.app.mytasser.lib.kInject
+import itasser.app.mytasser.lib.SettingsManager
+import itasser.app.mytasser.lib.kInject
+import itasserui.common.logger.Logger
 import itasserui.common.utils.uuid
 import itasserui.lib.process.Arg
-import itasserui.lib.process.manager.ProcessManager
 import itasserui.lib.process.process.ITasser
 import tornadofx.ItemViewModel
 import java.nio.file.Files
-import java.nio.file.Paths
 
-class NewProcessDialogModel : ItemViewModel<NewProcessController>(NewProcessController()) {
-    val profileManager = bind(NewProcessController::profileManager)
-    val processManager: ProcessManager by kInject()
+class NewProteinDialogModel :
+    ItemViewModel<NewProteinDialogController>(NewProteinDialogController()),
+    Logger {
     val settings: SettingsManager by kInject()
-    val user = bind(NewProcessController::userProperty)
-    val seqFile = bind(NewProcessController::seqFileProperty)
-    val name = bind(NewProcessController::nameProperty)
-    val profile = bind(NewProcessController::profileProperty)
-    val seqName = bind(NewProcessController::seqNameProperty)
-    val users = bind(NewProcessController::usersProperty)
-    val dataDir = bind(NewProcessController::dataDirProperty)
-    val outDir = bind(NewProcessController::outDirProperty)
-    val homoFlag = bind(NewProcessController::homoFlagProperty)
-    val idCut = bind(NewProcessController::idCutProperty)
-    val nTemp = bind(NewProcessController::nTempProperty)
-    val nModel = bind(NewProcessController::nModelProperty)
-    val ec = bind(NewProcessController::ecProperty)
-    val lbs = bind(NewProcessController::lbsProperty)
-    val go = bind(NewProcessController::goProperty)
-    val tempExcl = bind(NewProcessController::tempExclProperty)
-    val restraint1 = bind(NewProcessController::restraint1Property)
-    val restraint2 = bind(NewProcessController::restraint2Property)
-    val restraint3 = bind(NewProcessController::restraint3Property)
-    val restraint4 = bind(NewProcessController::restraint4Property)
-    val traj = bind(NewProcessController::trajProperty)
-    val light = bind(NewProcessController::lightProperty)
-    val hours = bind(NewProcessController::hoursProperty)
+    val user = bind(NewProteinDialogController::userProperty)
+    val seqFile = bind(NewProteinDialogController::seqFileProperty)
+    val name = bind(NewProteinDialogController::nameProperty)
+    val profile = bind(NewProteinDialogController::profileProperty)
+    val seqName = bind(NewProteinDialogController::seqNameProperty)
+    val users = bind(NewProteinDialogController::usersProperty)
+    val dataDir = bind(NewProteinDialogController::dataDirProperty)
+    val outDir = bind(NewProteinDialogController::outDirProperty)
+    val homoFlag = bind(NewProteinDialogController::homoFlagProperty)
+    val idCut = bind(NewProteinDialogController::idCutProperty)
+    val nTemp = bind(NewProteinDialogController::nTempProperty)
+    val nModel = bind(NewProteinDialogController::nModelProperty)
+    val ec = bind(NewProteinDialogController::ecProperty)
+    val lbs = bind(NewProteinDialogController::lbsProperty)
+    val go = bind(NewProteinDialogController::goProperty)
+    val tempExcl = bind(NewProteinDialogController::tempExclProperty)
+    val restraint1 = bind(NewProteinDialogController::restraint1Property)
+    val restraint2 = bind(NewProteinDialogController::restraint2Property)
+    val restraint3 = bind(NewProteinDialogController::restraint3Property)
+    val restraint4 = bind(NewProteinDialogController::restraint4Property)
+    val traj = bind(NewProteinDialogController::trajProperty)
+    val light = bind(NewProteinDialogController::lightProperty)
+    val hours = bind(NewProteinDialogController::hoursProperty)
 
     fun moveFasta() {
         item.seqFile?.let { seqfile ->
@@ -63,6 +62,7 @@ class NewProcessDialogModel : ItemViewModel<NewProcessController>(NewProcessCont
         ).filter { it.value == null }
 
         val args = arrayListOf<String>(
+            settings.itasser.pkgDir.resolve("run-ITASSER.pl").toString(),
             Arg.SeqName.arg, seqName.value,
             Arg.DataDir.arg, dataDir.value.value.toString(),
             Arg.OutDir.arg, outDir.value.value.toString(),
@@ -85,9 +85,14 @@ class NewProcessDialogModel : ItemViewModel<NewProcessController>(NewProcessCont
             args.add(value!!)
         }
 
-        return processManager.new(
-            uuid, 0, seqFile.value.value ?: Paths.get("/seqfile empty"),
-            name.value, args, profile.value.value!!.user.id, dataDir.value.value!!,
+        return item.processManager.new(
+            uuid,
+            0,
+            seqFile.value.value!!,
+            seqName.value,
+            args,
+            profile.value.value!!.user.id,
+            dataDir.value.value!!,
             outDir.value.value!!
         )
     }

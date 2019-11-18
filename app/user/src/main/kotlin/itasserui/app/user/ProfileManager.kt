@@ -29,6 +29,7 @@ import lk.kotlin.observable.list.ObservableListWrapper
 import org.dizitart.kno2.filters.eq
 import org.dizitart.no2.objects.ObjectFilter
 import java.lang.System.currentTimeMillis
+import java.nio.file.Paths
 import java.time.Duration
 import java.util.*
 
@@ -40,7 +41,8 @@ class ProfileManager(
     val id = uuid
     val profiles: ObservableList<Profile> = ObservableListWrapper()
     val sessions: Map<UUID, Session?> = mutableMapOf()
-    val activeSessions get() = sessions.filter{it.value?.isActive == true}
+    val activeSessions get() = sessions.filter { it.value?.isActive == true }
+
     data class Session(val start: Long, val duration: Duration) {
         val sessionTimeRemaining: Long get() = start + duration.toMillis() - currentTimeMillis()
         @Suppress("MemberVisibilityCanBePrivate", "unused")
@@ -65,7 +67,7 @@ class ProfileManager(
     fun getAdmin(password: RawPassword): Outcome<User> {
         val results = database.read<User> { Account::isAdmin eq true }
         lateinit var user: User
-        true.ifTrue {  }
+        true.ifTrue { }
         return results
             .map { it.first() }
             .map { user = it; it }
@@ -131,7 +133,7 @@ class ProfileManager(
             .map {
                 val found = fileManager[user]
                 val directory: DomainDirectory = found ?: fileManager.new(user)
-                val directories = directory?.subdirectories
+                val directories = directory.subdirectories
                 val profile = findOrCreateProfile(user, it, directories, directory)
                 profiles += profile
                 addSession(profile.user, session)
@@ -213,8 +215,11 @@ class ProfileManager(
             .create(user)
             .map { user }
 
-    fun getUserDir(user: User, category: UserCategory) =
-        fileManager[user]!![category]
+    fun getUserDir(user: User) = fileManager[user] ?: Paths.get("/No Such User  ${user.name}")
+    fun getUserDir(user: User, category: UserCategory) = when (val fmResult = fileManager[user]) {
+        null -> Paths.get("/No User  Path Found for ${user.name}")
+        else -> fmResult[category]
+    }
 
     private fun trySaveToDb(user: User): Outcome<User> = when (val exists = existsInDatabase(user)) {
         is None -> saveToDb(user)

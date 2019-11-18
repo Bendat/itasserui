@@ -4,8 +4,8 @@ import itasser.app.mytasser.app.installwizard.viewmodel.InstallWizardViewModel
 import itasser.app.mytasser.app.installwizard.views.ITasserSetupPage
 import itasser.app.mytasser.app.installwizard.views.InstallWizardPage
 import itasser.app.mytasser.app.installwizard.views.RegistrationPage
-import itasserui.app.mytasser.lib.DI
-import itasserui.app.mytasser.lib.SettingsManager
+import itasser.app.mytasser.lib.DI
+import itasser.app.mytasser.lib.SettingsManager
 import itasserui.common.logger.Logger
 import org.kodein.di.generic.instance
 import tornadofx.Scope

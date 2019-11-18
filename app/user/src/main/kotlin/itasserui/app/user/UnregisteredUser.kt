@@ -17,6 +17,7 @@ interface Account : FileDomain, Subcategory {
     val emailAddress: EmailAddress
     val isAdmin: Boolean
     fun toUser(id: UUID = this.id): User
+
 }
 
 data class UnregisteredUser(
@@ -30,7 +31,7 @@ data class UnregisteredUser(
     override val category: FileCategory
         get() = Users
     override val relativeRootName: String
-        get() = "tmp/${username.value}"
+        get() = username.value
     override val id: UUID = uuid
     override val categories: List<Subcategory> = listOf()
 

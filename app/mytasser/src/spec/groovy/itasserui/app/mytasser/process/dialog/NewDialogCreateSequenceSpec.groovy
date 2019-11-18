@@ -1,71 +1,116 @@
 package itasserui.app.mytasser.process.dialog
 
-import itasser.app.mytasser.app.process.newDialog.NewSequenceCss
-import itasserui.common.utils.SafeWaitKt
+
+import javafx.scene.input.KeyCode
+import org.testfx.matcher.base.NodeMatchers
+
+import static itasser.app.mytasser.app.process.newDialog.NewProteinDialogCss.*
+import static org.testfx.api.FxAssert.verifyThat
 
 class NewDialogCreateSequenceSpec extends AbstractNewDialogSpec {
+    void "Sequence details should be disabled by default"() {
+        given: "A locator for the sequence details fieldset"
+        def detailSet = lookup(".protein-details-fieldset")
+        def requiredParams = lookup(".protein-details-required-parameters")
 
-    void "Verifies the sequence name and required dirs are autofilled"() {
-        given: "Controls fields"
-        def createButton = lookup(NewSequenceCss.createButton.render()).queryButton()
-        def errorPrompt = { -> lookup(NewSequenceCss.errorLabel.render()).queryLabeled() }
-        def userField = lookup(NewSequenceCss.userField.render()).queryComboBox()
-        def description = lookup(NewSequenceCss.description.render()).queryTextInputControl()
-        def name = lookup(NewSequenceCss.name.render()).queryTextInputControl()
-        def seqName = lookup(NewSequenceCss.sequenceName.render()).queryTextInputControl()
-        def datadir = lookup("${NewSequenceCss.dataDir.render()} .text-input").queryTextInputControl()
-        def outdir = lookup("${NewSequenceCss.outDir.render()} .text-input").queryTextInputControl()
+        expect: "The New Sequence Details should be disabled"
+        verifyThat(detailSet, NodeMatchers.isDisabled())
 
-        and: "Login dialog fields"
-        def loginUserPassword = { -> lookup("#password_field").queryTextInputControl() }
-
-        when: "Logging in and completing form"
-        clickOn(userField).write(account.username.value)
-        clickOn(createButton)
-        loginWithModal(loginUserPassword)
-        clickOn(name).write("Amoxyl Dioxyn Junior")
-        clickOn(description).write("This boys got a lot amoxy")
-
-        then: "The Directories should match those of the selected profile"
-        datadir.text == view.model.item.profile?.dataDir?.unixPath?.toString()
-        outdir.text == view.model.item.profile?.outDir?.unixPath?.toString()
-
-        and: "The sequence name should match the seqname value"
-        seqName.text == name.text
+        and: "The required parameter set should remain disabled"
+        verifyThat(requiredParams, NodeMatchers.isDisabled())
     }
 
-    void "Wait"(){
-        expect:
-        SafeWaitKt.safeWait(10000)
+    void "Sequence details should be enabled when user selected"() {
+        given: "A user"
+        def user = account
+
+        and: "A locator for the sequence details fieldset"
+        def detailSet = lookup(".protein-details-fieldset")
+        def requiredParams = lookup(".protein-details-required-parameters")
+        def defaultParams = lookup(".protein-details-default-parameters")
+        def optionalParams = lookup(".protein-details-optional-parameters")
+
+        when: "The username is entered"
+        clickOn(userField.render()).write(user.username.value)
+        type(KeyCode.ENTER)
+
+        then: "The New Protein Details fieldset should be enabled"
+        verifyThat(detailSet, NodeMatchers.isEnabled())
+
+        and: "The remaining fieldsets should remain disabled"
+        verifyThat(requiredParams, NodeMatchers.isDisabled())
+        verifyThat(defaultParams, NodeMatchers.isDisabled())
+        verifyThat(optionalParams, NodeMatchers.isDisabled())
     }
 
-    void "Verifies creating the sequence"() {
-        given: "Controls fields"
-        def createButton = lookup(NewSequenceCss.createButton.render()).queryButton()
-        def errorPrompt = { -> lookup(NewSequenceCss.errorLabel.render()).queryLabeled() }
-        def userField = lookup(NewSequenceCss.userField.render()).queryComboBox()
-        def description = lookup(NewSequenceCss.description.render()).queryTextInputControl()
-        def name = lookup(NewSequenceCss.name.render()).queryTextInputControl()
-        def seqName = lookup(NewSequenceCss.sequenceName.render()).queryTextInputControl()
-        def seqFileField = lookup(".new-sequence-seq-file .file-chooser-input").queryTextInputControl()
-        def datadir = lookup("${NewSequenceCss.dataDir.render()} .text-input").queryTextInputControl()
-        def outdir = lookup("${NewSequenceCss.outDir.render()} .text-input").queryTextInputControl()
+    void "Optional and parameter fieldsets should be enabled when Required parameters are set"() {
+        given: "A user"
+        def user = account
 
-        and: "Login dialog fields"
+        and: "A locator for the sequence details fieldset"
+        def requiredParams = lookup(requiredFieldSet.render())
+        def defaultParams = lookup(defaultParams.render())
+        def optionalParams = lookup(optionalParams.render())
+
+        and: "The locators for the outdir and datadir fields"
+        def outDirField = lookup("${outDir.render()} .text-input").queryTextInputControl()
+        def dataDirField = lookup("${dataDir.render()} .text-input").queryTextInputControl()
+
+        when: "A user is selected"
+        clickOn(userField.render()).write(user.username.value)
+        type(KeyCode.ENTER)
+
+        and: "The protein details are entered"
+        clickOn(name.render()).write("Amoxylinezine")
+        clickOn(description.render()).write("This isn't gonna work")
+        clickOn(fastaLocation.render()).write(tmpdirPath.toString())
+
+        then: "Required, Default and Optional parameters should be enabled"
+        verifyThat(requiredParams, NodeMatchers.isEnabled())
+        verifyThat(defaultParams, NodeMatchers.isEnabled())
+        verifyThat(optionalParams, NodeMatchers.isEnabled())
+
+        and: "The outdir and datadir have been filled"
+        println("Relative root is ${user.relativeRootName}")
+        dataDirField.text == tmpdirPath
+                .resolve("users")
+                .resolve(user.relativeRootName)
+                .resolve("datadir")
+                .resolve("Amoxylinezin")
+                .toString()
+        outDirField.text == tmpdirPath
+                .resolve("users")
+                .resolve(user.relativeRootName)
+                .resolve("outdir")
+                .resolve("Amoxylinezin")
+                .toString()
+
+        and: "The model should be valid"
+        view.model.isValid()
+    }
+
+    void "Successfully creating an ITasser sequence"() {
+        given: "A user"
+        def user = account
+
+        and: "A locator for password input"
         def loginUserPassword = { -> lookup("#password_field").queryTextInputControl() }
 
-        when: "Logging in and completing form"
-        clickOn(userField).write(account.username.value)
-        clickOn(createButton)
-        loginWithModal(loginUserPassword)
-        clickOn(name).write("Amoxyl Dioxyn Junior")
-        println("SeqFile is $seqFile")
-        clickOn(seqFileField).write(seqFile.toString())
-        clickOn(description).write("This boys got a lot amoxy")
-        clickOn(createButton)
+        when: "A user is selected"
+        clickOn(userField.render()).write(user.username.value)
+        type(KeyCode.ENTER)
+
+        and: "The protein details are entered"
+        clickOn(name.render()).write("Amoxylinezine")
+        clickOn(description.render()).write("This isn't gonna work")
+        clickOn(fastaLocation.render()).write(tmpdirPath.toString())
+
+        and: "The create button is clicked"
+        clickOn(createButton.render())
+        loginWithModal(loginUserPassword, account, false)
 
         then:
-        extractor.proc.processes.all.size == 1
-        SafeWaitKt.safeWait(15000)
+        extractor.proc.processes.size == 1
     }
+
 }

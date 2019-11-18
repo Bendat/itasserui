@@ -1,4 +1,4 @@
-package itasserui.app.mytasser.lib
+package itasser.app.mytasser.lib
 
 import itasserui.common.logger.Logger
 import org.kodein.di.Instance

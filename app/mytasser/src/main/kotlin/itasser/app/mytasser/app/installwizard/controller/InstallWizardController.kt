@@ -7,7 +7,9 @@ import arrow.data.Ior
 import arrow.data.NonEmptyList
 import arrow.data.nel
 import itasser.app.mytasser.kodeinmodules.DependencyInjector.initializeKodein
-import itasserui.app.mytasser.lib.ITasserSettings
+import itasser.app.mytasser.lib.DI
+import itasser.app.mytasser.lib.ITasserSettings
+import itasser.app.mytasser.lib.KodeinInjector
 import itasserui.app.user.ProfileManager
 import itasserui.app.user.UnregisteredUser
 import itasserui.common.`typealias`.NelOutcome
@@ -107,6 +109,7 @@ class InstallWizardController : Controller(), Logger {
         val dbWrite = db.create(toSettings())
         info { "Creating user profile: $profile" }
         info { "Creating database settings: $dbWrite" }
+        setInScope(DI(di), scope)
         return when {
             profile is Ior.Left && dbWrite is Either.Left ->
                 NonEmptyList(dbWrite.a, *profile.value.all.toTypedArray()).left()

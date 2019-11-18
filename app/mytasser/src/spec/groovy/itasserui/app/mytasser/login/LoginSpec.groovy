@@ -1,61 +1,12 @@
 package itasserui.app.mytasser.login
 
 import itasser.app.mytasser.app.login.LoginModal
-import itasser.app.mytasser.kodeinmodules.DependencyInjector
-import itasserui.app.mytasser.AppSpec
-import itasserui.app.mytasser.lib.DI
-import itasserui.app.mytasser.lib.ITasserSettings
-import itasserui.app.user.UnregisteredUser
-import itasserui.common.interfaces.inline.EmailAddress
-import itasserui.common.interfaces.inline.RawPassword
-import itasserui.common.interfaces.inline.Username
-import org.kodein.di.Kodein
-import org.testfx.api.FxAssert
-import org.testfx.api.FxToolkit
-import org.testfx.matcher.control.ComboBoxMatchers
-import org.testfx.service.query.NodeQuery
-import tornadofx.Scope
+import itasserui.app.mytasser.UserAppSpec
 
-import java.nio.file.Path
-
-abstract class LoginSpec extends AppSpec<LoginModal> {
-    NodeQuery timeUnit = null
-
-    private ITasserSettings settins = new ITasserSettings(tmpdirPath, libdir, javaHome, datadir, "gnuparallel", UUID.randomUUID())
-
-    void cleanup() {
-        FxToolkit.hideStage()
-    }
-
-    void setup() {
-        def user = new UnregisteredUser(new Username(username), new RawPassword(password), new EmailAddress(email), false).toUser(UUID.randomUUID())
-        timeUnit = lookup("#timeout_unit")
-
-        "The combobox to have ${LoginModal.LoginDuration.values().size()}"
-        FxAssert.verifyThat(timeUnit, ComboBoxMatchers.hasItems(3))
-        FxAssert.verifyThat(timeUnit, ComboBoxMatchers.hasSelectedItem(LoginModal.LoginDuration.Seconds))
-
-        "A new user $username to exist in the database"
-        view.model.item.profileManager.database.launch()
-        view.model.item.profileManager.new(user)
-    }
-
+abstract class LoginSpec extends UserAppSpec<LoginModal> {
     @Override
     LoginModal create() {
-        println("Dir is ${tmpdirPath.toAbsolutePath()}")
-        def path = tmpdirPath as Path
-        Kodein kodein = initKodein(path)
-        def view = new LoginModal("User Login", new Scope())
-        view.setInScope(new DI(kodein), view.scope)
-        return view
-    }
-
-    private Kodein initKodein(Path path) {
-        def kodein = DependencyInjector.INSTANCE.initializeKodein(
-                username,
-                password,
-                settins,
-                path)
-        return kodein
+        setupStuff()
+        return new LoginModal("User Login", testScope)
     }
 }
