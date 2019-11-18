@@ -3,7 +3,7 @@ package itasser.app.mytasser.app.process.newDialog
 import tornadofx.cssclass
 
 
-object NewSequenceCss {
+object NewProteinDialogCss {
     @JvmStatic
     val userField by cssclass("sequence-user-field")
     @JvmStatic

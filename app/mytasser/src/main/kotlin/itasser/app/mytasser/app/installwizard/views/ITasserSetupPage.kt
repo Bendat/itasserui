@@ -37,7 +37,7 @@ class ITasserSetupPage : View("ITasser setup"), InstallWizardPage {
             field("Package Dir") {
                 textinput(model.pkgDir) {
                     addClass("pkgdir")
-                    promptText = "Directory containing the runITASSER.pl script"
+                    promptText = "Directory containing the run-ITASSER.pl script"
                     validator { validatePkgdir(this@textinput, this) }
                 }
             }

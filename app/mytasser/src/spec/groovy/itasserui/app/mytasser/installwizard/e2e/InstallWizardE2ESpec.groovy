@@ -11,7 +11,6 @@ import java.nio.file.Files
 class InstallWizardE2ESpec extends InstallWizardSpec {
 
     void "Successful E2E test for the install wizard"() {
-
         given:
         view.model.databasePath.value = tmpdirPath
 

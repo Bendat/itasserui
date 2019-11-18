@@ -17,7 +17,7 @@ import tornadofx.*
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import itasser.app.mytasser.app.process.newDialog.NewSequenceCss as css
+import itasser.app.mytasser.app.process.newDialog.NewProteinDialogCss as css
 
 fun path(path: String): Path = Paths.get(path)
 class NewProteinDialog(scope: Scope? = null) : View("Create New ITasser Process"), Logger {

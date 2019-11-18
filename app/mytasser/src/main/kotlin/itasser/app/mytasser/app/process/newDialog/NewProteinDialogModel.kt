@@ -8,7 +8,6 @@ import itasserui.lib.process.Arg
 import itasserui.lib.process.process.ITasser
 import tornadofx.ItemViewModel
 import java.nio.file.Files
-import java.nio.file.Paths
 
 class NewProteinDialogModel :
     ItemViewModel<NewProteinDialogController>(NewProteinDialogController()),
@@ -63,6 +62,7 @@ class NewProteinDialogModel :
         ).filter { it.value == null }
 
         val args = arrayListOf<String>(
+            settings.itasser.pkgDir.resolve("run-ITASSER.pl").toString(),
             Arg.SeqName.arg, seqName.value,
             Arg.DataDir.arg, dataDir.value.value.toString(),
             Arg.OutDir.arg, outDir.value.value.toString(),
@@ -84,15 +84,16 @@ class NewProteinDialogModel :
             args.add(key)
             args.add(value!!)
         }
-        info { "Profile is ${item.profile}" }
-        info { "seqfile is ${seqFile.value.value}" }
-        info { "datadir is ${dataDir.value.value}" }
-        info { "Outdir is ${outDir.value.value}" }
-        info { "Seqname is ${seqName.value}" }
+
         return item.processManager.new(
-            uuid, 0, item.seqFile ?: Paths.get("/seqfile empty"),
-            item.seqName, args, item.profile!!.user.id,
-            item.dataDir!!, item.outDir!!
+            uuid,
+            0,
+            seqFile.value.value!!,
+            seqName.value,
+            args,
+            profile.value.value!!.user.id,
+            dataDir.value.value!!,
+            outDir.value.value!!
         )
     }
 }

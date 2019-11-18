@@ -4,7 +4,7 @@ package itasserui.app.mytasser.process.dialog
 import javafx.scene.input.KeyCode
 import org.testfx.matcher.base.NodeMatchers
 
-import static itasser.app.mytasser.app.process.newDialog.NewSequenceCss.*
+import static itasser.app.mytasser.app.process.newDialog.NewProteinDialogCss.*
 import static org.testfx.api.FxAssert.verifyThat
 
 class NewDialogCreateSequenceSpec extends AbstractNewDialogSpec {
