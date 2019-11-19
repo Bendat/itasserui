@@ -1,4 +1,4 @@
-package blast;
+package itasserui.app.viewer.blast;
 
 import java.io.*;
 import java.net.HttpURLConnection;

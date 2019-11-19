@@ -1,5 +1,6 @@
-package view;
+package itasserui.app.viewer.view;
 
+import itasserui.app.viewer.pdbview3d.MyStackedBarChart;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.SubScene;
@@ -7,7 +8,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
-import pdbview3d.MyStackedBarChart;
 
 /**
  * View handling the GUI. This is the topPane itself.

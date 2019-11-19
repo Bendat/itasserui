@@ -1,25 +1,15 @@
-package blast
-
+package itasserui.app.viewer.blast
+import itasserui.app.viewer.blast.RemoteBlastClient.Status.*
 import javafx.concurrent.Service
 import javafx.concurrent.Task
 
-import blast.RemoteBlastClient.Status
 
 /**
  * Service allowing to concurrently call a BLAST function and run it.
  */
 class BlastService : Service<String>() {
 
-    private var sequence: String? = null
-
-    /**
-     * Set the sequence to BLAST.
-     *
-     * @param sequence The sequence to BLAST.
-     */
-    fun setSequence(sequence: String) {
-        this.sequence = sequence
-    }
+    var sequence: String? = null
 
     override fun createTask(): Task<String> {
         return object : Task<String>() {
@@ -43,7 +33,7 @@ class BlastService : Service<String>() {
                 )
                 updateProgress(0, remoteBlastClient.estimatedTime.toLong())
                 val startTime = System.currentTimeMillis()
-                var status: Status? = null
+                var status: RemoteBlastClient.Status? = null
                 // Query BLAST for status, if sequence is done or not.
                 do {
                     if (status != null)
@@ -60,7 +50,7 @@ class BlastService : Service<String>() {
                     )
                     if (isCancelled)
                         break
-                } while (status == Status.searching)
+                } while (status == searching)
 
                 if (isCancelled) {
                     updateTitle("Cancelled")
@@ -69,13 +59,13 @@ class BlastService : Service<String>() {
                 }
 
                 when (status) {
-                    Status.hitsFound -> {
+                    hitsFound -> {
                         updateTitle("BLAST done: Hits found.")
                         for (line in remoteBlastClient.remoteAlignments!!) {
                             result.append(line + "\n")
                         }
                     }
-                    Status.noHitsFound -> {
+                    noHitsFound -> {
                         updateTitle("BLAST done: no hits were found.")
                         result.append("No hits found.")
                         System.err.println("No hits")
