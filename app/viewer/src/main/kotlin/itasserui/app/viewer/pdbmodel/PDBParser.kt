@@ -52,7 +52,7 @@ object PDBParser : Logger {
         // Bond the atoms together in a correct way, since a PDB dous not give awa information about
         // how the atoms are connected
         setUpBonds(pdbEntry)
-
+        info { atomArrayList.map { it.chemicalElement } }
         // Something went wrong, could not parse any nodes. Maybe wrong file format?
         if (pdbEntry.nodes.size == 0) {
             throw Exception("No nodes were read from PDB file. Exiting.")
@@ -142,7 +142,8 @@ object PDBParser : Logger {
      * @return List of residues still to be added to the model, after the coordinated have been normalized.
      */
     private fun postProcess(
-        pdbEntry: PDBEntry, atomArrayList: ArrayList<Atom>,
+        pdbEntry: PDBEntry,
+        atomArrayList: ArrayList<Atom>,
         helices: ArrayList<Pair<String, String>>,
         betaSheets: ArrayList<Pair<String, String>>
     ): ArrayList<Residue> {

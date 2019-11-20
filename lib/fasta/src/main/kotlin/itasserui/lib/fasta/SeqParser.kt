@@ -86,7 +86,7 @@ object SeqParser : Logger {
         val badChars = value
             ?.trim()
             ?.toSet()
-            ?.minus(AminoAcids.values().map { it.code }.toSet())
+            ?.minus(AminoAcid.values().map { it.code }.toSet())
         return when (badChars?.any()) {
             true -> Some(BadChar("The sequence contains invalid characters", value, badChars, file))
             false, null -> None

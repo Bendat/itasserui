@@ -84,7 +84,6 @@ class Atom(x: Double, y: Double, z: Double, chemicalElement: String, text: Strin
                     CA, CB, C -> 12 / 1.5
                     N -> 14 / 1.5
                     O -> 16 / 1.5
-                    else -> 5 / 1.5
                 }
             }
 
@@ -99,7 +98,6 @@ class Atom(x: Double, y: Double, z: Double, chemicalElement: String, text: Strin
                     CA, CB, C -> Color.web("202020")
                     N -> Color.web("2060ff")
                     O -> Color.web("ee2010")
-                    else -> Color.GREEN
                 }
             }
     }

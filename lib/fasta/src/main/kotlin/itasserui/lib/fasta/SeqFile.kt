@@ -2,6 +2,7 @@
 
 package itasserui.lib.fasta
 
+import itasserui.common.logger.Logger
 import itasserui.common.utils.uuid
 import itasserui.lib.fasta.description.Description
 import java.util.*
@@ -47,31 +48,39 @@ sealed class SequenceChain {
 
 }
 
-enum class AminoAcids(val code: Char, val abbreviation: String, val aminoacid: String) {
-    A('A', "ALA", "alanine"),
-    B('B', "ASX", "asparagine"),
-    C('C', "CYS", "cystine"),
-    D('D', "ASP", "aspartate"),
-    E('E', "GLU", "glutamate  "),
-    F('F', "PHE", "phenylalanine"),
-    G('G', "GLY", "glycine"),
-    H('H', "HIS", "histidine"),
-    I('I', "ILE", "isoleucine"),
-    K('K', "LYS", "lysine"),
-    L('L', "LEU", "leucine"),
-    M('M', "MET", "methionine"),
-    N('N', "ASN", "asparagine "),
-    P('P', "PRO", "proline"),
-    Q('Q', "GLN", "glutamine"),
-    R('R', "ARG", "arginine"),
-    S('S', "SER", "serine"),
-    T('T', "THR", "threonine"),
-    V('V', "VAl", "valine"),
-    W('W', "TRP", "tryptophan"),
-    U('U', "", "selenocysteine"),
-    Y('Y', "TYR", "tyrosine"),
-    Z('Z', "GLX", "glutamine"),
+enum class AminoAcid(val code: Char, val abbreviation: String, val aminoacid: String) {
+    A('A', "ALA", "Alanine"),
+    B('B', "ASX", "Asparagine"),
+    C('C', "CYS", "Cystine"),
+    D('D', "ASP", "Aspartate"),
+    E('E', "GLU", "Glutamate"),
+    F('F', "PHE", "Phenylalanine"),
+    G('G', "GLY", "Glycine"),
+    H('H', "HIS", "Histidine"),
+    I('I', "ILE", "Isoleucine"),
+    K('K', "LYS", "Lysine"),
+    L('L', "LEU", "Leucine"),
+    M('M', "MET", "Methionine"),
+    N('N', "ASN", "Asparagine "),
+    P('P', "PRO", "Proline"),
+    Q('Q', "GLN", "Glutamine"),
+    R('R', "ARG", "Arginine"),
+    S('S', "SER", "Serine"),
+    T('T', "THR", "Threonine"),
+    V('V', "VAL", "Valine"),
+    W('W', "TRP", "Tryptophan"),
+    U('U', "SEL", "Selenocysteine"),
+    Y('Y', "TYR", "Tyrosine"),
+    Z('Z', "GLX", "Glutamine"),
     X('X', "", "Any"),
     Stop('*', "", "Translation stop"),
-    Gap('-', "", "Gap of unknown length")
+    Gap('-', "", "Gap of unknown length");
+
+    companion object : Logger {
+        fun fromAbbreviation(abbr: String) =
+            values().first { it.abbreviation == abbr }
+
+
+    }
+
 }

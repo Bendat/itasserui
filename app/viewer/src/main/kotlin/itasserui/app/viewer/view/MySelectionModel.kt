@@ -20,7 +20,6 @@ class MySelectionModel<T>(vararg items: T) : MultipleSelectionModel<T>(), Logger
     var items: List<T> = items.toList()
         set(value) {
             clearSelection()
-            info { "Setting new items $value" }
             field = value.toList()// use copy for safety
         }// need a copy of this array to map indices to objects, when required
 
