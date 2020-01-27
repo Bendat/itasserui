@@ -37,7 +37,6 @@ internal constructor(
         val tooltip = Tooltip()
         tooltip.textProperty().bind(modelNodeReference.textProperty)
         Tooltip.install(this, tooltip)
-
         // Draw the circular sphere which represents a node
         shape = Sphere()
         shape.radiusProperty().bind(modelNodeReference.radiusProperty.multiply(radiusScaling))

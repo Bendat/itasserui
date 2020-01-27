@@ -136,7 +136,7 @@ class MyGraphView3D
         // Create new view node
         val node = MyNodeView3D(atom, this.atomRadiusScaling)
         // Set up the view logic in the presenter for this node.
-        presenter.setUpNodeView(node)
+         presenter.setUpNodeView(node)
         // Add the node to the scene graph
         nodeViewGroup.children.add(node)
         // Add to mapping for later use

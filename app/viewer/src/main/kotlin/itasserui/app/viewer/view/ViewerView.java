@@ -12,7 +12,7 @@ import javafx.stage.FileChooser;
 /**
  * View handling the GUI. This is the topPane itself.
  */
-public class View extends BorderPane {
+public class ViewerView extends BorderPane {
 
     /**
      * Menu Bar for the program
@@ -201,7 +201,7 @@ public class View extends BorderPane {
     /**
      * Construct the view.View.
      */
-    public View() {
+    public ViewerView() {
         secondaryStructureContentStackedBarChart = new MyStackedBarChart();
 
         status = new Label();

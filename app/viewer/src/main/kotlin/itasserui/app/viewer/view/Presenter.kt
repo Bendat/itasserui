@@ -62,7 +62,7 @@ class Presenter
     /**
      * View to be set in the scene.
      */
-    private val view: View,
+    private val view: ViewerView,
     /**
      * PDB model to be represented by the view.
      */

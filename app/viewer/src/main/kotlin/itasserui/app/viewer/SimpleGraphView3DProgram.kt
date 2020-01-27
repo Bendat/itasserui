@@ -2,14 +2,12 @@ package itasserui.app.viewer
 
 import itasserui.app.viewer.pdbmodel.PDBEntry
 import itasserui.app.viewer.view.Presenter
-import itasserui.app.viewer.view.View
+import itasserui.app.viewer.view.ViewerView
 import javafx.application.Application
 import javafx.scene.Scene
 import javafx.stage.Stage
 
 import javax.swing.ImageIcon
-import java.awt.*
-import java.net.URL
 
 /**
  * Main class.
@@ -20,7 +18,7 @@ class SimpleGraphView3DProgram : Application() {
 
     override fun start(primaryStage: Stage) {
         // Create the GUI view and a model graph.
-        val view = View()
+        val view = ViewerView()
         val graph = PDBEntry()
 
 
