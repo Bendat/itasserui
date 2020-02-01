@@ -14,6 +14,7 @@ import tornadofx.setValue
  *
  * @author Patrick Grupp
  */
+val defaultAtom get() = Atom(0.0, 0.0, 0.0, "A", "helio")
 class Atom(x: Double, y: Double, z: Double, chemicalElement: String, text: String) {
 
     /**

@@ -10,23 +10,23 @@ class Residue(var resNum: String, aminoAcid: String) {
     /**
      * C atom of the residue.
      */
-    var cAtom: Atom? = null
+    var cAtom: Atom = defaultAtom
     /**
      * O atom of the residue.
      */
-    var oAtom: Atom? = null
+    var oAtom: Atom = defaultAtom
     /**
      * N atom of the residue.
      */
-    var nAtom: Atom? = null
+    var nAtom: Atom = defaultAtom
     /**
      * C alpha atom of the residue.
      */
-    var cAlphaAtom: Atom? = null
+    var cAlphaAtom: Atom = defaultAtom
     /**
      * C beta atom of the residue.
      */
-    var cBetaAtom: Atom? = null
+    var cBetaAtom: Atom = defaultAtom
 
     /**
      * If the residue is part of a secondary structure it is referenced here, else null.

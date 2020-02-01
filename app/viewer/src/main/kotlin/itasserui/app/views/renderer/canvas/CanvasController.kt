@@ -24,5 +24,4 @@ class CanvasController {
 
     val atomViews = FXCollections.observableHashMap<Atom, NodeRenderer>()
     val edgeViews = FXCollections.observableHashMap<Bond, EdgeView>()
-    
 }
