@@ -1,7 +1,7 @@
 package itasserui.common.extensions
 
-val Boolean.isFalse get() = !this
-val Boolean.isTrue get() = this
+val Boolean?.isFalse get() = this == false
+val Boolean?.isTrue get() = this == true
 
 fun <TReturn> Boolean.ifTrue(action: () -> TReturn) =
     apply { if (this) action() }
