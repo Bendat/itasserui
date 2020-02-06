@@ -1,10 +1,14 @@
 package itasserui.app.viewer.pdbmodel
 
 import itasserui.common.logger.Logger
+import itasserui.lib.pdb.parser.Element
+import itasserui.lib.pdb.parser.NormalizedAtom
 import javafx.geometry.Point3D
 import javafx.scene.transform.Rotate
 import javafx.util.Pair
 import java.io.BufferedReader
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.*
 
 /**
@@ -52,7 +56,12 @@ object PDBParser : Logger {
         // Bond the atoms together in a correct way, since a PDB dous not give awa information about
         // how the atoms are connected
         setUpBonds(pdbEntry)
-        info { atomArrayList.map { it.chemicalElement } }
+        info { "Atom is ${atomArrayList.last()}" }
+        info { "Atom is ${atomArrayList.last().chemicalElement}" }
+        info { "Atom is ${atomArrayList.last().residue.resNum}" }
+        info { "Helix is ${helices}" }
+        info { "beta is ${betaSheets}" }
+        info { "residue is ${residues.last()}" }
         // Something went wrong, could not parse any nodes. Maybe wrong file format?
         if (pdbEntry.nodes.size == 0) {
             throw Exception("No nodes were read from PDB file. Exiting.")
@@ -72,7 +81,8 @@ object PDBParser : Logger {
      * program should end parsind, since EOF or end of model is reached.
      */
     private fun processLine(
-        line: String, pdbEntry: PDBEntry, atoms: ArrayList<Atom>,
+        line: String, pdbEntry: PDBEntry,
+        atoms: ArrayList<Atom>,
         helices: ArrayList<Pair<String, String>>,
         betaSheets: ArrayList<Pair<String, String>>
     ): Status {

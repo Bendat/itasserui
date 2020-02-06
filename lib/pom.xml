@@ -6,6 +6,7 @@
         <module>filemanager</module>
         <module>store</module>
         <module>process</module>
+        <module>pdb</module>
     </modules>
 
     <parent>

@@ -35,6 +35,7 @@ class RibbonController(val residue: Residue) {
     var mesh by meshProperty
 
     init {
+        arrayOf<Int>().map {  }
         if (lastResidue is Some) {
             val lr = lastResidue as Some
             source = lr.t

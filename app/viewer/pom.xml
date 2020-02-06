@@ -57,6 +57,12 @@
         </dependency>
         <dependency>
             <groupId>itasserui.lib</groupId>
+            <artifactId>pdb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>itasserui.lib</groupId>
             <artifactId>fasta</artifactId>
             <version>${project.version}</version>
         </dependency>

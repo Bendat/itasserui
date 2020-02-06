@@ -27,6 +27,10 @@ object Serializer : Logger {
     fun toJson(obj: Any?): String =
         mapper.writeValueAsString(obj)
 
+    fun toPrettyJson(obj: Any?): String =
+        mapper.writerWithDefaultPrettyPrinter()
+            .writeValueAsString(obj)
+
     inline fun <reified T> fromJson(value: String): T =
         mapper.readValue(value, T::class.java)
 

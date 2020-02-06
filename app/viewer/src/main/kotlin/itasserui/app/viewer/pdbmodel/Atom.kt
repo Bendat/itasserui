@@ -73,7 +73,7 @@ class Atom(x: Double, y: Double, z: Double, chemicalElement: String, text: Strin
     val radiusProperty: DoubleProperty = SimpleDoubleProperty(this.chemicalElement.radius)
     var radius by radiusProperty
     enum class ChemicalElement {
-        CA, CB, N, O, C;
+        CA, CB, N, O, C, A/*null value*/;
 
         /**
          * Get the chemically correct ratio between radii of the elements.
@@ -85,6 +85,7 @@ class Atom(x: Double, y: Double, z: Double, chemicalElement: String, text: Strin
                     CA, CB, C -> 12 / 1.5
                     N -> 14 / 1.5
                     O -> 16 / 1.5
+                    A -> 1.0
                 }
             }
 
@@ -99,6 +100,7 @@ class Atom(x: Double, y: Double, z: Double, chemicalElement: String, text: Strin
                     CA, CB, C -> Color.web("202020")
                     N -> Color.web("2060ff")
                     O -> Color.web("ee2010")
+                    A -> Color.GREEN
                 }
             }
     }
