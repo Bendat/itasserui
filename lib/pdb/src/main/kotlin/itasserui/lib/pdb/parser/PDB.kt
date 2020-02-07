@@ -6,7 +6,8 @@ import itasserui.lib.pdb.parser.sections.Sheet
 
 data class PDB(
     val header: Header,
-    val nodes: List<Atomic>, val edges: List<Bond>,
+    val nodes: List<Atomic>,
+    val edges: List<Bond>,
     val helixStructures: List<SecondaryStructure>,
     val sheetStructures: List<SecondaryStructure>,
     val helices: List<Helix>,

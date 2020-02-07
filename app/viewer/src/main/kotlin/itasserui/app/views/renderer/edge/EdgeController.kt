@@ -1,11 +1,10 @@
 package itasserui.app.views.renderer.edge
 
 import itasserui.app.viewer.pdbmodel.Bond
-import itasserui.app.views.renderer.atom.NodeRenderer
+import itasserui.app.views.renderer.atom.node.NodeRenderer
 import itasserui.app.views.renderer.edge.line.Line
 import itasserui.app.views.renderer.edge.line.LineView
 import itasserui.app.views.renderer.edge.line.Pos
-import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.paint.Color

@@ -1,4 +1,4 @@
-package itasserui.app.views.renderer.atom
+package itasserui.app.views.renderer.atom.node
 
 import itasserui.app.viewer.pdbmodel.Atom
 import javafx.beans.property.DoubleProperty

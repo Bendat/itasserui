@@ -1,7 +1,5 @@
 @file:Suppress("MemberVisibilityCanBePrivate")
 
-package itasserui.app.views.renderer.atom
-
 import itasserui.app.viewer.pdbmodel.Atom
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleObjectProperty

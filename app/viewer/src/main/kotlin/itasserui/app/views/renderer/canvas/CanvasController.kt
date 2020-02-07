@@ -2,7 +2,7 @@ package itasserui.app.views.renderer.canvas
 
 import itasserui.app.viewer.pdbmodel.Atom
 import itasserui.app.viewer.pdbmodel.Bond
-import itasserui.app.views.renderer.atom.NodeRenderer
+import itasserui.app.views.renderer.atom.node.NodeRenderer
 import itasserui.app.views.renderer.edge.EdgeView
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections

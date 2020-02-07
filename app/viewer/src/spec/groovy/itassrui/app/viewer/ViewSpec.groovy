@@ -2,7 +2,7 @@ package itassrui.app.viewer
 
 import itasserui.app.viewer.pdbmodel.PDBEntry
 import itasserui.app.viewer.pdbmodel.PDBParser
-import itasserui.app.views.renderer.atom.NodeRenderer
+import itasserui.app.views.renderer.atom.node.NodeRenderer
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.scene.Scene
 import javafx.stage.Stage

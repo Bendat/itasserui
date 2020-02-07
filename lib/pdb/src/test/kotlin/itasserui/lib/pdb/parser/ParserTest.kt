@@ -73,7 +73,7 @@ class ParserTest : DescribeSpec({
 
         }
         it("Verifies the first residue") {
-            val residue = pdb.residues[0]
+            val residue = pdb.residues.first()
             residue.sequenceNo should be(6)
         }
     }
