@@ -1,4 +1,4 @@
-package itasserui.app.views.renderer.bond
+package itasserui.app.views.renderer.data.bond
 
 import itasserui.lib.pdb.parser.Bond
 import tornadofx.Controller

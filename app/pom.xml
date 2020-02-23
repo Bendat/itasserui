@@ -12,6 +12,7 @@
         <module>user</module>
         <module>mytasser</module>
         <module>viewer</module>
+        <module>fxutils</module>
     </modules>
 
     <groupId>itasserui.app</groupId>

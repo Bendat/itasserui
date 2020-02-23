@@ -13,6 +13,9 @@ import javafx.scene.shape.Sphere
  *
  * @author Patrick Grupp
  */
+// Intellij gets confused by lambdas which implement
+// interfaces
+@Suppress("RedundantLambdaArrow")
 class MyNodeView3D
 /**
  * Constructs a View representation of a node.
@@ -26,7 +29,8 @@ internal constructor(
      *
      * @return Model's node instance, this view node represents.
      */
-    val modelNodeReference: Atom, radiusScaling: DoubleProperty
+    val modelNodeReference: Atom,
+    radiusScaling: DoubleProperty
 ) : Group() {
     val shape: Sphere
     var material: PhongMaterial
@@ -47,7 +51,7 @@ internal constructor(
         // The listener listens on the models color property and adapts the specular color of the material accordingly
 
         modelNodeReference.colorProperty
-            .addListener { e -> material.specularColor = modelNodeReference.colorProperty.value.brighter() }
+            .addListener { _ -> material.specularColor = modelNodeReference.colorProperty.value.brighter() }
 
         shape.material = material
 

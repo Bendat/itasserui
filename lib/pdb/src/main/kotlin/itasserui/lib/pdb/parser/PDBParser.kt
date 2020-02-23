@@ -1,12 +1,11 @@
 package itasserui.lib.pdb.parser
 
-import arrow.core.*
-import arrow.data.Nel
-import arrow.data.nel
+import arrow.core.Either
+import arrow.core.Left
+import arrow.core.right
+import arrow.data.*
 import itasserui.common.extensions.isTrue
 import itasserui.common.logger.Logger
-import itasserui.lib.pdb.parser.SecondaryStructureType.Alphahelix
-import itasserui.lib.pdb.parser.SecondaryStructureType.Betasheet
 import itasserui.lib.pdb.parser.errors.*
 import itasserui.lib.pdb.parser.sections.*
 import javafx.geometry.Point3D
@@ -17,19 +16,22 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 
-enum class ShapeType{
+enum class ShapeType {
     HELIX,
     SHEET
 }
+
 object PDBParser : Logger {
     const val atom_distance_factor = 20
 
-    fun parse(file: Path): Either<PDBParseError, PDB> {
+    @Suppress("NAME_SHADOWING")
+    fun parse(file: Path): Validated<PDBParseError, PDB> {
         lateinit var residues: List<Residue>
         lateinit var helixStructures: List<SecondaryStructure>
         lateinit var sheetStructures: List<SecondaryStructure>
 
         val lines = Files.readAllLines(file)
+        // todo: validate lines
         val header: Header = getHeader(lines).fold({ EmptyHeader }) { it }
 
         val helices = getStructure(ShapeType.HELIX, lines, 21 to 26, 33 to 38, 38)
@@ -53,16 +55,15 @@ object PDBParser : Logger {
         val sheetList = sheets.fold({ listOf<Sheet>() }) { it }
 
         return PDB(header, nodes, bonds, helixStructures, sheetStructures,
-            helixList, sheetList, residues).right()
+            helixList, sheetList, residues).valid()
     }
 
     private fun getShape(
         shapes: List<Shape>,
         type: SecondaryStructureType,
         residues: List<Residue>
-    ): List<SecondaryStructure> = shapes.flatMap {
-        getSecondaryStructures(residues, it, type)
-    }
+    ): List<SecondaryStructure> =
+        shapes.flatMap { getSecondaryStructures(residues, it, type) }
 
 
     fun setupBonds(residues: List<Residue>): ArrayList<Bond> {
@@ -111,7 +112,7 @@ object PDBParser : Logger {
             }
         }
 
-    internal fun getResidues(atoms: List<Atomic>): List<Residue> {
+    private fun getResidues(atoms: List<Atomic>): List<Residue> {
         return atoms.groupBy { it.sequenceNumber }.map { pair ->
             val caAtom = pair.value.firstOrNull { it.element == Element.CA } ?: EmptyAtom
             val cbAtom = pair.value.firstOrNull { it.element == Element.CB } ?: EmptyAtom
@@ -143,7 +144,7 @@ object PDBParser : Logger {
         return structures
     }
 
-    internal fun handleGlycine(residue: Residue): Residue {
+    private fun handleGlycine(residue: Residue): Residue {
         if (residue.acid != AminoAcid.GLY)
             return residue
         val ca = residue.cAlphaAtom.let { Point3D(it.position.x, it.position.y, it.position.z) }
@@ -159,21 +160,21 @@ object PDBParser : Logger {
 
         val newcBeta =
             Atom(result, Element.CB, residue.sequenceNo, residue.acid, residue.cBetaAtom.line)
-        return Residue(
-            residue.sequenceNo, residue.acid, residue.cAtom,
-            residue.nAtom, residue.oAtom, residue.cAlphaAtom, newcBeta
-        )
+
+        return Residue(residue.sequenceNo, residue.acid, residue.cAtom,
+            residue.nAtom, residue.oAtom, residue.cAlphaAtom, newcBeta)
     }
 
-    internal fun getAtoms(lines: List<String>): Either<ErrorList, List<Atom>> {
+    internal fun getAtoms(lines: List<String>): Validated<ErrorList, List<Atom>> {
         val atomLines = lines.filter { it.startsWith("ATOM") }
         val atoms = atomLines.mapIndexedNotNull { number, line ->
-            if (54 > line.length)
-                Left(InvalidLine(line, line.length, 54, StructureType.Atom))
-            else {
-                val atomName = line.getSegment(12, 16)
-                if (atomName !in Element.values().map { it.name }) null
-                else getAtomFromLine(line, atomName, number)
+            when {
+                54 > line.length -> Left(InvalidLine(line, line.length, 54, StructureType.Atom))
+                else -> {
+                    val atomName = line.getSegment(12, 16)
+                    if (atomName !in Element.values().map { it.name }) null
+                    else getAtomFromLine(line, atomName, number)
+                }
             }
         }
         val errors = atoms
@@ -181,9 +182,9 @@ object PDBParser : Logger {
             .map { it.a }
 
         if (errors.isNotEmpty())
-            return Left(ErrorList(Nel(errors.first(), errors.drop(1))))
+            return Invalid(ErrorList(Nel(errors.first(), errors.drop(1))))
 
-        return Right(atoms.filterIsInstance<Either.Right<Atom>>().map { it.b })
+        return Valid(atoms.filterIsInstance<Either.Right<Atom>>().map { it.b })
     }
 
     private fun getAtomFromLine(
@@ -218,7 +219,7 @@ object PDBParser : Logger {
         end: Pair<Int, Int>,
         length: Int,
         crossinline structure: (Int, Int) -> T
-    ): Either<ErrorList, List<T>> {
+    ): Validated<ErrorList, List<T>> {
         val helices = lines.filter { it.startsWith(prefix.name) }
         if (helices.none { it.length < length }) {
             val mapped = helices.mapStructure(start, end) { s, e -> structure(s, e) }
@@ -227,24 +228,21 @@ object PDBParser : Logger {
         val line = helices.first { it.length < 38 }
         val lineError = InvalidLine(line, line.length, 38, StructureType.Betasheet).nel()
         val errorList = ErrorList(lineError)
-        return Left(errorList)
+        return Invalid(errorList)
     }
 
 
-    private fun getHeader(lines: List<String>): Either<PDBParseError, Header> {
-        if (lines.isEmpty())
-            return Left(EmptyFile)
-
+    private fun getHeader(lines: List<String>): Validated<PDBParseError, Header> {
         val line = lines.first()
-        return if (!line.startsWith("HEADER"))
-            Left(MissingHeader)
-        else if (line.length < 66)
-            Left(InvalidLine(line, line.length, 66,
-                StructureType.Header))
-        else {
-            val title = line.getSegment(10, 50)
-            val code = line.getSegment(62, 66)
-            Right(ValidHeader(title, code))
+        return when {
+            !line.startsWith("HEADER") -> Valid(EmptyHeader)
+            line.length < 66 ->
+                Invalid(InvalidLine(line, line.length, 66, StructureType.Header))
+            else -> {
+                val title = line.getSegment(10, 50)
+                val code = line.getSegment(62, 66)
+                Valid(ValidHeader(title, code))
+            }
         }
     }
 
@@ -253,36 +251,35 @@ object PDBParser : Logger {
     }
 
     private inline fun <reified T> handleStructureErrors(
-        mapped: List<Either<PDBParseError, T>>
-    ): Either<ErrorList, List<T>> {
-        val errors = mapped.filterIsInstance<Either.Left<PDBParseError>>()
-            .map { it.a }
+        mapped: List<Validated<PDBParseError, T>>
+    ): Validated<ErrorList, List<T>> {
+        val errors = mapped.filterIsInstance<Invalid<PDBParseError>>()
+            .map { it.e }
         if (errors.isNotEmpty())
-            return ErrorList(Nel(errors.first(), errors.drop(1))).left()
-        return mapped.filterIsInstance<Either.Right<T>>()
-            .map { it.b }.right()
+            return ErrorList(Nel(errors.first(), errors.drop(1))).invalid()
+        return mapped.filterIsInstance<Valid<T>>()
+            .map { it.a }.valid()
     }
 
     private inline fun <reified T> List<String>.mapStructure(
         startIndices: Pair<Int, Int>,
         endIndices: Pair<Int, Int>,
         structure: (Int, Int) -> T
-    ): List<Either<InvalidSequenceNumber, T>> {
+    ): List<Validated<InvalidSequenceNumber, T>> {
         return map { line ->
             val start = line.getSegment(startIndices.first, startIndices.second)
             val end = line.getSegment(endIndices.first, endIndices.second)
-            if (!start.isInt())
-                Left(InvalidSequenceNumber(line, start))
-            else if (!end.isInt())
-                Left(InvalidSequenceNumber(line, start))
-            else {
-                Right(structure(start.toInt(), end.toInt()))
+            when {
+                !start.isInt() -> Invalid(InvalidSequenceNumber(line, start))
+                !end.isInt() -> Invalid(InvalidSequenceNumber(line, start))
+                else -> Valid(structure(start.toInt(), end.toInt()))
             }
         }
     }
 }
 
 
+@Suppress("unused")
 enum class StructureType {
     Header,
     Remarks,

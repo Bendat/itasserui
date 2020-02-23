@@ -6,3 +6,15 @@ fun <T> T.print(): T {
     object : Logger {}.info { "Printing object value [$this]" }
     return this
 }
+
+data class LetPair<T, K>(val t: T?, val k: K?) {
+    operator fun invoke(op: (T, K) -> Unit) {
+        t?.let { t ->
+            k?.let { k ->
+                op(t, k)
+            }
+        }
+    }
+}
+
+infix fun <T, K> T?.compose(other: K?) = LetPair(this, other)

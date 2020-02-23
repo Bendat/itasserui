@@ -12,3 +12,7 @@ fun <T, R> Collection<T>.loop(
 ): List<R> {
     return map { action(it); transform(it) }
 }
+
+fun <K, V> Map<K, V>.having(key: K, action: (V) -> Unit) {
+    this[key]?.apply(action)
+}

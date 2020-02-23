@@ -1,10 +1,11 @@
 package itasserui.lib.pdb.parser
 
+import io.kotlintest.assertions.arrow.validation.beValid
 import io.kotlintest.be
 import io.kotlintest.should
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.DescribeSpec
-import itasserui.test_utils.matchers.Be
+import io.kotlintest.specs.StringSpec
 import javafx.geometry.Point3D
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -18,9 +19,14 @@ class ParserTest : DescribeSpec({
         }
 
         it("Parses the file") {
-            PDBParser.parse(file)
-                .map { pdb = it } should Be.ok()
+            val parsed = PDBParser.parse(file)
+            parsed should beValid()
+            parsed.map { pdb = it }
+        }
 
+        it("Validates the header") {
+            pdb.header.title should be("HYDROLASE")
+            pdb.header.code should be("1EY4")
         }
 
         context("Atoms should match the reference program") {

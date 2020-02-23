@@ -4,15 +4,19 @@
 
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>itasserui.lib</groupId>
-        <artifactId>lib</artifactId>
+        <artifactId>app</artifactId>
+        <groupId>itasserui.app</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>pdb</artifactId>
+    <artifactId>fxutils</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>PDB Parsing library</name>
+    <name>itasserui.app fxutils</name>
+
+    <properties>
+        <tornadofx.version>1.7.17</tornadofx.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -21,24 +25,14 @@
             <version>${kotlin.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>12.0.1</version>
-        </dependency>
-        <dependency>
             <groupId>no.tornado</groupId>
             <artifactId>tornadofx</artifactId>
             <version>${tornadofx.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.kotlintest</groupId>
-            <artifactId>kotlintest-assertions-arrow</artifactId>
-            <version>3.1.2</version>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+            <version>${kotlin.version}</version>
         </dependency>
     </dependencies>
 

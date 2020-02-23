@@ -11,11 +11,34 @@ enum class AminoAcid(val symbol: String, val molecule: String) {
     NUL("0", "Nothing")
 }
 
-data class Residue(
-    val sequenceNo: Int, val acid: AminoAcid,
-    val cAtom: Atomic, val nAtom: Atomic, val oAtom: Atomic,
-    val cAlphaAtom: Atomic, val cBetaAtom: Atomic
-) {
+interface Peptide {
+    val sequenceNo: Int
+    val acid: AminoAcid
+    val cAtom: Atomic
+    val nAtom: Atomic
+    val oAtom: Atomic
+    val cAlphaAtom: Atomic
+    val cBetaAtom: Atomic
+
     val atoms get() = arrayOf(nAtom, cAtom, cAlphaAtom, cBetaAtom, oAtom)
 }
 
+data class Residue(
+    override val sequenceNo: Int,
+    override val acid: AminoAcid,
+    override val cAtom: Atomic,
+    override val nAtom: Atomic,
+    override val oAtom: Atomic,
+    override val cAlphaAtom: Atomic,
+    override val cBetaAtom: Atomic
+) : Peptide
+
+object ResidueStub: Peptide{
+    override val sequenceNo: Int = -1
+    override val acid: AminoAcid = AminoAcid.NUL
+    override val cAtom: Atomic = EmptyAtom
+    override val nAtom: Atomic = EmptyAtom
+    override val oAtom: Atomic = EmptyAtom
+    override val cAlphaAtom: Atomic = EmptyAtom
+    override val cBetaAtom: Atomic = EmptyAtom
+}

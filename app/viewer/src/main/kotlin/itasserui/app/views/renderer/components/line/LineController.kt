@@ -1,4 +1,4 @@
-package itasserui.app.views.renderer.edge.line
+package itasserui.app.views.renderer.components.line
 
 import javafx.beans.InvalidationListener
 import javafx.beans.property.DoubleProperty
@@ -19,7 +19,11 @@ data class Pos(
 data class Line(
     val start: Pos,
     val end: Pos
-)
+) {
+    constructor(start: Point3D, end: Point3D) :
+            this(Pos(start.x.toProperty(), start.y.toProperty(), start.z.toProperty()),
+                Pos(end.x.toProperty(), end.y.toProperty(), end.z.toProperty()))
+}
 
 class LineController(
     val line: Line,
@@ -58,9 +62,7 @@ class LineController(
         line.end.x.addListener(listener)
         line.end.y.addListener(listener)
         line.end.z.addListener(listener)
-
         listener.invalidated(line.start.x)
-
     }
 }
 

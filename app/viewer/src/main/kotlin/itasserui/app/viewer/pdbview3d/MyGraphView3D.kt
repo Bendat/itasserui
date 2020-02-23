@@ -7,6 +7,7 @@ import itasserui.app.viewer.pdbmodel.Bond
 import itasserui.app.viewer.pdbmodel.Residue
 import itasserui.app.viewer.pdbmodel.SecondaryStructure
 import itasserui.app.viewer.view.Presenter
+import itasserui.common.extensions.ifFalse
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.scene.Group
@@ -136,7 +137,7 @@ class MyGraphView3D
         // Create new view node
         val node = MyNodeView3D(atom, this.atomRadiusScaling)
         // Set up the view logic in the presenter for this node.
-         presenter.setUpNodeView(node)
+        presenter.setUpNodeView(node)
         // Add the node to the scene graph
         nodeViewGroup.children.add(node)
         // Add to mapping for later use
@@ -151,7 +152,6 @@ class MyGraphView3D
     fun removeNode(atom: Atom) {
         // Filter for view's node to be removed through all view nodes.
         if (modelToNode.containsKey(atom)) {
-
             val current = modelToNode[atom]
             nodeViewGroup.children.remove(current)
             modelToNode.remove(atom)
@@ -330,11 +330,7 @@ class MyGraphView3D
      */
     fun cartoonView(hide: Boolean) {
         this.secondaryStructureViewGroup.children.stream().map { el -> el as MySecondaryStructureView3D }
-            .forEach { structure ->
-                if (!structure.wasComputed()) {
-                    structure.compute()
-                }
-            }
+            .forEach { structure -> structure.wasComputed().ifFalse { structure.compute() } }
         this.secondaryStructureViewGroup.isVisible = !hide
     }
 
