@@ -28,16 +28,40 @@ class Viewer : View("PDB Viewer") {
                     togglegroup {
                         radiobutton("Atom View", this) {
                             isSelected = true
+                            selectedProperty().onChange {
+                                graph.controller.nodeViewGroup.isVisible = it
+                                graph.controller.edgeGroup.isVisible = it
+                            }
                         }
-                        radiobutton("Cartoon View", this) {}
+                        radiobutton("Cartoon View", this) {
+                            selectedProperty().onChange { graph.controller.showCartoonView(it) }
+                        }
                     }
                     separator(Orientation.VERTICAL)
                     button("Run Blast")
                     separator(Orientation.VERTICAL)
 
-                    checkbox("Ribbon View")
-                    checkbox("Show bonds")
-                    checkbox("Show C-Betas")
+                    checkbox("Ribbon View") {
+                        selectedProperty().onChange { graph.controller.residueViewGroup.isVisible = it }
+                    }
+                    checkbox("Show Atoms") {
+                        isSelected = true
+                        selectedProperty().onChange { graph.controller.nodeViewGroup.isVisible = it }
+                    }
+                    checkbox("Show bonds") {
+                        isSelected = true
+                        selectedProperty().onChange { graph.controller.edgeGroup.isVisible = it }
+
+
+                    }
+                    checkbox("Show C-Betas") {
+                        isSelected = true
+                        selectedProperty().onChange {
+                            graph.controller.cAlphaBetas.forEach { node -> node.isVisible = it }
+                            graph.controller.cBetas.forEach { node -> node.isVisible = it }
+                        }
+
+                    }
                 }
                 toolbar {
                     hbox {
@@ -60,9 +84,17 @@ class Viewer : View("PDB Viewer") {
                     }
 
                     togglegroup {
-                        radiobutton("By Element", this).isSelected = true
-                        radiobutton("By Residue", this)
-                        radiobutton("By Secondary Structure", this)
+                        radiobutton("By Element", this) {
+                            isSelected = true
+                            selectedProperty().onChange { graph.controller.colorByAtom() }
+                        }
+
+                        radiobutton("By Residue", this){
+                            selectedProperty().onChange { graph.controller.colorByResidue() }
+                        }
+                        radiobutton("By Secondary Structure", this){
+                            selectedProperty().onChange { graph.controller.colorBySecondaryStructure() }
+                        }
                     }
 
                     button("Reset Position") {

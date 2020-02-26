@@ -11,6 +11,7 @@ import itasserui.lib.pdb.parser.ResidueStub
 import javafx.beans.property.Property
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.scene.Node
 import javafx.scene.paint.Color
 import javafx.scene.paint.PhongMaterial
 import javafx.scene.shape.DrawMode
@@ -28,12 +29,11 @@ class RibbonController(val residue: Residue, override val scope: Scope) : Contro
     val meshProperty: Property<TriangleMesh> = TriangleMesh(POINT_TEXCOORD).toProperty()
     var mesh by meshProperty
 
-    init {
+    fun load(children: MutableList<Node>) {
         if (lastResidue is Some) {
             val lr = lastResidue as Some
             source = lr.t
             target = residue
-            SimpleDoubleProperty()
             lastResidue.map { lastResidue ->
                 val sourceAlpha = lastResidue.cAlphaAtom.position
                 val sourceBeta = lastResidue.cBetaAtom.position
@@ -101,12 +101,10 @@ class RibbonController(val residue: Residue, override val scope: Scope) : Contro
                 val mat = PhongMaterial(Color.MEDIUMAQUAMARINE)
                 mat.specularColor = Color.MEDIUMAQUAMARINE.brighter()
                 meshView.material = mat
-                view.root.children.add(meshView)
+                children.add(meshView)
             }
-
-            lastResidue = Some(residue)
         }
-
+        lastResidue = Some(residue)
     }
 
     companion object {

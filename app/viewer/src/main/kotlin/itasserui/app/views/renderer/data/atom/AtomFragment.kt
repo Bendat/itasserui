@@ -13,6 +13,7 @@ class AtomFragment(atom: NormalizedAtom, radiusScaling: DoubleProperty, text: St
     override val scope: Scope = Scope()
     val controller = AtomController(atom, radiusScaling, text, scope)
     override val root = group {
+        userData = this@AtomFragment
         children += controller.shape
         translateXProperty().bind(controller.xCoordinateProperty)
         translateYProperty().bind(controller.yCoordinateProperty)

@@ -13,6 +13,7 @@ class EdgeFragment(val from: AtomFragment, val to: AtomFragment, edgeScaling: Do
     override val scope: Scope = Scope()
     val controller = EdgeController(from, to, edgeScaling, scope)
     override val root = group {
+        userData = this@EdgeFragment
         children += controller.makeLineView().root
     }
 }

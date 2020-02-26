@@ -3,13 +3,16 @@ package itasserui.app.views.renderer.components.graph
 import itasserui.app.views.renderer.components.ribbon.RibbonFragment
 import itasserui.app.views.renderer.data.atom.AtomFragment
 import itasserui.app.views.renderer.data.edge.EdgeFragment
+import itasserui.app.views.renderer.data.structure.SecondaryStructureController
 import itasserui.app.views.renderer.data.structure.SecondaryStructureView
 import itasserui.common.extensions.compose
 import itasserui.common.extensions.having
+import itasserui.common.extensions.ifTrue
 import itasserui.lib.pdb.parser.*
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.collections.FXCollections
 import javafx.collections.FXCollections.observableHashMap
 import javafx.collections.ObservableList
 import javafx.collections.ObservableMap
@@ -17,9 +20,11 @@ import javafx.event.EventTarget
 import javafx.geometry.Point3D
 import javafx.scene.Group
 import javafx.scene.Node
+import javafx.scene.paint.Color
 import javafx.scene.transform.Rotate
 import javafx.scene.transform.Transform
 import tornadofx.*
+import java.util.*
 
 object EmptyGroup : Group()
 
@@ -64,7 +69,9 @@ class GraphController(
 
     val nodeViews: ObservableList<Node> get() = nodeViewGroup.children
     val edgeViews: ObservableList<Node> get() = edgeGroup.children
-
+    val cAlphaBetas: ObservableList<Node> = FXCollections.observableArrayList()
+    val cBetas: ObservableList<Node> = FXCollections.observableArrayList()
+    val residueAtoms = observableHashMap<Residue, List<AtomFragment>>()
     private val defaultGroup get() = Group().toProperty()
     private var defaultTransform = worldTransform
 
@@ -72,12 +79,59 @@ class GraphController(
         worldTransformProperty.addListener { _, _, n ->
             view.root.transforms.setAll(n)
         }
-
-        pdb.nodes.filterIsInstance<NormalizedAtom>().forEach { add(it) }
+        pdb.residues.map { residue ->
+            residueAtoms[residue] = residue.atoms.mapNotNull {
+                if (it is NormalizedAtom) {
+                    add(it)
+                } else null
+            }
+        }
+//        pdb.nodes.filterIsInstance<NormalizedAtom>().forEach { add(it) }
         pdb.edges.forEach { add(it) }
         pdb.structures.forEach { add(it) }
+        pdb.residues.forEach { add(it) }
+        residueViewGroup.isVisible = false
     }
-    fun reset(){
+
+    fun colorByAtom() {
+        nodeViews.map { it.userData }
+            .map { it as AtomFragment }
+            .map { it.controller }
+            .forEach { it.color = it.atom.element.color }
+        modelToEdge.values.forEach { it.controller.color = Color.GRAY }
+    }
+
+    fun colorByResidue() {
+        val randomGenerator = Random()
+        residueAtoms.map { entry ->
+            val r = randomGenerator.nextFloat()
+            val g = randomGenerator.nextFloat()
+            val b = randomGenerator.nextFloat()
+            val col = Color(r.toDouble(), g.toDouble(), b.toDouble(), 1.0)
+            entry.value.forEach { it.controller.color = col }
+            modelToEdge.values.forEach {
+                if (it.controller.from in entry.value)
+                    it.controller.color = col
+            }
+        }
+    }
+
+    fun colorBySecondaryStructure() {
+        val random = Random()
+        modelToStructure.keys.forEach { ss ->
+            var color = if (ss.structureType == Alphahelix)
+                Color.RED else Color.CORNFLOWERBLUE
+            residueAtoms.map { res ->
+
+                if (modelToStructure.any { res.key in it.key }) {
+                    color = Color(random.nextDouble(), random.nextDouble(), random.nextDouble(), 1.0)
+                }
+                res.value.forEach { it.controller.color = color }
+            }
+        }
+    }
+
+    fun reset() {
         worldTransform = defaultTransform
     }
 
@@ -85,11 +139,12 @@ class GraphController(
         modelToNode.having(atom) { nodeViewGroup.children.remove(it.root) }
     }
 
-    fun add(atom: NormalizedAtom) {
+    fun add(atom: NormalizedAtom): AtomFragment {
         val view = AtomFragment(atom, atomRadiusScalingProperty, "")
         nodeViewGroup.children += view.root
         modelToNode[atom] = view
-//        TODO("     presenter.setUpNodeView(node)")
+        atom.isCBeta.ifTrue { cBetas += view.root }
+        return view
     }
 
     fun add(bond: Bond) {
@@ -98,12 +153,14 @@ class GraphController(
         (source compose target){ source, target ->
             val view = EdgeFragment(source, target, bondRadiusScalingProperty)
             edgeGroup.children += view.root
+            bond.isCAlphaBeta.ifTrue { cAlphaBetas += view.root }
             modelToEdge[bond] = view
         }
     }
 
     fun add(residue: Residue) {
         val ribbon = RibbonFragment(residue)
+        println(ribbon.root.children)
         residueViewGroup.children += ribbon.root
         modelToResidue[residue] = ribbon
     }
@@ -116,9 +173,9 @@ class GraphController(
 
     fun showCartoonView(shouldShow: Boolean) {
         secondaryStructureGroup.children
-            .filter { it.userData is SecondaryStructureView }
-            .map { it.userData as SecondaryStructureView }
-            .forEach { it.controller.compute() }
+            .filter { it.userData is SecondaryStructureController }
+            .map { it.userData as SecondaryStructureController }
+            .forEach { it.compute() }
         secondaryStructureGroup.isVisible = shouldShow
     }
 
@@ -176,8 +233,8 @@ class GraphView : View() {
                 root.children.addAll(it.edgeGroup, it.nodeViewGroup,
                     it.residueViewGroup, it.secondaryStructureGroup)
 
-                it.residueViewGroup.isVisible = true
-                it.secondaryStructureGroup.isVisible = false
+//                it.residueViewGroup.isVisible = true
+//                it.secondaryStructureGroup.isVisible = false
             }
         }
     }

@@ -29,10 +29,10 @@ class SecondaryStructureController(val structure: SecondaryStructure, override v
 
 
     fun compute() {
-        val children = view.root.children
-        children.clear()
-        if (structure.isEmpty())
+        if (structure.isEmpty()) {
+            println("Structure empty")
             return
+        }
         when (structure.structureType) {
             is Alphahelix -> makeAlphaHelix()
             is Betasheet -> makeBetaSheet()
@@ -50,7 +50,7 @@ class SecondaryStructureController(val structure: SecondaryStructure, override v
         val texArray = floatArrayOf(0F, 0F)
 
         val faces = IntArray(residues.size * 6 * 8)
-        val smoothing = IntArray(residues.size)
+        val smoothing = IntArray(residues.size*8)
 
         val first = residues.first()
         val second = residues[1]
@@ -125,6 +125,7 @@ class SecondaryStructureController(val structure: SecondaryStructure, override v
                     else -> connectOther(faces, facePositions, i)
                 }
             }
+            println(smoothing.map { it })
             // Set smoothing
             // original topping
             smoothing[(i - 1) * 8] = 1 shl 1
@@ -515,5 +516,10 @@ class SecondaryStructureController(val structure: SecondaryStructure, override v
 class SecondaryStructureView(val structure: SecondaryStructure) : View("Secondary Structure") {
     override val scope: Scope = Scope()
     val controller = SecondaryStructureController(structure, scope)
-    override val root = group { userData = this }
+
+    override val root = group {
+        setInScope(this@SecondaryStructureView, scope)
+        setInScope(controller, scope)
+        userData = controller
+    }
 }

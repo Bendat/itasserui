@@ -21,6 +21,8 @@ sealed class Atomic {
     abstract val sequenceNumber: Int
     abstract val acid: AminoAcid
     abstract val line: Int
+
+    val isCBeta get() = element == Element.CB
 }
 
 val Atomic.asAtom get() = Atom(position, element, sequenceNumber, acid, line)

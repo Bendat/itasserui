@@ -18,8 +18,8 @@ sealed class SecondaryStructureType {
 object Betasheet : SecondaryStructureType()
 object Alphahelix : SecondaryStructureType()
 
-class SecondaryStructure(val structureType: SecondaryStructureType) :
-    MutableList<Residue> by arrayListOf() {
+class SecondaryStructure(val structureType: SecondaryStructureType, residues: List<Residue>) :
+    MutableList<Residue> by arrayListOf(*residues.toTypedArray()) {
     val asSymbol get() = if (structureType is Betasheet) "H" else "E"
     override fun toString(): String {
         return "SecondaryStructure(structureType='$structureType', symbol='$asSymbol', resides='${toList()}')"

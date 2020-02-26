@@ -5,7 +5,6 @@ import itasserui.app.views.renderer.components.line.LineView
 import itasserui.app.views.renderer.components.line.Pos
 import itasserui.app.views.renderer.data.atom.AtomFragment
 import javafx.beans.property.DoubleProperty
-import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.paint.Color
 import tornadofx.Controller
@@ -20,7 +19,8 @@ class EdgeController(
     override val scope: Scope
 ) : Controller() {
     val view: EdgeFragment by inject()
-    val color = SimpleObjectProperty(Color.LIGHTGRAY)
+    val colorProperty = SimpleObjectProperty(Color.LIGHTGRAY)
+    var color by colorProperty
     val radiusProperty = scaling
     var radius by radiusProperty
 
@@ -36,6 +36,6 @@ class EdgeController(
             to.root.translateZProperty()
         )
         val line = Line(startPos, endPos)
-        return LineView(line, radiusProperty, color)
+        return LineView(line, radiusProperty, colorProperty)
     }
 }

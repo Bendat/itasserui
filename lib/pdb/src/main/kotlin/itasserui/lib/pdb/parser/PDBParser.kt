@@ -62,7 +62,7 @@ object PDBParser : Logger {
         type: SecondaryStructureType,
         residues: List<Residue>
     ): List<SecondaryStructure> =
-        shapes.flatMap { getSecondaryStructures(residues, it, type) }
+        shapes.map { getSecondaryStructures(residues, it, type) }
 
 
     fun setupBonds(residues: List<Residue>): ArrayList<Bond> {
@@ -126,21 +126,9 @@ object PDBParser : Logger {
         residues: List<Residue>,
         struct: Shape,
         type: SecondaryStructureType
-    ): LinkedList<SecondaryStructure> {
-        val structures = LinkedList<SecondaryStructure>()
-        for (residue in residues) {
-            if (structures.peek()?.contains(residue).isTrue) {
-                structures.peek()?.add(residue)
-                if (residue.sequenceNo == struct.end)
-                    break
-            }
-            if (residue.sequenceNo == struct.start)
-                continue
-            val structure = SecondaryStructure(type)
-            structure.add(residue)
-            structures.push(structure)
-        }
-        return structures
+    ): SecondaryStructure {
+        val res = residues.filter { it.sequenceNo >= struct.start && it.sequenceNo <= struct.end}
+        return SecondaryStructure(type, res)
     }
 
     private fun handleGlycine(residue: Residue): Residue {
