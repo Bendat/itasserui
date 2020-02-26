@@ -73,7 +73,7 @@ class GraphController(
     val cBetas: ObservableList<Node> = FXCollections.observableArrayList()
     val residueAtoms = observableHashMap<Residue, List<AtomFragment>>()
     private val defaultGroup get() = Group().toProperty()
-    private var defaultTransform = worldTransform
+    internal val defaultTransform = worldTransform
 
     init {
         worldTransformProperty.addListener { _, _, n ->
@@ -86,57 +86,10 @@ class GraphController(
                 } else null
             }
         }
-//        pdb.nodes.filterIsInstance<NormalizedAtom>().forEach { add(it) }
         pdb.edges.forEach { add(it) }
         pdb.structures.forEach { add(it) }
         pdb.residues.forEach { add(it) }
         residueViewGroup.isVisible = false
-    }
-
-    fun colorByAtom() {
-        nodeViews.map { it.userData }
-            .map { it as AtomFragment }
-            .map { it.controller }
-            .forEach { it.color = it.atom.element.color }
-        modelToEdge.values.forEach { it.controller.color = Color.GRAY }
-    }
-
-    fun colorByResidue() {
-        val randomGenerator = Random()
-        residueAtoms.map { entry ->
-            val r = randomGenerator.nextFloat()
-            val g = randomGenerator.nextFloat()
-            val b = randomGenerator.nextFloat()
-            val col = Color(r.toDouble(), g.toDouble(), b.toDouble(), 1.0)
-            entry.value.forEach { it.controller.color = col }
-            modelToEdge.values.forEach {
-                if (it.controller.from in entry.value)
-                    it.controller.color = col
-            }
-        }
-    }
-
-    fun colorBySecondaryStructure() {
-        val random = Random()
-        modelToStructure.keys.forEach { ss ->
-            var color = if (ss.structureType == Alphahelix)
-                Color.RED else Color.CORNFLOWERBLUE
-            residueAtoms.map { res ->
-
-                if (modelToStructure.any { res.key in it.key }) {
-                    color = Color(random.nextDouble(), random.nextDouble(), random.nextDouble(), 1.0)
-                }
-                res.value.forEach { it.controller.color = color }
-            }
-        }
-    }
-
-    fun reset() {
-        worldTransform = defaultTransform
-    }
-
-    fun remove(atom: Atom) {
-        modelToNode.having(atom) { nodeViewGroup.children.remove(it.root) }
     }
 
     fun add(atom: NormalizedAtom): AtomFragment {
@@ -203,17 +156,6 @@ class GraphModel : ItemViewModel<GraphController>() {
     val atomRadiusScaling = bind(GraphController::atomRadiusScalingProperty)
     val nodeViews = bind(GraphController::nodeViews)
     val edgeViews = bind(GraphController::edgeViews)
-}
-
-fun EventTarget.graphview(
-    pdb: PDB,
-    nodeScaling: DoubleProperty,
-    edgeScaling: DoubleProperty,
-    op: Group.(GraphView) -> Unit = {}
-): GraphView {
-    val view = GraphView()
-    opcr(this, view.root, { op(view) })
-    return view
 }
 
 class GraphView : View() {
