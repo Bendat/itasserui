@@ -1,7 +1,7 @@
 package itasserui.app.views.renderer.data.atom
 
 import itasserui.app.viewer.pdbmodel.Bond
-import itasserui.lib.pdb.parser.Atom
+import itasserui.lib.pdb.parser.NormalizedAtom
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
@@ -10,7 +10,11 @@ import javafx.scene.paint.PhongMaterial
 import javafx.scene.shape.Sphere
 import tornadofx.*
 
-class AtomController(atom: Atom, radiusScaling: DoubleProperty, text: String) : Controller() {
+class AtomController(
+    atom: NormalizedAtom, radiusScaling: DoubleProperty, text: String,
+    override val scope: Scope
+) : Controller() {
+    val view: AtomFragment by inject()
     val outEdges: ObservableList<Bond> = FXCollections.observableArrayList()
     val inEdges: ObservableList<Bond> = FXCollections.observableArrayList()
 
@@ -50,6 +54,7 @@ class AtomController(atom: Atom, radiusScaling: DoubleProperty, text: String) : 
         colorProperty
             .addListener { _ -> material.specularColor = colorProperty.value.brighter() }
     }
+
 }
 
 

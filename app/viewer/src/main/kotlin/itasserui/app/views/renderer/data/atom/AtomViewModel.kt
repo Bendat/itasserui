@@ -1,8 +1,9 @@
 package itasserui.app.views.renderer.data.atom
 
 import tornadofx.ItemViewModel
+import tornadofx.Scope
 
-class AtomViewModel(item: AtomController) : ItemViewModel<AtomController>(item) {
+class AtomViewModel(item: AtomController, override val scope: Scope) : ItemViewModel<AtomController>(item) {
     val outEdges = bind(AtomController::outEdges)
     val inEdges = bind(AtomController::inEdges)
     val atom = bind(AtomController::atomProperty)

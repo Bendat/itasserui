@@ -1,36 +1,42 @@
 package itasserui.app.views.renderer.components.graph
 
-import itasserui.app.views.renderer.components.ribbon.RibbonController
 import itasserui.app.views.renderer.components.ribbon.RibbonFragment
-import itasserui.app.views.renderer.components.ribbon.RibbonModel
-import itasserui.app.views.renderer.data.atom.AtomController
 import itasserui.app.views.renderer.data.atom.AtomFragment
-import itasserui.app.views.renderer.data.atom.AtomViewModel
-import itasserui.app.views.renderer.data.edge.EdgeController
-import itasserui.app.views.renderer.data.edge.EdgeView
-import itasserui.app.views.renderer.data.edge.EdgeViewModel
-import itasserui.app.views.renderer.data.structure.SecondaryStructureController
-import itasserui.app.views.renderer.data.structure.SecondaryStructureModel
+import itasserui.app.views.renderer.data.edge.EdgeFragment
 import itasserui.app.views.renderer.data.structure.SecondaryStructureView
 import itasserui.common.extensions.compose
 import itasserui.common.extensions.having
-import itasserui.lib.pdb.parser.Atom
-import itasserui.lib.pdb.parser.Bond
-import itasserui.lib.pdb.parser.Residue
-import itasserui.lib.pdb.parser.SecondaryStructure
+import itasserui.lib.pdb.parser.*
+import javafx.beans.property.DoubleProperty
+import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections.observableHashMap
 import javafx.collections.ObservableList
 import javafx.collections.ObservableMap
+import javafx.event.EventTarget
+import javafx.geometry.Point3D
 import javafx.scene.Group
 import javafx.scene.Node
+import javafx.scene.transform.Rotate
+import javafx.scene.transform.Transform
 import tornadofx.*
 
 object EmptyGroup : Group()
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-class GraphController : Controller() {
+class GraphController(
+    pdb: PDB,
+    override val scope: Scope,
+    nodeScaling: DoubleProperty,
+    edgeScaling: DoubleProperty
+) : Controller() {
+    val pdbProperty = pdb.toProperty()
+    var pdb by pdbProperty
+
+    val worldTransformProperty = SimpleObjectProperty<Transform>(Rotate())
+    var worldTransform by worldTransformProperty
+
     val view: GraphView by inject()
-    val children get() = view.root.children
 
     val nodeViewGroupProperty = defaultGroup
     var nodeViewGroup: Group by nodeViewGroupProperty
@@ -44,65 +50,66 @@ class GraphController : Controller() {
     val secondaryStructureGroupProperty = defaultGroup
     var secondaryStructureGroup: Group by secondaryStructureGroupProperty
 
-    val modelToNode: ObservableMap<Atom, AtomFragment> = observableHashMap<Atom, AtomFragment>()
-    val modelToEdge: ObservableMap<Bond, EdgeView> = observableHashMap<Bond, EdgeView>()
+    val modelToNode: ObservableMap<Atomic, AtomFragment> = observableHashMap<Atomic, AtomFragment>()
+    val modelToEdge: ObservableMap<Bond, EdgeFragment> = observableHashMap<Bond, EdgeFragment>()
     val modelToResidue: ObservableMap<Residue, RibbonFragment> = observableHashMap<Residue, RibbonFragment>()
     val modelToStructure: ObservableMap<SecondaryStructure, SecondaryStructureView> =
         observableHashMap<SecondaryStructure, SecondaryStructureView>()
 
-    val bondRadiusScalingProperty = 1.0.toProperty()
+    val bondRadiusScalingProperty = edgeScaling
     var bondRadiusScaling by bondRadiusScalingProperty
 
-    val atomRadiusScalingProperty = 1.0.toProperty()
+    val atomRadiusScalingProperty = nodeScaling
     var atomRadiusScaling by atomRadiusScalingProperty
 
     val nodeViews: ObservableList<Node> get() = nodeViewGroup.children
     val edgeViews: ObservableList<Node> get() = edgeGroup.children
 
     private val defaultGroup get() = Group().toProperty()
+    private var defaultTransform = worldTransform
+
+    init {
+        worldTransformProperty.addListener { _, _, n ->
+            view.root.transforms.setAll(n)
+        }
+
+        pdb.nodes.filterIsInstance<NormalizedAtom>().forEach { add(it) }
+        pdb.edges.forEach { add(it) }
+        pdb.structures.forEach { add(it) }
+    }
+    fun reset(){
+        worldTransform = defaultTransform
+    }
 
     fun remove(atom: Atom) {
         modelToNode.having(atom) { nodeViewGroup.children.remove(it.root) }
     }
 
-    fun add(atom: Atom) {
-        val controller = AtomController(atom, atomRadiusScalingProperty, "")
-        val model = AtomViewModel(controller)
-        val scope = Scope(controller, model)
-        val view = AtomFragment(scope)
-        TODO("     presenter.setUpNodeView(node)")
+    fun add(atom: NormalizedAtom) {
+        val view = AtomFragment(atom, atomRadiusScalingProperty, "")
         nodeViewGroup.children += view.root
         modelToNode[atom] = view
+//        TODO("     presenter.setUpNodeView(node)")
     }
 
     fun add(bond: Bond) {
         val source = modelToNode[bond.from]
         val target = modelToNode[bond.to]
         (source compose target){ source, target ->
-            val scope = Scope(source, target)
-            val controller = EdgeController(scope)
-            val model = EdgeViewModel(controller, scope)
-            setInScope(model, scope)
-            val view = EdgeView(scope)
+            val view = EdgeFragment(source, target, bondRadiusScalingProperty)
             edgeGroup.children += view.root
             modelToEdge[bond] = view
         }
     }
 
     fun add(residue: Residue) {
-        val scope = Scope()
-        val controller = RibbonController(residue, scope)
-        RibbonModel(controller, scope)
-        val ribbon = RibbonFragment(scope)
+        val ribbon = RibbonFragment(residue)
         residueViewGroup.children += ribbon.root
         modelToResidue[residue] = ribbon
     }
 
     fun add(secondaryStructure: SecondaryStructure) {
-        val scope = Scope()
-        val cartoon = SecondaryStructureController(secondaryStructure, scope)
-        SecondaryStructureModel(cartoon, scope)
-        val view = SecondaryStructureView(scope)
+        val view = SecondaryStructureView(secondaryStructure)
         secondaryStructureGroup.children += view.root
         modelToStructure[secondaryStructure] = view
     }
@@ -114,11 +121,19 @@ class GraphController : Controller() {
             .forEach { it.controller.compute() }
         secondaryStructureGroup.isVisible = shouldShow
     }
+
+    internal fun computePivot(): Point3D {
+        // Use the local bound for computation of the midpoint
+        val b = view.root.boundsInLocal
+        val x = b.maxX - b.width / 2
+        val y = b.maxY - b.height / 2
+        val z = b.maxZ - b.depth / 2
+        return Point3D(x, y, z)
+    }
 }
 
 @Suppress("unused")
-class GraphControllerModel(controller: GraphController) :
-    ItemViewModel<GraphController>(controller) {
+class GraphModel : ItemViewModel<GraphController>() {
     val nodeViewGroup = bind(GraphController::nodeViewGroupProperty)
     val residueViewGroup = bind(GraphController::residueViewGroupProperty)
     val edgeGroup = bind(GraphController::edgeGroupProperty)
@@ -133,14 +148,50 @@ class GraphControllerModel(controller: GraphController) :
     val edgeViews = bind(GraphController::edgeViews)
 }
 
-class GraphView(override val scope: Scope) : View() {
-    val model by inject<GraphControllerModel>()
-    val controller by inject<GraphController>()
-    override val root = group {
-        children.addAll(controller.edgeGroup, controller.nodeViewGroup,
-            controller.residueViewGroup, controller.secondaryStructureGroup)
-        controller.residueViewGroup.isVisible = true
-        controller.secondaryStructureGroup.isVisible = false
+fun EventTarget.graphview(
+    pdb: PDB,
+    nodeScaling: DoubleProperty,
+    edgeScaling: DoubleProperty,
+    op: Group.(GraphView) -> Unit = {}
+): GraphView {
+    val view = GraphView()
+    opcr(this, view.root, { op(view) })
+    return view
+}
+
+class GraphView : View() {
+    val atomScaling = SimpleDoubleProperty()
+    val bondScaling = SimpleDoubleProperty()
+    val pdbProperty = SimpleObjectProperty<PDB>()
+    var pdb by pdbProperty
+    val controllerProperty = SimpleObjectProperty<GraphController>()
+    var controller by controllerProperty
+
+    init {
+        setInScope(this, scope)
+        pdbProperty.onChange { controller = GraphController(pdb, scope, atomScaling, bondScaling) }
+        controllerProperty.onChange {
+            if (it != null) {
+                root.children.clear()
+                root.children.addAll(it.edgeGroup, it.nodeViewGroup,
+                    it.residueViewGroup, it.secondaryStructureGroup)
+
+                it.residueViewGroup.isVisible = true
+                it.secondaryStructureGroup.isVisible = false
+            }
+        }
+    }
+
+    override val root = group {}
+
+    fun bind(atomScaling: DoubleProperty, bondScaling: DoubleProperty) {
+        this.atomScaling.bind(atomScaling)
+        this.bondScaling.bind(bondScaling)
+    }
+
+    companion object {
+        const val PaneDepth = 5000.0
+        const val PaneHeight = 600.0
     }
 }
 

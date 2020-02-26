@@ -2,7 +2,7 @@ package itassrui.app.viewer
 
 import itasserui.app.viewer.pdbmodel.PDBEntry
 import itasserui.app.viewer.pdbmodel.PDBParser
-import itasserui.app.views.renderer.atom.node.NodeVew
+import itasserui.app.views.renderer.data.atom.AtomViewModel
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.scene.Scene
 import javafx.stage.Stage
@@ -17,7 +17,7 @@ class ViewSpec extends ApplicationSpec {
         def br = new BufferedReader(new FileReader(pdb))
         PDBParser.INSTANCE.parse(entry, br)
         print(entry.allCBetaAtoms)
-        def view = new NodeVew(entry.allCBetaAtoms[0], new SimpleDoubleProperty(1.0))
+        def view = new AtomViewModel(entry.allCBetaAtoms[0], new SimpleDoubleProperty(1.0))
         def scene = new Scene(view.root)
         stage.scene = scene
         stage.show()

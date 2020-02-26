@@ -1,6 +1,5 @@
 package itasserui.app.views.renderer.data.structure
 
-import itasserui.app.fxutils.InjectViewModel
 import itasserui.app.views.renderer.components.line.Line
 import itasserui.app.views.renderer.components.line.LineView
 import itasserui.lib.pdb.parser.Alphahelix
@@ -513,22 +512,8 @@ class SecondaryStructureController(val structure: SecondaryStructure, override v
     }
 }
 
-class SecondaryStructureModel(
-    controller: SecondaryStructureController,
-    override val scope: Scope
-) : InjectViewModel<SecondaryStructureController>(controller) {
-
-    val radius = bind(SecondaryStructureController::radiusProperty)
-    val color = bind(SecondaryStructureController::color)
-    val residues = bind(SecondaryStructureController::residues)
-}
-
-class SecondaryStructureView(
-    override val scope: Scope
-) : View("Secondary Structure") {
-    val controller by inject<SecondaryStructureController>()
-    val model by inject<SecondaryStructureModel>()
-    override val root = group {
-        userData = this
-    }
+class SecondaryStructureView(val structure: SecondaryStructure) : View("Secondary Structure") {
+    override val scope: Scope = Scope()
+    val controller = SecondaryStructureController(structure, scope)
+    override val root = group { userData = this }
 }

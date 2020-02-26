@@ -1,11 +1,17 @@
 package itasserui.app.views.renderer.data.atom
 
+import itasserui.lib.pdb.parser.Atom
+import itasserui.lib.pdb.parser.NormalizedAtom
+import javafx.beans.property.DoubleProperty
 import javafx.beans.property.Property
-import tornadofx.*
+import tornadofx.Fragment
+import tornadofx.Scope
+import tornadofx.ScopedInstance
+import tornadofx.group
 
-class AtomFragment(override val scope: Scope) : Fragment("My View"), ScopedInstance {
-    val controller: AtomController by inject()
-    val model: AtomViewModel by inject()
+class AtomFragment(atom: NormalizedAtom, radiusScaling: DoubleProperty, text: String) : Fragment("My View"), ScopedInstance {
+    override val scope: Scope = Scope()
+    val controller = AtomController(atom, radiusScaling, text, scope)
     override val root = group {
         children += controller.shape
         translateXProperty().bind(controller.xCoordinateProperty)
@@ -21,5 +27,6 @@ class AtomFragment(override val scope: Scope) : Fragment("My View"), ScopedInsta
             root.scaleXProperty(),
             root.scaleYProperty(),
             root.scaleZProperty(),
-            model.item.shapeProperty)
+            controller.shapeProperty)
+
 }

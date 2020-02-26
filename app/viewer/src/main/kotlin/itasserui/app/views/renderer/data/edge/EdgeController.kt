@@ -1,37 +1,39 @@
 package itasserui.app.views.renderer.data.edge
 
-import arrow.data.k
 import itasserui.app.views.renderer.components.line.Line
 import itasserui.app.views.renderer.components.line.LineView
 import itasserui.app.views.renderer.components.line.Pos
-import itasserui.app.views.renderer.components.node.NodeView
 import itasserui.app.views.renderer.data.atom.AtomFragment
-import itasserui.app.views.renderer.data.bond.BondController
+import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.paint.Color
-import tornadofx.*
+import tornadofx.Controller
+import tornadofx.Scope
+import tornadofx.getValue
+import tornadofx.setValue
 
 class EdgeController(
+    val from: AtomFragment,
+    val to: AtomFragment,
+    scaling: DoubleProperty,
     override val scope: Scope
-): Controller() {
-    val source: AtomFragment by inject()
-    val target: AtomFragment by inject()
+) : Controller() {
+    val view: EdgeFragment by inject()
     val color = SimpleObjectProperty(Color.LIGHTGRAY)
-    var line = makeLineView()
-    val radiusProperty = SimpleDoubleProperty(1.0)
+    val radiusProperty = scaling
     var radius by radiusProperty
 
-    private fun makeLineView(): LineView {
+    internal fun makeLineView(): LineView {
         val startPos = Pos(
-            source.root.translateXProperty(),
-            source.root.translateYProperty(),
-            source.root.translateZProperty()
+            from.root.translateXProperty(),
+            from.root.translateYProperty(),
+            from.root.translateZProperty()
         )
         val endPos = Pos(
-            target.root.translateXProperty(),
-            target.root.translateYProperty(),
-            target.root.translateZProperty()
+            to.root.translateXProperty(),
+            to.root.translateYProperty(),
+            to.root.translateZProperty()
         )
         val line = Line(startPos, endPos)
         return LineView(line, radiusProperty, color)

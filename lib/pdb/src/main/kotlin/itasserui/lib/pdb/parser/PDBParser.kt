@@ -47,7 +47,6 @@ object PDBParser : Logger {
         }
 
         helices.map { helixStructures = getShape(it, Alphahelix, residues) }
-        print("Sheets are $sheets")
         sheets.map { sheetStructures = getShape(it, Betasheet, residues) }
 
         val bonds = setupBonds(residues)
