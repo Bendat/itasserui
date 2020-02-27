@@ -30,7 +30,6 @@ class SecondaryStructureController(val structure: SecondaryStructure, override v
 
     fun compute() {
         if (structure.isEmpty()) {
-            println("Structure empty")
             return
         }
         when (structure.structureType) {
@@ -125,7 +124,6 @@ class SecondaryStructureController(val structure: SecondaryStructure, override v
                     else -> connectOther(faces, facePositions, i)
                 }
             }
-            println(smoothing.map { it })
             // Set smoothing
             // original topping
             smoothing[(i - 1) * 8] = 1 shl 1

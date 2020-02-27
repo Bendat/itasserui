@@ -12,7 +12,7 @@ enum class AminoAcid(val symbol: String, val molecule: String) {
 }
 
 interface Peptide {
-    val sequenceNo: Int
+    val sequenceNo: String
     val acid: AminoAcid
     val cAtom: Atomic
     val nAtom: Atomic
@@ -24,7 +24,7 @@ interface Peptide {
 }
 
 data class Residue(
-    override val sequenceNo: Int,
+    override val sequenceNo: String,
     override val acid: AminoAcid,
     override val cAtom: Atomic,
     override val nAtom: Atomic,
@@ -33,8 +33,8 @@ data class Residue(
     override val cBetaAtom: Atomic
 ) : Peptide
 
-object ResidueStub: Peptide{
-    override val sequenceNo: Int = -1
+object ResidueStub : Peptide {
+    override val sequenceNo: String = "-1"
     override val acid: AminoAcid = AminoAcid.NUL
     override val cAtom: Atomic = EmptyAtom
     override val nAtom: Atomic = EmptyAtom

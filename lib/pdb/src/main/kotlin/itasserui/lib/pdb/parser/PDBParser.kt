@@ -4,14 +4,12 @@ import arrow.core.Either
 import arrow.core.Left
 import arrow.core.right
 import arrow.data.*
-import itasserui.common.extensions.isTrue
 import itasserui.common.logger.Logger
 import itasserui.lib.pdb.parser.errors.*
 import itasserui.lib.pdb.parser.sections.*
 import javafx.geometry.Point3D
 import javafx.scene.transform.Rotate
 import tornadofx.isDouble
-import tornadofx.isInt
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
@@ -127,7 +125,7 @@ object PDBParser : Logger {
         struct: Shape,
         type: SecondaryStructureType
     ): SecondaryStructure {
-        val res = residues.filter { it.sequenceNo >= struct.start && it.sequenceNo <= struct.end}
+        val res = residues.filter { it.sequenceNo >= struct.start && it.sequenceNo <= struct.end }
         return SecondaryStructure(type, res)
     }
 
@@ -192,7 +190,7 @@ object PDBParser : Logger {
                 Point3D(x.toDouble() * atom_distance_factor,
                     y.toDouble() * atom_distance_factor,
                     z.toDouble() * atom_distance_factor),
-                Element.valueOf(atomName), residueSequenceNo.toInt(),
+                Element.valueOf(atomName), residueSequenceNo,
                 AminoAcid.valueOf(residueName),
                 number
             ).right()
@@ -205,7 +203,7 @@ object PDBParser : Logger {
         start: Pair<Int, Int>,
         end: Pair<Int, Int>,
         length: Int,
-        crossinline structure: (Int, Int) -> T
+        crossinline structure: (String, String) -> T
     ): Validated<ErrorList, List<T>> {
         val helices = lines.filter { it.startsWith(prefix.name) }
         if (helices.none { it.length < length }) {
@@ -251,16 +249,12 @@ object PDBParser : Logger {
     private inline fun <reified T> List<String>.mapStructure(
         startIndices: Pair<Int, Int>,
         endIndices: Pair<Int, Int>,
-        structure: (Int, Int) -> T
+        structure: (String, String) -> T
     ): List<Validated<InvalidSequenceNumber, T>> {
         return map { line ->
             val start = line.getSegment(startIndices.first, startIndices.second)
             val end = line.getSegment(endIndices.first, endIndices.second)
-            when {
-                !start.isInt() -> Invalid(InvalidSequenceNumber(line, start))
-                !end.isInt() -> Invalid(InvalidSequenceNumber(line, start))
-                else -> Valid(structure(start.toInt(), end.toInt()))
-            }
+            Valid(structure(start, end))
         }
     }
 }

@@ -18,7 +18,7 @@ enum class Element(val radius: Double, val color: Color) {
 sealed class Atomic {
     abstract val position: Point3D
     abstract val element: Element
-    abstract val sequenceNumber: Int
+    abstract val sequenceNumber: String
     abstract val acid: AminoAcid
     abstract val line: Int
 
@@ -30,7 +30,7 @@ val Atomic.asAtom get() = Atom(position, element, sequenceNumber, acid, line)
 data class Atom(
     override val position: Point3D,
     override val element: Element,
-    override val sequenceNumber: Int,
+    override val sequenceNumber: String,
     override val acid: AminoAcid,
     override val line: Int
 ) : Atomic() {
@@ -43,7 +43,7 @@ data class Atom(
 data class NormalizedAtom(
     override val position: Point3D,
     override val element: Element,
-    override val sequenceNumber: Int,
+    override val sequenceNumber: String,
     override val acid: AminoAcid,
     override val line: Int,
     val old: Atomic
@@ -57,7 +57,7 @@ data class NormalizedAtom(
 object EmptyAtom : Atomic() {
     override val position: Point3D get() = Point3D(0.0, 0.0, 0.0)
     override val element: Element get() = Element.NUL
-    override val sequenceNumber: Int get() = -100
+    override val sequenceNumber: String get() = "-100"
     override val acid: AminoAcid get() = AminoAcid.NUL
     override val line: Int = -1
 }

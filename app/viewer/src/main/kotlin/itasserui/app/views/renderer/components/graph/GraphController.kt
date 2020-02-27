@@ -6,7 +6,6 @@ import itasserui.app.views.renderer.data.edge.EdgeFragment
 import itasserui.app.views.renderer.data.structure.SecondaryStructureController
 import itasserui.app.views.renderer.data.structure.SecondaryStructureView
 import itasserui.common.extensions.compose
-import itasserui.common.extensions.having
 import itasserui.common.extensions.ifTrue
 import itasserui.lib.pdb.parser.*
 import javafx.beans.property.DoubleProperty
@@ -16,15 +15,12 @@ import javafx.collections.FXCollections
 import javafx.collections.FXCollections.observableHashMap
 import javafx.collections.ObservableList
 import javafx.collections.ObservableMap
-import javafx.event.EventTarget
 import javafx.geometry.Point3D
 import javafx.scene.Group
 import javafx.scene.Node
-import javafx.scene.paint.Color
 import javafx.scene.transform.Rotate
 import javafx.scene.transform.Transform
 import tornadofx.*
-import java.util.*
 
 object EmptyGroup : Group()
 
@@ -76,21 +72,23 @@ class GraphController(
     internal val defaultTransform = worldTransform
 
     init {
-        worldTransformProperty.addListener { _, _, n ->
-            view.root.transforms.setAll(n)
-        }
-        pdb.residues.map { residue ->
-            residueAtoms[residue] = residue.atoms.mapNotNull {
-                if (it is NormalizedAtom) {
-                    add(it)
-                } else null
-            }
-        }
+        setWorldTransformListener()
+        createAtomFragments(pdb)
         pdb.edges.forEach { add(it) }
         pdb.structures.forEach { add(it) }
         pdb.residues.forEach { add(it) }
         residueViewGroup.isVisible = false
     }
+
+    private fun createAtomFragments(pdb: PDB) = pdb.residues.map { residue ->
+        residueAtoms[residue] = residue.atoms.mapNotNull {
+            if (it is NormalizedAtom) add(it) else null
+        }
+    }
+
+    private fun setWorldTransformListener() =
+        worldTransformProperty.addListener { _, _, n -> view.root.transforms.setAll(n) }
+
 
     fun add(atom: NormalizedAtom): AtomFragment {
         val view = AtomFragment(atom, atomRadiusScalingProperty, "")
@@ -113,7 +111,6 @@ class GraphController(
 
     fun add(residue: Residue) {
         val ribbon = RibbonFragment(residue)
-        println(ribbon.root.children)
         residueViewGroup.children += ribbon.root
         modelToResidue[residue] = ribbon
     }
@@ -168,17 +165,8 @@ class GraphView : View() {
 
     init {
         setInScope(this, scope)
-        pdbProperty.onChange { controller = GraphController(pdb, scope, atomScaling, bondScaling) }
-        controllerProperty.onChange {
-            if (it != null) {
-                root.children.clear()
-                root.children.addAll(it.edgeGroup, it.nodeViewGroup,
-                    it.residueViewGroup, it.secondaryStructureGroup)
-
-//                it.residueViewGroup.isVisible = true
-//                it.secondaryStructureGroup.isVisible = false
-            }
-        }
+        setPdbPropertyListener()
+        setControllerListener()
     }
 
     override val root = group {}
@@ -188,10 +176,22 @@ class GraphView : View() {
         this.bondScaling.bind(bondScaling)
     }
 
-    companion object {
-        const val PaneDepth = 5000.0
-        const val PaneHeight = 600.0
+    private fun setPdbPropertyListener() {
+        pdbProperty.onChange { controller = GraphController(pdb, scope, atomScaling, bondScaling) }
     }
+
+    private fun setControllerListener() {
+        controllerProperty.onChange { change ->
+            change?.let {
+                root.children.clear()
+                root.children.addAll(it.edgeGroup, it.nodeViewGroup,
+                    it.residueViewGroup, it.secondaryStructureGroup)
+            }
+
+        }
+    }
+
+
 }
 
 
