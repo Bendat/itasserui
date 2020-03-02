@@ -28,6 +28,10 @@ class ParserTest : DescribeSpec({
             pdb.header.code should be("1EY4")
         }
 
+        it("Gets the sequence"){
+            println("Sequence is ${pdb.sequence}")
+        }
+
         context("Atoms should match the reference program") {
             it("Verifies the nodes graph is not empty") {
                 pdb.nodes.filterNot { it is EmptyAtom }.size shouldBe be(671)

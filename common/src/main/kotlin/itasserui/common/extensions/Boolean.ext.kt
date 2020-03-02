@@ -8,3 +8,8 @@ fun <TReturn> Boolean.ifTrue(action: () -> TReturn) =
 
 fun <TReturn> Boolean.ifFalse(action: () -> TReturn) =
     apply { if (!this) action() }
+
+infix fun Boolean.ior(other: () -> Boolean) =
+    if (this.isFalse)
+        false
+    else this or other()

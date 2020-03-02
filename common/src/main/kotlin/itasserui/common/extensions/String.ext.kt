@@ -6,6 +6,7 @@ import arrow.data.Validated
 import itasserui.common.errors.*
 
 
+val emptyString get() = ""
 fun String.remove(vararg character: String): String {
     var orig = this
     character.forEach { orig = orig.replace(it, "") }

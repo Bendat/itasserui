@@ -7,6 +7,12 @@ fun <T> T.print(): T {
     return this
 }
 
+val Any?.isNull
+    get() = this == null
+
+val Any?.notNull
+    get() = this != null
+
 data class LetPair<T, K>(val t: T?, val k: K?) {
     operator fun invoke(op: (T, K) -> Unit) {
         t?.let { t ->

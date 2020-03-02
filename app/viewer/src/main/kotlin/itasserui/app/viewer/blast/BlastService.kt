@@ -1,86 +1,165 @@
 package itasserui.app.viewer.blast
-import itasserui.app.viewer.blast.RemoteBlastClient.Status.*
-import javafx.concurrent.Service
-import javafx.concurrent.Task
+
+import itasserui.app.viewer.events.*
+import itasserui.app.viewer.renderer.components.graph.GraphView
+import itasserui.common.extensions.isNull
+import itasserui.lib.pdb.parser.PDB
+import javafx.application.Platform
+import javafx.beans.property.SimpleObjectProperty
+import javafx.scene.control.Alert
+import javafx.util.StringConverter
+import tornadofx.*
+import java.util.*
+import kotlin.concurrent.timer
+
+@Suppress("MemberVisibilityCanBePrivate", "unused")
+class BlastServiceController : Controller() {
+    val sequenceCodeProperty = "".toProperty()
+    var sequenceCode: String by sequenceCodeProperty
+
+    val programProperty = SimpleObjectProperty<BlastProgram>(BlastProgram.blastp)
+    var program: BlastProgram by programProperty
+
+    val statusProperty = SimpleObjectProperty<BlastStatus>(BlastStatus.Idle)
+    var status: BlastStatus by statusProperty
+
+    val databaseProperty = "nr".toProperty()
+    var database: String by databaseProperty
+
+    val requestIdProperty = "".toProperty()
+    var requestId: String by requestIdProperty
+
+    val startTimeProperty = Long.MIN_VALUE.toProperty()
+    var startTime: Long by startTimeProperty
+
+    val estimatedTimeProperty = Long.MIN_VALUE.toProperty()
+    var estimatedTime: Long by estimatedTimeProperty
+
+    val actualTimeProperty = Long.MIN_VALUE.toProperty()
+    var actualTime: Long by actualTimeProperty
+
+    init {
+        subscribe<PDBLoadedEvent> {
+            sequenceCode = it.pdb.header.code
+        }
+        subscribe<BlastClient.BlastDetailsEvent> {
+            requestId = it.requestID
+            estimatedTime = it.timeEstimate
+        }
+        subscribe<BlastStatusEvent> {
+            status = it.status
+        }
+    }
+}
+
+class BlastServiceModel : ItemViewModel<BlastServiceController>() {
+    val sequenceCode = bind(BlastServiceController::sequenceCodeProperty)
+    val program = bind(BlastServiceController::programProperty)
+    val status = bind(BlastServiceController::statusProperty)
+    val database = bind(BlastServiceController::databaseProperty)
+    val requestId = bind(BlastServiceController::requestIdProperty)
+    val startTime = bind(BlastServiceController::startTimeProperty)
+    val estimatedTime = bind(BlastServiceController::estimatedTimeProperty)
+    val actualTime = bind(BlastServiceController::actualTimeProperty)
+}
 
 
-/**
- * Service allowing to concurrently call a BLAST function and run it.
- */
-class BlastService : Service<String>() {
+class BlastServiceView : View() {
+    val controller: BlastServiceController by inject()
+    val client: BlastClient by inject()
+    val model: BlastServiceModel by inject()
+    val graph: GraphView by inject()
 
-    var sequence: String? = null
+    init {
+        model.item = controller
+    }
 
-    override fun createTask(): Task<String> {
-        return object : Task<String>() {
-            override fun call(): String {
-                // No sequence was set, the task needs to fail.
-                if (sequence == null)
-                    throw Exception("No sequence set. Cannot BLAST.")
-                // Build the result
-                val result = StringBuilder()
-                // Use and call the client to handle BLAST queries
-                val remoteBlastClient = RemoteBlastClient()
-                remoteBlastClient.setProgram(RemoteBlastClient.BlastProgram.blastp).database = "nr"
+    override val root = vbox {
+        subscribe<BlastAlreadyRunningEvent> {
+            alert(Alert.AlertType.INFORMATION,
+                "Blast is Already Running",
+                "You can run it again once the current execution is finished or cancelled.")
+        }
+        toolbar {
+            button("Run BLAST") {
+                setOnAction {
+                    runBlastActon()
+                }
+            }
 
-                // Set the Task's title to this
-                updateTitle("BLAST sequence...")
-                remoteBlastClient.startRemoteSearch(sequence)
-
-                updateMessage(
-                    "Request id: " + remoteBlastClient.requestId + "\n" +
-                            "Estimated time: " + remoteBlastClient.estimatedTime + "s"
-                )
-                updateProgress(0, remoteBlastClient.estimatedTime.toLong())
-                val startTime = System.currentTimeMillis()
-                var status: RemoteBlastClient.Status? = null
-                // Query BLAST for status, if sequence is done or not.
-                do {
-                    if (status != null)
-                        Thread.sleep(5000)
-                    status = remoteBlastClient.remoteStatus
-                    updateMessage(
-                        "Request id: " + remoteBlastClient.requestId + "\n" +
-                                "Estimated time: " + remoteBlastClient.estimatedTime + "s\n" +
-                                "Passed time: " + (System.currentTimeMillis() - startTime) / 1000 + "s"
-                    )
-                    updateProgress(
-                        (System.currentTimeMillis() - startTime) / 1000,
-                        remoteBlastClient.estimatedTime.toLong()
-                    )
-                    if (isCancelled)
-                        break
-                } while (status == searching)
-
-                if (isCancelled) {
-                    updateTitle("Cancelled")
-                    result.append("Cancelled")
-                    return result.toString()
+            button("Cancel Blast") {
+                setOnAction {
+                    fire(BlastEndedEvent)
+                }
+            }
+            separator()
+            label(model.status, converter = statusConverter())
+            val idSeperator = separator { isVisible = false }
+            label(model.requestId, converter = idConverter()) {
+                idSeperator.visibleProperty().bind(visibleProperty())
+                isVisible = false
+                controller.requestIdProperty.onChange {
+                    isVisible = it != ""
+                }
+            }
+            val timeSeparator = separator { isVisible = false }
+            label(model.estimatedTime, converter = timeConverter("Est. Time")) {
+                timeSeparator.visibleProperty().bind(visibleProperty())
+                isVisible = false
+                controller.estimatedTimeProperty.onChange {
+                    isVisible = it >= 0
+                }
+            }
+            val actualSeparator = separator { isVisible = false }
+            label(model.actualTime, converter = timeConverter("Elapsed Time")) {
+                actualSeparator.visibleProperty().bind(visibleProperty())
+                isVisible = false
+                controller.actualTimeProperty
+                    .onChange { isVisible = it >= 0 }
+                var timer: Timer? = null
+                subscribe<BlastStartedEvent> {
+                    controller.actualTime = 0
+                    timer = timer("Blast execution time", false, 0L, 1000L) {
+                        Platform.runLater { controller.actualTime += 1 }
+                    }
                 }
 
-                when (status) {
-                    hitsFound -> {
-                        updateTitle("BLAST done: Hits found.")
-                        for (line in remoteBlastClient.remoteAlignments!!) {
-                            result.append(line + "\n")
-                        }
-                    }
-                    noHitsFound -> {
-                        updateTitle("BLAST done: no hits were found.")
-                        result.append("No hits found.")
-                        System.err.println("No hits")
-                    }
-                    else -> {
-                        updateMessage("BLAST failed.")
-                        updateTitle("BLAST failed.")
-                        System.err.println("Status: " + status!!)
-                        throw Exception("This might be because you are not connected to the Internet.")
-                    }
+                subscribe<BlastEndedEvent> {
+                    timer?.cancel()
+                    timer?.purge()
                 }
-
-                System.err.println("Actual time: " + remoteBlastClient.actualTime + "s")
-                return result.toString()
             }
         }
+    }
+
+    private fun runBlastActon() {
+        if (graph.controller.pdb is PDB) return
+        runAsync { client.postSequence(graph.controller.pdb.sequence) }
+            .ui { res -> res.map { runAsync { client.waitForBlast(it.requestID) } } }
+    }
+
+
+}
+
+private fun timeConverter(prefix: String): StringConverter<Number> {
+    return object : StringConverter<Number>() {
+        override fun fromString(string: String?): Number = TODO("not implemented")
+        override fun toString(time: Number?): String =
+            if (time as Long >= 0) "$prefix: $time seconds"
+            else ""
+    }
+}
+
+private fun idConverter(): StringConverter<String> {
+    return object : StringConverter<String>() {
+        override fun fromString(string: String?): String = TODO("not implemented")
+        override fun toString(id: String?) = if (id.isNullOrEmpty()) id else "ID: $id"
+    }
+}
+
+private fun statusConverter(): StringConverter<BlastStatus> {
+    return object : StringConverter<BlastStatus>() {
+        override fun fromString(string: String?): BlastStatus = TODO("not implemented")
+        override fun toString(status: BlastStatus?) = "Status: $status"
     }
 }
