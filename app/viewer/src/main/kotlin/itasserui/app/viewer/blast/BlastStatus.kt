@@ -1,7 +1,7 @@
 package itasserui.app.viewer.blast
 
 enum class BlastStatus {
-    Stopped, Waiting, Ready, NoHitsFound, Failed, Cancelled, Unknown, Idle;
+    Stopped, Waiting, Starting, Ready, NoHitsFound, Failed, Cancelled, Unknown, Idle;
 
     companion object {
         fun get(value: String) =

@@ -10,13 +10,14 @@ import tornadofx.FXEvent
 object BlastEndedEvent : FXEvent()
 
 object BlastStartedEvent : FXEvent()
+object BlastStartingEvent: FXEvent()
 object BlastAlreadyRunningEvent : FXEvent()
 
 /***************************************
  * Blast Data Events                   *
  ***************************************/
 data class BlastStatusEvent(val status: BlastStatus) : FXEvent()
-
+data class BlastRemoteAlignmentsEvent(val text: String): FXEvent()
 
 /***************************************
  * PDB Data Events                   *

@@ -2,7 +2,6 @@ package itasserui.app.viewer.blast
 
 import itasserui.app.viewer.events.*
 import itasserui.app.viewer.renderer.components.graph.GraphView
-import itasserui.common.extensions.isNull
 import itasserui.lib.pdb.parser.PDB
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
@@ -38,6 +37,9 @@ class BlastServiceController : Controller() {
     val actualTimeProperty = Long.MIN_VALUE.toProperty()
     var actualTime: Long by actualTimeProperty
 
+    val remoteAlignmentTextProperty = "".toProperty()
+    var remoteAlignmentText: String by remoteAlignmentTextProperty
+
     init {
         subscribe<PDBLoadedEvent> {
             sequenceCode = it.pdb.header.code
@@ -48,6 +50,10 @@ class BlastServiceController : Controller() {
         }
         subscribe<BlastStatusEvent> {
             status = it.status
+        }
+
+        subscribe<BlastRemoteAlignmentsEvent> {
+            remoteAlignmentText = it.text
         }
     }
 }
@@ -74,70 +80,73 @@ class BlastServiceView : View() {
         model.item = controller
     }
 
-    override val root = vbox {
+    override val root = borderpane() {
         subscribe<BlastAlreadyRunningEvent> {
             alert(Alert.AlertType.INFORMATION,
                 "Blast is Already Running",
                 "You can run it again once the current execution is finished or cancelled.")
         }
-        toolbar {
-            button("Run BLAST") {
-                setOnAction {
-                    runBlastActon()
-                }
-            }
-
-            button("Cancel Blast") {
-                setOnAction {
-                    fire(BlastEndedEvent)
-                }
-            }
-            separator()
-            label(model.status, converter = statusConverter())
-            val idSeperator = separator { isVisible = false }
-            label(model.requestId, converter = idConverter()) {
-                idSeperator.visibleProperty().bind(visibleProperty())
-                isVisible = false
-                controller.requestIdProperty.onChange {
-                    isVisible = it != ""
-                }
-            }
-            val timeSeparator = separator { isVisible = false }
-            label(model.estimatedTime, converter = timeConverter("Est. Time")) {
-                timeSeparator.visibleProperty().bind(visibleProperty())
-                isVisible = false
-                controller.estimatedTimeProperty.onChange {
-                    isVisible = it >= 0
-                }
-            }
-            val actualSeparator = separator { isVisible = false }
-            label(model.actualTime, converter = timeConverter("Elapsed Time")) {
-                actualSeparator.visibleProperty().bind(visibleProperty())
-                isVisible = false
-                controller.actualTimeProperty
-                    .onChange { isVisible = it >= 0 }
-                var timer: Timer? = null
-                subscribe<BlastStartedEvent> {
-                    controller.actualTime = 0
-                    timer = timer("Blast execution time", false, 0L, 1000L) {
-                        Platform.runLater { controller.actualTime += 1 }
+        top {
+            toolbar {
+                button("Run BLAST") {
+                    setOnAction {
+                        if (graph.controller.pdb !is PDB) return@setOnAction
+                        runAsync {
+                            client.postSequence(graph.controller.pdb.sequence)
+                        }.ui { res -> res.map { runAsync { client.waitForBlast(it.requestID).also { println(it) } } } }
                     }
                 }
 
-                subscribe<BlastEndedEvent> {
-                    timer?.cancel()
-                    timer?.purge()
+                button("Cancel Blast") {
+                    setOnAction {
+                        fire(BlastEndedEvent)
+                    }
+                }
+                separator()
+                label(model.status, converter = statusConverter())
+                val idSeperator = separator { isVisible = false }
+                label(model.requestId, converter = idConverter()) {
+                    idSeperator.visibleProperty().bind(visibleProperty())
+                    isVisible = false
+                    controller.requestIdProperty.onChange {
+                        isVisible = it != ""
+                    }
+                }
+                val timeSeparator = separator { isVisible = false }
+                label(model.estimatedTime, converter = timeConverter("Est. Time")) {
+                    timeSeparator.visibleProperty().bind(visibleProperty())
+                    isVisible = false
+                    controller.estimatedTimeProperty.onChange { isVisible = it >= 0 }
+                }
+                val actualSeparator = separator { isVisible = false }
+                label(model.actualTime, converter = timeConverter("Elapsed Time")) {
+                    actualSeparator.visibleProperty().bind(visibleProperty())
+                    isVisible = false
+                    controller.actualTimeProperty
+                        .onChange { isVisible = it >= 0 }
+                    var timer: Timer? = null
+                    subscribe<BlastStartedEvent> {
+                        controller.actualTime = 0
+                        timer = timer("Blast execution time", false, 0L, 1000L) {
+                            Platform.runLater { controller.actualTime += 1 }
+                        }
+                    }
+
+                    subscribe<BlastEndedEvent> {
+                        timer?.cancel()
+                        timer?.purge()
+                    }
                 }
             }
         }
-    }
+        bottom {
+            fitToParentHeight()
+            textarea(controller.remoteAlignmentTextProperty) {
+                fitToParentHeight()
+            }
+        }
 
-    private fun runBlastActon() {
-        if (graph.controller.pdb is PDB) return
-        runAsync { client.postSequence(graph.controller.pdb.sequence) }
-            .ui { res -> res.map { runAsync { client.waitForBlast(it.requestID) } } }
     }
-
 
 }
 

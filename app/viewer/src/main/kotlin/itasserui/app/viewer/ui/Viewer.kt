@@ -10,6 +10,7 @@ import itasserui.app.viewer.renderer.components.graph.ScalingController
 import itasserui.app.viewer.ui.components.CountView
 import itasserui.app.viewer.ui.components.tab.viewer.ViewTabView
 import itasserui.lib.pdb.parser.PDBParser
+import javafx.beans.property.IntegerProperty
 import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import javafx.stage.FileChooser
@@ -35,33 +36,36 @@ class Viewer : View("PDB Viewer") {
             minHeightProperty().bind(this@vbox.heightProperty())
             tabClosingPolicy = TabPane.TabClosingPolicy.UNAVAILABLE
             prefHeight = 300.0
+            val selected = 1.toProperty()
             tab("Open") {
-                setOnSelectOpenTab(this, this@tabpane)
+                setOnSelectOpenTab(this, this@tabpane, selected)
             }
             tab("View") {
                 select()
+                selectedProperty().onChange { selected.value = 1 }
                 add<ViewTabView>()
             }
             tab("Stats") {
-                borderpane {
-                    top {
-                        buttonbar {
-                            button("Cancel BLAST").prefWidth = 50.0
-                        }
-                    }
-                }
+                selectedProperty().onChange { selected.value = 2 }
+
             }
             tab("Blast") {
+                selectedProperty().onChange { selected.value = 3 }
+
                 openPDBButton()
                 add<BlastServiceView>()
             }
         }
     }
 
-    private fun setOnSelectOpenTab(tab: Tab, tabPane: TabPane) {
+    private fun setOnSelectOpenTab(
+        tab: Tab,
+        tabPane: TabPane,
+        selected: IntegerProperty
+    ) {
         tab.selectedProperty().onChange {
             if (it) {
-                tabPane.tabs[1].select()
+                tabPane.tabs[selected.value].select()
                 val filter = FileChooser.ExtensionFilter(
                     "PDB files (.pdb, .PDB)",
                     "*.pdb", "*.PDB"

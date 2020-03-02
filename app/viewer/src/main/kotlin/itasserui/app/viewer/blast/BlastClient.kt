@@ -3,22 +3,21 @@ package itasserui.app.viewer.blast
 import arrow.core.Failure
 import arrow.core.Success
 import arrow.core.Try
+import arrow.data.Valid
 import arrow.data.Validated
 import arrow.data.invalid
 import arrow.data.valid
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.squareup.okhttp.*
-import itasserui.app.viewer.events.BlastAlreadyRunningEvent
-import itasserui.app.viewer.events.BlastEndedEvent
-import itasserui.app.viewer.events.BlastStartedEvent
-import itasserui.app.viewer.events.BlastStatusEvent
+import itasserui.app.viewer.events.*
 import itasserui.common.utils.safeWait
 import javafx.application.Platform
 import tornadofx.Controller
 import tornadofx.FXEvent
 import tornadofx.isLong
 
+// TODO add response code checks
 class BlastClient : Controller() {
     data class BlastDetailsEvent(val requestID: String, val timeEstimate: Long) : FXEvent()
 
@@ -37,8 +36,8 @@ class BlastClient : Controller() {
             .build()
 
         return when (val response = Try { client.newCall(request).execute() }) {
-            is Failure -> HTTPException(response.exception).invalid()
-            is Success -> parseResponse(response.value)
+            is Failure -> HTTPException(response.exception).also { println(it) } .invalid()
+            is Success -> parseResponse(response.value).also { println(it) }
         }
     }
 
@@ -51,6 +50,19 @@ class BlastClient : Controller() {
         return when (val response = Try { client.newCall(request).execute() }) {
             is Failure -> HTTPException(response.exception).invalid()
             is Success -> parseStatus(response.value)
+        }
+    }
+
+    fun getRemoteAlignmentRequest(rid: String): Validated<BlastServiceError, String> {
+        val query = remoteAlignmentRequest(rid)
+        val request = Request.Builder()
+            .url("$url?${query.urlEncoded}")
+            .header("Content-Type", "text/plain")
+            .get().build()
+
+        return when (val response = Try { client.newCall(request).execute() }) {
+            is Failure -> HTTPException(response.exception).invalid()
+            is Success -> remoteAlignmentText(response.value).valid()
         }
     }
 
@@ -76,7 +88,21 @@ class BlastClient : Controller() {
         } while (service.status == BlastStatus.Waiting)
         running = false
         fire(BlastEndedEvent)
+        when (val alignments = getRemoteAlignmentRequest(rid)){
+            is Valid -> fire(BlastRemoteAlignmentsEvent(alignments.a))
+        }
+
+
         // TODO Remote alignments
+    }
+
+
+
+    private fun remoteAlignmentText(response: Response): String {
+        val body = response.body().string()
+        val text = body.substringAfter("<PRE>")
+        println(text)
+        return text
     }
 
     private fun parseStatus(response: Response):
@@ -164,4 +190,18 @@ class BlastStatusRequest {
     val urlEncoded
         get() =
             "CMD=$cmd&RID=$rid&FORMAT_OBJECT=$formatObject"
+}
+
+fun remoteAlignmentRequest(rid: String? = "", op: BlastRemoteAlignmentsRequest.() -> Unit = {}) =
+    BlastRemoteAlignmentsRequest().apply(op).apply { this.rid = rid }
+
+class BlastRemoteAlignmentsRequest {
+    val cmd: String = "Get"
+    var rid: String? = null
+    @JsonProperty("FORMAT_TYPE")
+    val formatType: String = "Text"
+
+    val urlEncoded
+        get() =
+            "CMD=$cmd&RID=$rid&FORMAT_TYPE=$formatType"
 }
