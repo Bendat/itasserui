@@ -12,7 +12,6 @@ import javafx.scene.transform.Rotate
 import tornadofx.isDouble
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.*
 
 enum class ShapeType {
     HELIX,
@@ -125,8 +124,21 @@ object PDBParser : Logger {
         struct: Shape,
         type: SecondaryStructureType
     ): SecondaryStructure {
-        val res = residues.filter { it.sequenceNo >= struct.start && it.sequenceNo <= struct.end }
-        return SecondaryStructure(type, res)
+//        val res = residues.filter { it.sequenceNo >= struct.start && it.sequenceNo <= struct.end }
+//        var current: SecondaryStructure? = null
+        var currentList: ArrayList<Residue>? = null
+        for (res in residues) {
+            if (currentList == null && res.sequenceNo == struct.start) {
+                currentList = arrayListOf()
+                currentList.add(res)
+            } else if (currentList != null && res.sequenceNo != struct.end) {
+                currentList.add(res)
+            }else if(currentList != null && res.sequenceNo == struct.end){
+                currentList.add(res)
+                break
+            }
+        }
+        return SecondaryStructure(type, currentList ?: listOf())
     }
 
     private fun handleGlycine(residue: Residue): Residue {

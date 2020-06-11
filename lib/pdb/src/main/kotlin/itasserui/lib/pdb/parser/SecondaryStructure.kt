@@ -17,6 +17,7 @@ sealed class SecondaryStructureType {
 
 object Betasheet : SecondaryStructureType()
 object Alphahelix : SecondaryStructureType()
+object Coil : SecondaryStructureType()
 
 class SecondaryStructure(val structureType: SecondaryStructureType, residues: List<Residue>) :
     MutableList<Residue> by arrayListOf(*residues.toTypedArray()) {

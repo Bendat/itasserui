@@ -52,12 +52,6 @@ object PDBParser : Logger {
         // Bond the atoms together in a correct way, since a PDB dous not give awa information about
         // how the atoms are connected
         setUpBonds(pdbEntry)
-        info { "Atom is ${atomArrayList.last()}" }
-        info { "Atom is ${atomArrayList.last().chemicalElement}" }
-        info { "Atom is ${atomArrayList.last().residue.resNum}" }
-        info { "Helix is ${helices}" }
-        info { "beta is ${betaSheets}" }
-        info { "residue is ${residues.last()}" }
         // Something went wrong, could not parse any nodes. Maybe wrong file format?
         if (pdbEntry.nodes.size == 0) {
             throw Exception("No nodes were read from PDB file. Exiting.")

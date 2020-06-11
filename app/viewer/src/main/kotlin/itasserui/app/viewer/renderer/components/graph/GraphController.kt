@@ -186,11 +186,6 @@ class GraphView : View() {
 
     override val root = group {}
 
-    fun bind(atomScaling: DoubleProperty, bondScaling: DoubleProperty) {
-        scaling.atoms.bind(atomScaling)
-        scaling.bonds.bind(bondScaling)
-    }
-
     private fun setControllerListener() {
         controller.pdbProperty.onChange { change ->
             println("Change is $change")

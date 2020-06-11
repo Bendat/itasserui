@@ -8,6 +8,7 @@ import itasserui.app.viewer.renderer.components.graph.GraphController
 import itasserui.app.viewer.renderer.components.graph.GraphView
 import itasserui.app.viewer.renderer.components.graph.ScalingController
 import itasserui.app.viewer.ui.components.CountView
+import itasserui.app.viewer.ui.components.chart.BarChartView
 import itasserui.app.viewer.ui.components.tab.viewer.ViewTabView
 import itasserui.lib.pdb.parser.PDBParser
 import javafx.beans.property.IntegerProperty
@@ -47,7 +48,14 @@ class Viewer : View("PDB Viewer") {
             }
             tab("Stats") {
                 selectedProperty().onChange { selected.value = 2 }
-
+                borderpane {
+                    fitToParentSize()
+                    center {
+                        this.fitToParentSize()
+                        add<BarChartView>() {
+                        }
+                    }
+                }
             }
             tab("Blast") {
                 selectedProperty().onChange { selected.value = 3 }

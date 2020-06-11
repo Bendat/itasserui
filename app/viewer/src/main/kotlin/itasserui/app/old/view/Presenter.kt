@@ -802,6 +802,7 @@ class Presenter
             info{"New residues are $residues"}
             selectionModel.items = residues.toList()
             // Compute charts
+//            println("AHC is ${pdbModel.alphaHelixContent.map { it.key }}")
             view.secondaryStructureContentStackedBarChart.initialize(
                 pdbModel.alphaHelixContent,
                 pdbModel.betaSheetContent,

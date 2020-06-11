@@ -171,7 +171,25 @@ class PDBEntry {
 
     private fun getHelix(structureType: StructureType?): HashMap<Residue.AminoAcid, Int> {
         val result = HashMap<Residue.AminoAcid, Int>()
+        val res = residues.flatMap { it.atoms.map { it.text } }
+        val map = mutableMapOf<StructureType?, MutableList<Residue.AminoAcid?>?>()
+
         for (r in residues) {
+            if (r.secondaryStructure?.secondaryStructureType !in map) {
+                val type: StructureType? = r.secondaryStructure?.secondaryStructureType
+                val list: MutableList<Residue.AminoAcid?>? =
+                    r.secondaryStructure?.residuesContained?.map { it.aminoAcid }?.toMutableList<Residue.AminoAcid?>()
+                        ?: mutableListOf()
+                map[type] = list
+            }
+            if (r.secondaryStructure == null) {
+                if (map[null] == null) map[null] = arrayListOf()
+                map[null]?.add(r.aminoAcid)
+            }
+        }
+        println(map)
+        for (r in residues) {
+
             if (r.secondaryStructure != null && r.secondaryStructure?.secondaryStructureType == structureType) {
                 if (result.containsKey(r.aminoAcid)) {
                     result[r.aminoAcid] = result[r.aminoAcid]!! + 1

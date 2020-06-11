@@ -1,8 +1,10 @@
 package itasserui.test_utils.matchers
 
 import arrow.core.*
+import arrow.data.Validated
 import io.kotlintest.Matcher
 import io.kotlintest.MatcherResult
+import org.apache.commons.lang3.Validate
 import org.skyscreamer.jsonassert.JSONAssert
 import java.lang.Math.abs
 
@@ -57,6 +59,13 @@ object Be {
         override fun test(value: Either<*, *>): MatcherResult {
             val result = value.fold({ false }) { true }
             return MatcherResult(result, "Outcome [$value] should be OK", "Outcome [$value] should not be OK")
+        }
+    }
+
+    fun valid() = object : Matcher<Validated<*, *>> {
+        override fun test(value: Validated<*, *>): MatcherResult {
+            val result = value.fold({ false }) { true }
+            return MatcherResult(result, "Outcome [$value] should be Valid", "Outcome [$value] should not be Valid")
         }
     }
 

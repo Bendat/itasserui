@@ -133,6 +133,7 @@ class BlastServiceView : View() {
                     }
 
                     subscribe<BlastEndedEvent> {
+                        controller.status = BlastStatus.Cancelled
                         timer?.cancel()
                         timer?.purge()
                     }

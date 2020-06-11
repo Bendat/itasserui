@@ -10,9 +10,8 @@ import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.StackedBarChart
 import javafx.scene.chart.XYChart
 import javafx.scene.control.Tooltip
-
-import java.util.Arrays
-import java.util.HashMap
+import tornadofx.onChange
+import java.util.*
 
 /**
  * Stacked Bar chart to present some stats of the loaded PDB file.
@@ -31,6 +30,7 @@ class MyStackedBarChart : Group() {
         aminoAcidCountCoil: HashMap<Residue.AminoAcid, Int>,
         widthProperty: ReadOnlyDoubleProperty, heightProperty: ReadOnlyDoubleProperty
     ) {
+        println("Sheets are $aminoAcidCountBeta")
         stackedBarChart.title = "Amino Acids in Secondary Structures"
         xAxis.label = "Secondary Structure"
         xAxis.categories = FXCollections.observableArrayList(Arrays.asList(alpha, beta, coil))
@@ -46,18 +46,23 @@ class MyStackedBarChart : Group() {
                 if (aminoAcidCountAlpha.containsKey(aaType)) {
                     data = XYChart.Data(alpha, aminoAcidCountAlpha[aaType]!!)
                     current.data.add(data)
-                    Tooltip.install(
-                        data.node,
-                        Tooltip(Residue.getName(aaType) + ", #Occurences: " + aminoAcidCountAlpha[aaType])
-                    )
+                    data.nodeProperty().onChange {
+                        Tooltip.install(
+                            it,
+                            Tooltip(Residue.getName(aaType) + ", #Occurences: " + aminoAcidCountAlpha[aaType])
+                        )
+                    }
+
                 }
                 if (aminoAcidCountBeta.containsKey(aaType)) {
                     data = XYChart.Data(beta, aminoAcidCountBeta[aaType]!!)
                     current.data.add(data)
-                    Tooltip.install(
-                        data.node,
-                        Tooltip(Residue.getName(aaType) + ", #Occurences: " + aminoAcidCountBeta[aaType])
-                    )
+                    data.nodeProperty().onChange {
+                        Tooltip.install(
+                            it,
+                            Tooltip(Residue.getName(aaType) + ", #Occurences: " + aminoAcidCountBeta[aaType])
+                        )
+                    }
 
                 }
                 if (aminoAcidCountCoil.containsKey(aaType)) {

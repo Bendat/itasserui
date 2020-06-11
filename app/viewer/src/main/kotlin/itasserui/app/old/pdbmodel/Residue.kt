@@ -31,6 +31,7 @@ class Residue(var resNum: String, aminoAcid: String) {
     /**
      * If the residue is part of a secondary structure it is referenced here, else null.
      */
+    // TODO this being  null is  where coils are defined
     var secondaryStructure: SecondaryStructure? = null
 
     /**

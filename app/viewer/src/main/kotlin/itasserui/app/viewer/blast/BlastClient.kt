@@ -36,7 +36,7 @@ class BlastClient : Controller() {
             .build()
 
         return when (val response = Try { client.newCall(request).execute() }) {
-            is Failure -> HTTPException(response.exception).also { println(it) } .invalid()
+            is Failure -> HTTPException(response.exception).also { println(it) }.invalid()
             is Success -> parseResponse(response.value).also { println(it) }
         }
     }
@@ -74,6 +74,7 @@ class BlastClient : Controller() {
         }
         running = true
         do {
+            safeWait(5000)
             val status = getStatus(rid)
             status.map {
                 val event = BlastStatusEvent(it)
@@ -83,19 +84,17 @@ class BlastClient : Controller() {
                 cancelled = false
                 break
             }
-            safeWait(5000)
             print(service.status == BlastStatus.Waiting)
         } while (service.status == BlastStatus.Waiting)
         running = false
         fire(BlastEndedEvent)
-        when (val alignments = getRemoteAlignmentRequest(rid)){
-            is Valid -> fire(BlastRemoteAlignmentsEvent(alignments.a))
+        when (val alignments = getRemoteAlignmentRequest(rid)) {
+            is Valid -> if (!cancelled) fire(BlastRemoteAlignmentsEvent(alignments.a))
         }
 
 
         // TODO Remote alignments
     }
-
 
 
     private fun remoteAlignmentText(response: Response): String {
